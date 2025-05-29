@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +6,7 @@
     <title>Sekací zóny a Pracovní čas</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             margin: 0;
@@ -200,7 +162,7 @@
                 max-height: 70vh;
             }
         }
-        @media (max-width: 430px) and (max-height: 932px) { /* iPhone 15 */
+        @media (max-width: 430px) and (max-height: 932px) {
             .controls-container {
                 max-height: 50vh;
             }
@@ -250,6 +212,11 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Inicializace Supabase
+        const supabaseUrl = 'https://xxsdcsnqxdrhvclaeyij.supabase.co'; // Např. https://xyz.supabase.co
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4c2Rjc25xeGRyaHZjbGFleWlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1NDEwNTMsImV4cCI6MjA2NDExNzA1M30.5L22I1HzvuR6DbVN37DmnCfwbXrPoVGoCyUYJEDYVvM';
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
         // Inicializace mapy
         const map = L.map('map').setView([49.4287294, 14.2014521], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -285,11 +252,39 @@
             return interpolateColor(progress);
         }
 
-        // Načtení zón z localStorage
-        let zones = JSON.parse(localStorage.getItem('mowingZones')) || [];
+        // Načtení zón z Supabase
+        let zones = [];
         const zoneLayers = {};
+        async function loadZones() {
+            const { data, error } = await supabase
+                .from('mowing_zones')
+                .select('*');
+            if (error) {
+                console.error('Chyba při načítání zón:', error);
+                zones = [];
+            } else {
+                zones = data || [];
+            }
+            renderZones();
+        }
 
-        // Funkce pro zobrazení zón na mapě
+        // Uložení zón do Supabase
+        async function saveZones() {
+            await supabase.from('mowing_zones').delete().neq('id', '');
+            const { error } = await supabase.from('mowing_zones').insert(zones);
+            if (error) console.error('Chyba při ukládání zón:', error);
+            renderZones();
+        }
+
+        // Real-time aktualizace zón
+        supabase
+            .channel('mowing_zones')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'mowing_zones' }, () => {
+                loadZones();
+            })
+            .subscribe();
+
+        // Zobrazení zón na mapě
         function renderZones() {
             Object.keys(zoneLayers).forEach(id => {
                 map.removeLayer(zoneLayers[id]);
@@ -297,7 +292,7 @@
             });
 
             zones.forEach(zone => {
-                const color = getZoneColor(zone.lastMowed, zone.mowInterval);
+                const color = getZoneColor(zone.last_mowed, zone.mow_interval);
                 const poly = L.polygon(zone.coordinates, {
                     color: color,
                     weight: 2,
@@ -308,7 +303,7 @@
 
                 poly.bindPopup(`
                     <b>Zóna: ${zone.name}</b><br>
-                    Interval sekání: <input type="number" id="interval-${zone.id}" value="${zone.mowInterval}" min="1"> dní<br>
+                    Interval sekání: <input type="number" id="interval-${zone.id}" value="${zone.mow_interval}" min="1"> dní<br>
                     <button onclick="updateZone('${zone.id}')">Uložit</button>
                     <button onclick="markAsMowed('${zone.id}')">Označit jako posekané</button>
                     <button onclick="deleteZone('${zone.id}')">Smazat</button>
@@ -318,16 +313,16 @@
             renderZoneList();
         }
 
-        // Funkce pro zobrazení seznamu zón
+        // Zobrazení seznamu zón
         function renderZoneList() {
             const zoneList = document.getElementById('zoneList');
             zoneList.innerHTML = '';
             zones.forEach(zone => {
-                const color = getZoneColor(zone.lastMowed, zone.mowInterval);
-                const lastMowed = zone.lastMowed ? new Date(zone.lastMowed).toLocaleDateString('cs-CZ') : 'Nikdy';
+                const color = getZoneColor(zone.last_mowed, zone.mow_interval);
+                const lastMowed = zone.last_mowed ? new Date(zone.last_mowed).toLocaleDateString('cs-CZ') : 'Nikdy';
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <span style="color: ${color};">●</span> ${zone.name} - Poslední sekání: ${lastMowed}, Interval: ${zone.mowInterval} dní
+                    <span style="color: ${color};">●</span> ${zone.name} - Poslední sekání: ${lastMowed}, Interval: ${zone.mow_interval} dní
                     <button class="mow-btn" onclick="markAsMowed('${zone.id}')">Posekat</button>
                     <button class="delete-btn" onclick="deleteZone('${zone.id}')">Smazat</button>
                 `;
@@ -335,43 +330,36 @@
             });
         }
 
-        // Funkce pro uložení zón
-        function saveZones() {
-            localStorage.setItem('mowingZones', JSON.stringify(zones));
-            renderZones();
-        }
-
-        // Funkce pro aktualizaci zóny
-        window.updateZone = function(id) {
+        // Aktualizace zóny
+        window.updateZone = async function(id) {
             const zone = zones.find(z => z.id === id);
             const intervalInput = document.getElementById(`interval-${id}`);
-            zone.mowInterval = parseInt(intervalInput.value) || 14;
+            zone.mow_interval = parseInt(intervalInput.value) || 14;
             zone.name = prompt('Zadejte název zóny:', zone.name) || zone.name;
-            saveZones();
+            await saveZones();
         };
 
-        // Funkce pro označení jako posekané
-        window.markAsMowed = function(id) {
+        // Označení jako posekané
+        window.markAsMowed = async function(id) {
             const zone = zones.find(z => z.id === id);
-            zone.lastMowed = new Date().toISOString();
+            zone.last_mowed = new Date().toISOString();
             alert(`Zóna ${zone.name} označena jako posekaná.`);
-            saveZones();
+            await saveZones();
         };
 
-        // Funkce pro smazání zóny
-        window.deleteZone = function(id) {
+        // Smazání zóny
+        window.deleteZone = async function(id) {
             if (confirm('Opravdu smazat tuto zónu?')) {
                 zones = zones.filter(z => z.id !== id);
-                saveZones();
+                await saveZones();
             }
         };
 
-        // Funkce pro smazání všech zón
-        document.getElementById('clearAll').addEventListener('click', () => {
+        // Smazání všech zón
+        document.getElementById('clearAll').addEventListener('click', async () => {
             if (confirm('Opravdu smazat všechny zóny?')) {
                 zones = [];
-                localStorage.removeItem('mowingZones');
-                renderZones();
+                await saveZones();
             }
         });
 
@@ -409,7 +397,7 @@
             }).addTo(map);
         });
 
-        function onKeyPress(e) {
+        async function onKeyPress(e) {
             if (e.key === 'Enter' && points.length >= 3) {
                 drawing = false;
                 map.getContainer().style.cursor = '';
@@ -421,10 +409,10 @@
                     id: generateUUID(),
                     coordinates: points,
                     name: name,
-                    lastMowed: null,
-                    mowInterval: 14
+                    last_mowed: null,
+                    mow_interval: 14
                 });
-                saveZones();
+                await saveZones();
             } else if (e.key === 'Escape') {
                 drawing = false;
                 map.getContainer().style.cursor = '';
@@ -451,13 +439,38 @@
         });
 
         // Počítadlo pracovního času
-        let shift = JSON.parse(localStorage.getItem('shift')) || {
-            startTime: null,
-            pauses: [],
-            endTime: null,
-            totalWorked: 0
-        };
+        let shift = { start_time: null, pauses: [], end_time: null, total_worked: 0 };
         let timerInterval = null;
+
+        async function loadShift() {
+            const { data, error } = await supabase
+                .from('shift')
+                .select('*')
+                .order('id', { ascending: false })
+                .limit(1);
+            if (error || !data.length) {
+                console.error('Chyba při načítání směny:', error);
+                shift = { start_time: null, pauses: [], end_time: null, total_worked: 0 };
+            } else {
+                shift = data[0];
+            }
+            initializeTimer();
+        }
+
+        async function saveShift() {
+            const { error } = await supabase
+                .from('shift')
+                .upsert([shift]);
+            if (error) console.error('Chyba při ukládání směny:', error);
+        }
+
+        // Real-time aktualizace směny
+        supabase
+            .channel('shift')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'shift' }, () => {
+                loadShift();
+            })
+            .subscribe();
 
         function formatTime(seconds) {
             const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
@@ -467,9 +480,9 @@
         }
 
         function updateTimer() {
-            if (!shift.startTime || shift.endTime) return;
+            if (!shift.start_time || shift.end_time) return;
             const now = new Date();
-            let totalSeconds = Math.floor((now - new Date(shift.startTime)) / 1000);
+            let totalSeconds = Math.floor((now - new Date(shift.start_time)) / 1000);
             shift.pauses.forEach(pause => {
                 if (pause.start && pause.end) {
                     totalSeconds -= Math.floor((new Date(pause.end) - new Date(pause.start)) / 1000);
@@ -478,18 +491,33 @@
                 }
             });
             document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(totalSeconds)}`;
-            shift.totalWorked = totalSeconds;
-            localStorage.setItem('shift', JSON.stringify(shift));
+            shift.total_worked = totalSeconds;
+            saveShift();
         }
 
-        document.getElementById('startShift').addEventListener('click', () => {
-            if (!shift.startTime || shift.endTime) {
+        function initializeTimer() {
+            if (shift.start_time && !shift.end_time) {
+                document.getElementById('startShift').disabled = true;
+                document.getElementById('startPause').disabled = false;
+                document.getElementById('endShift').disabled = false;
+                timerInterval = setInterval(updateTimer, 1000);
+                updateTimer();
+            } else {
+                document.getElementById('startPause').disabled = true;
+                document.getElementById('endShift').disabled = true;
+                document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(shift.total_worked || 0)}`;
+            }
+        }
+
+        document.getElementById('startShift').addEventListener('click', async () => {
+            if (!shift.start_time || shift.end_time) {
                 shift = {
-                    startTime: new Date().toISOString(),
+                    start_time: new Date().toISOString(),
                     pauses: [],
-                    endTime: null,
-                    totalWorked: 0
+                    end_time: null,
+                    total_worked: 0
                 };
+                await saveShift();
                 timerInterval = setInterval(updateTimer, 1000);
                 document.getElementById('startShift').disabled = true;
                 document.getElementById('startPause').disabled = false;
@@ -498,48 +526,36 @@
             }
         });
 
-        document.getElementById('startPause').addEventListener('click', () => {
+        document.getElementById('startPause').addEventListener('click', async () => {
             const lastPause = shift.pauses[shift.pauses.length - 1];
             if (lastPause && !lastPause.end) {
                 lastPause.end = new Date().toISOString();
             } else {
                 shift.pauses.push({ start: new Date().toISOString(), end: null });
             }
-            localStorage.setItem('shift', JSON.stringify(shift));
+            await saveShift();
             updateTimer();
         });
 
-        document.getElementById('endShift').addEventListener('click', () => {
-            if (shift.startTime && !shift.endTime) {
-                shift.endTime = new Date().toISOString();
+        document.getElementById('endShift').addEventListener('click', async () => {
+            if (shift.start_time && !shift.end_time) {
+                shift.end_time = new Date().toISOString();
                 clearInterval(timerInterval);
                 updateTimer();
-                alert(`Směna ukončena. Celkový odpracovaný čas: ${formatTime(shift.totalWorked)}`);
+                alert(`Směna ukončena. Celkový odpracovaný čas: ${formatTime(shift.total_worked)}`);
                 document.getElementById('startShift').disabled = false;
                 document.getElementById('startPause').disabled = true;
                 document.getElementById('endShift').disabled = true;
-                localStorage.setItem('shift', JSON.stringify(shift));
+                await saveShift();
             }
         });
-
-        // Inicializace časovače
-        if (shift.startTime && !shift.endTime) {
-            document.getElementById('startShift').disabled = true;
-            document.getElementById('startPause').disabled = false;
-            document.getElementById('endShift').disabled = false;
-            timerInterval = setInterval(updateTimer, 1000);
-            updateTimer();
-        } else {
-            document.getElementById('startPause').disabled = true;
-            document.getElementById('endShift').disabled = true;
-            document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(shift.totalWorked || 0)}`;
-        }
 
         // Periodická aktualizace zobrazení pro plynulou změnu barvy
         setInterval(renderZones, 12 * 60 * 60 * 1000); // Aktualizace každých 12 hodin
 
-        // Inicializace zón
-        renderZones();
+        // Inicializace
+        loadZones();
+        loadShift();
     </script>
 </body>
 </html>
