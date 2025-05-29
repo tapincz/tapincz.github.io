@@ -20,7 +20,6 @@
             background: #0a0a0a;
             color: #ffffff;
         }
-        /* Pozadí s částicemi */
         #particles {
             position: fixed;
             top: 0;
@@ -30,19 +29,22 @@
             z-index: -1;
             background: linear-gradient(135deg, #1e1e2f 0%, #2a0a2a 100%);
         }
-        /* Parallax vrstva */
         .parallax-layer {
             position: absolute;
             width: 100%;
             height: 100%;
             top: 0;
             left: 0;
-            opacity: 0.2;
+            opacity: 0.15;
             background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
             z-index: -1;
             transform: translateZ(0);
+            animation: subtlePulse 10s ease-in-out infinite;
         }
-        /* Animace pro navigaci */
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.25; }
+        }
         .nav-item {
             transition: transform 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -60,7 +62,7 @@
             background: #1e1e2f;
             min-width: 160px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            z-index: 1;
+            z-index: 10;
             border-radius: 8px;
             transform: translateY(10px);
             opacity: 0;
@@ -71,7 +73,6 @@
             transform: translateY(0);
             opacity: 1;
         }
-        /* Animace pro mobilní menu */
         .mobile-menu {
             transform: translateY(-100%);
             opacity: 0;
@@ -90,7 +91,6 @@
             transform: translateX(0);
             opacity: 1;
         }
-        /* Animace pro tlačítko */
         .cta-button {
             transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
             background: linear-gradient(45deg, #ef4444, #f472b6);
@@ -99,13 +99,18 @@
             transform: scale(1.1) rotate(3deg);
             box-shadow: 0 8px 20px rgba(244, 114, 182, 0.6);
         }
-        /* Animace pro text */
         .animate-text {
             animation: fadeInUp 1s ease-out;
         }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px) rotate(-2deg); }
             to { opacity: 1; transform: translateY(0) rotate(0); }
+        }
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #ef4444, #f472b6);
+            border-radius: 50%;
+            opacity: 0.3;
         }
     </style>
 </head>
@@ -177,23 +182,22 @@
     <script>
         // Částice
         const particlesDiv = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 30; i++) { // Sníženo na 30 pro lepší výkon
             const particle = document.createElement('div');
-            particle.className = 'absolute bg-white rounded-full opacity-20';
-            const size = Math.random() * 4 + 2;
+            particle.className = 'particle';
+            const size = Math.random() * 3 + 2;
             particle.style.width = `${size}px`;
             particle.style.height = `${size}px`;
             particle.style.left = `${Math.random() * 100}%`;
             particle.style.top = `${Math.random() * 100}%`;
-            particle.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+            particle.style.animation = `float ${Math.random() * 8 + 4}s ease-in-out infinite`;
             particlesDiv.appendChild(particle);
         }
-        // Styl pro animaci částic
         const styleSheet = document.createElement('style');
         styleSheet.textContent = `
             @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-20px); }
+                0%, 100% { transform: translateY(0) translateX(0); }
+                50% { transform: translateY(-15px) translateX(5px); }
             }
         `;
         document.head.appendChild(styleSheet);
@@ -215,3 +219,5 @@
             });
         });
     </script>
+</body>
+</html>
