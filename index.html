@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="tapin.cz - Temný a stylový prostor pro jedinečné zážitky">
+    <meta name="description" content="tapin.cz - Váš prostor pro inspiraci">
     <title>tapin.cz - Domov</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,101 +11,207 @@
         body {
             font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            background: #0a0a0a;
+            color: #ffffff;
         }
-        .menu-transition {
-            transition: all 0.3s ease-in-out;
-        }
-        /* Animované pozadí */
-        .animated-bg {
+        /* Pozadí s částicemi */
+        #particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
             z-index: -1;
-            overflow: hidden;
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a0a2a 100%);
         }
-        .animated-bg::before {
-            content: '';
+        /* Parallax vrstva */
+        .parallax-layer {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-            animation: moveBackground 20s linear infinite;
-            opacity: 0.3;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.2;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+            z-index: -1;
+            transform: translateZ(0);
         }
-        @keyframes moveBackground {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-20%, -20%); }
-            100% { transform: translate(0, 0); }
+        /* Animace pro navigaci */
+        .nav-item {
+            transition: transform 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .nav-item:hover {
+            transform: translateY(-3px) rotate(2deg);
+            color: #f472b6;
+            box-shadow: 0 2px 5px rgba(244, 114, 182, 0.5);
+        }
+        .dropdown {
+            position: relative;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: #1e1e2f;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            border-radius: 8px;
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        /* Animace pro mobilní menu */
+        .mobile-menu {
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .mobile-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .mobile-menu-item {
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+        .mobile-menu-item.animate-in {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        /* Animace pro tlačítko */
+        .cta-button {
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(45deg, #ef4444, #f472b6);
+        }
+        .cta-button:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 8px 20px rgba(244, 114, 182, 0.6);
+        }
+        /* Animace pro text */
+        .animate-text {
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px) rotate(-2deg); }
+            to { opacity: 1; transform: translateY(0) rotate(0); }
         }
     </style>
 </head>
-<body class="bg-transparent text-white">
-    <!-- Animované pozadí -->
-    <div class="animated-bg"></div>
+<body>
+    <!-- Pozadí s částicemi -->
+    <div id="particles"></div>
+    <div class="parallax-layer"></div>
 
     <!-- Navigace -->
-    <header class="bg-black bg-opacity-80 shadow fixed top-0 w-full z-50">
+    <header class="bg-black bg-opacity-90 shadow fixed top-0 w-full z-50">
         <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" class="text-3xl font-bold text-red-500">tapin.cz</a>
-            <button id="menu-toggle" class="md:hidden focus:outline-none">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="/" class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500 animate-text">tapin.cz</a>
+            <button id="menu-toggle" class="md:hidden focus:outline-none transition-transform hover:scale-110">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <ul id="nav-menu" class="hidden md:flex space-x-6">
-                <li><a href="/o-nas" class="text-gray-300 hover:text-red-500 transition">O nás</a></li>
-                <li><a href="/sluzby" class="text-gray-300 hover:text-red-500 transition">Služby</a></li>
-                <li><a href="/kontakt" class="text-gray-300 hover:text-red-500 transition">Kontakt</a></li>
+            <ul id="nav-menu" class="hidden md:flex space-x-8">
+                <li class="dropdown">
+                    <a href="/o-nas" class="text-gray-200 nav-item">O nás</a>
+                    <div class="dropdown-content">
+                        <a href="/o-nas/tym" class="block px-4 py-2 text-gray-200 hover:bg-pink-500 hover:text-white">Náš tým</a>
+                        <a href="/o-nas/historie" class="block px-4 py-2 text-gray-200 hover:bg-pink-500 hover:text-white">Historie</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="/sluzby" class="text-gray-200 nav-item">Služby</a>
+                    <div class="dropdown-content">
+                        <a href="/sluzby/produkty" class="block px-4 py-2 text-gray-200 hover:bg-pink-500 hover:text-white">Produkty</a>
+                        <a href="/sluzby/poradenstvi" class="block px-4 py-2 text-gray-200 hover:bg-pink-500 hover:text-white">Poradenství</a>
+                    </div>
+                </li>
+                <li><a href="/kontakt" class="text-gray-200 nav-item">Kontakt</a></li>
                 <!-- Další položky menu lze přidat zde -->
             </ul>
         </nav>
         <!-- Mobilní menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-90 shadow-lg">
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-black bg-opacity-95 shadow-lg">
             <ul class="flex flex-col space-y-4 p-4">
-                <li><a href="/o-nas" class="text-gray-300 hover:text-red-500 transition">O nás</a></li>
-                <li><a href="/sluzby" class="text-gray-300 hover:text-red-500 transition">Služby</a></li>
-                <li><a href="/kontakt" class="text-gray-300 hover:text-red-500 transition">Kontakt</a></li>
+                <li><a href="/o-nas" class="text-gray-200 mobile-menu-item">O nás</a></li>
+                <li><a href="/sluzby" class="text-gray-200 mobile-menu-item">Služby</a></li>
+                <li><a href="/kontakt" class="text-gray-200 mobile-menu-item">Kontakt</a></li>
                 <!-- Další položky mobilního menu lze přidat zde -->
             </ul>
         </div>
     </header>
 
     <!-- Hlavní obsah -->
-    <main class="container mx-auto px-4 pt-24 pb-12 relative z-10">
+    <main class="container mx-auto px-4 py-12 relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
         <section class="text-center">
-            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">Vítej na tapin.cz</h1>
-            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Objev temný a jedinečný svět plný inspirace a stylových zážitků.
+            <h1 class="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500 mb-6 animate-text">tapin.cz</h1>
+            <p class="text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-text" style="animation-delay: 0.2s;">
+                Objev svět tapin.cz a ponoř se do inspirace.
             </p>
-            <a href="/sluzby" class="inline-block bg-red-500 text-white px-8 py-4 rounded-full hover:bg-red-600 transition transform hover:scale-105">
-                Začni objevovat
+            <a href="/sluzby" class="cta-button inline-block text-white px-10 py-5 rounded-full text-lg">
+                Začni teď
             </a>
         </section>
     </main>
 
     <!-- Patička -->
-    <footer class="bg-black bg-opacity-80 text-white py-8 relative z-10">
+    <footer class="bg-black bg-opacity-90 text-white py-6 relative z-10 w-full">
         <div class="container mx-auto px-4 text-center">
-            <p>© 2025 tapin.cz. Všechna práva vyhrazena.</p>
-            <div class="mt-4 space-x-4">
-                <a href="/ochrana-osobnich-udaju" class="text-gray-400 hover:text-red-500">Ochrana osobních údajů</a>
-                <a href="/podminky-pouzivani" class="text-gray-400 hover:text-red-500">Podmínky používání</a>
-            </div>
+            <p class="animate-text text-gray-300">© 2025 tapin.cz. Všechna práva vyhrazena.</p>
         </div>
     </footer>
 
-    <!-- JavaScript pro otevírání/zavírání mobilního menu -->
+    <!-- JavaScript pro částice a menu -->
     <script>
+        // Částice
+        const particlesDiv = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'absolute bg-white rounded-full opacity-20';
+            const size = Math.random() * 4 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+            particlesDiv.appendChild(particle);
+        }
+        // Styl pro animaci částic
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Mobilní menu
         const menuToggle = document.getElementById('menu-toggle');
         const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
 
         menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            mobileMenu.classList.toggle('menu-transition');
+            const isOpen = !mobileMenu.classList.contains('open');
+            mobileMenu.classList.toggle('open', isOpen);
+            mobileMenu.classList.toggle('mobile-menu', !isOpen);
+
+            mobileMenuItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.toggle('animate-in', isOpen);
+                }, index * 100);
+            });
         });
     </script>
-</body>
-</html>
