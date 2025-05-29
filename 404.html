@@ -3,25 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Stránka nenalezena | tapin.cz</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-    </style>
+    <title>404 - Stránka nenalezena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen">
-    <div class="text-center bg-gray-800 p-10 rounded-xl shadow-2xl">
-        <h1 class="text-6xl font-bold text-red-500 pulse">404</h1>
-        <h2 class="text-3xl font-semibold mt-4">Stránka nenalezena</h2>
-        <p class="mt-4 text-lg max-w-md mx-auto">Jejda, tady nic není. Zkuste se vrátit na <a href="index.html" class="text-blue-400 hover:underline">domovskou stránku</a>.</p>
-        <a href="index.html" class="mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300">Zpět na domů</a>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold text-blue-400">404 - Zabloudil jsi, kámo!</h1>
+        <p class="mt-4 text-lg text-gray-300">Tady nic není, ale neboj, vrátíme tě zpět.</p>
+        <a href="index.html" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Zpět na úvod</a>
     </div>
 </body>
 </html>
