@@ -1,0 +1,185 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="tapin.cz - Stránka nenalezena">
+    <title>tapin.cz - Stránka nenalezena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            z-index: -1;
+            overflow: hidden;
+        }
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            animation: moveBackground 15s linear infinite;
+            opacity: 0.3;
+        }
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-15%, -15%); }
+            100% { transform: translate(0, 0); }
+        }
+        /* Animace pro text */
+        .animate-text {
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Animace pro tlačítko */
+        .cta-button {
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        /* Animace pro chybový kód */
+        .error-code {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="bg-transparent text-white">
+    <!-- Animované pozadí -->
+    <div class="animated-bg"></div>
+
+    <!-- Navigace -->
+    <header class="bg-black bg-opacity-80 shadow fixed top-0 w-full z-50">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-3xl font-bold text-red-500 animate-text">tapin.cz</a>
+            <button id="menu-toggle" class="md:hidden focus:outline-none transition-transform hover:scale-110">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <ul id="nav-menu" class="hidden md:flex space-x-6">
+                <li><a href="/o-nas" class="text-gray-300 transition hover:text-red-500 hover:transform hover:-translate-y-0.5">O nás</a></li>
+                <li><a href="/sluzby" class="text-gray-300 transition hover:text-red-500 hover:transform hover:-translate-y-0.5">Služby</a></li>
+                <li><a href="/kontakt" class="text-gray-300 transition hover:text-red-500 hover:transform hover:-translate-y-0.5">Kontakt</a></li>
+                <!-- Další položky menu lze přidat zde -->
+            </ul>
+        </nav>
+        <!-- Mobilní menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-black bg-opacity-90 shadow-lg">
+            <ul class="flex flex-col space-y-4 p-4">
+                <li><a href="/o-nas" class="text-gray-300 mobile-menu-item">O nás</a></li>
+                <li><a href="/sluzby" class="text-gray-300 mobile-menu-item">Služby</a></li>
+                <li><a href="/kontakt" class="text-gray-300 mobile-menu-item">Kontakt</a></li>
+                <!-- Další položky mobilního menu lze přidat zde -->
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hlavní obsah -->
+    <main class="container mx-auto px-4 py-12 relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
+        <section class="text-center">
+            <h1 class="text-7xl md:text-9xl font-bold text-red-500 mb-6 error-code">404</h1>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 animate-text">Stránka nenalezena</h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-text" style="animation-delay: 0.2s;">
+                Omlouváme se, ale tato stránka neexistuje. Možná jste se ztratili v temném světě tapin.cz.
+            </p>
+            <a href="/" class="cta-button inline-block bg-red-500 text-white px-8 py-4 rounded-full">
+                Zpět na hlavní stránku
+            </a>
+        </section>
+    </main>
+
+    <!-- Patička -->
+    <footer class="bg-black bg-opacity-80 text-white py-8 relative z-10 w-full">
+        <div class="container mx-auto px-4 text-center">
+            <p class="animate-text">© 2025 tapin.cz. Všechna práva vyhrazena.</p>
+            <div class="mt-4 space-x-4">
+                <a href="/ochrana-osobnich-udaju" class="text-gray-400 hover:text-red-500 transition hover:transform hover:-translate-y-0.5">Ochrana osobních údajů</a>
+                <a href="/podminky-pouzivani" class="text-gray-400 hover:text-red-500 transition hover:transform hover:-translate-y-0.5">Podmínky používání</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript pro otevírání/zavírání mobilního menu a animace -->
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = !mobileMenu.classList.contains('open');
+            mobileMenu.classList.toggle('open', isOpen);
+            mobileMenu.classList.toggle('mobile-menu', !isOpen);
+
+            mobileMenuItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.toggle('animate-in', isOpen);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
