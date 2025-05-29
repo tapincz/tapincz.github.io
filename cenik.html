@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ceník Kiosku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: -apple-system, Roboto, sans-serif;
+            background: #1C2526;
+            color: #FFF;
+            margin: 15px;
+            user-select: none;
+            overflow-x: hidden;
+            animation: fadeIn .5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #FFF;
+            margin-bottom: 15px;
+        }
+        .search-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #search {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            font-size: 18px;
+            border: 1px solid #3A4647;
+            border-radius: 12px;
+            background: #2D3839;
+            color: #FFF;
+            transition: transform .2s, box-shadow .2s;
+            touch-action: manipulation;
+        }
+        #search:focus {
+            outline: none;
+            transform: scale(1.02);
+            box-shadow: 0 0 8px rgba(0, 122, 255, .3);
+        }
+        .clear-btn {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #E8ECEF;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .category {
+            margin-bottom: 20px;
+            background: #2D3839;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideIn .5s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .category.hidden {
+            display: none;
+        }
+        .category h2 {
+            font-size: 20px;
+            font-weight: 500;
+            background: #007AFF;
+            color: #FFF;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            font-size: 16px;
+            background: #3A4647;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: transform .2s;
+            animation: slideIn .3s ease-out;
+        }
+        .item:hover {
+            transform: translateY(-2px);
+        }
+        .item.hidden {
+            display: none;
+        }
+        .item.match {
+            font-size: 24px;
+            font-weight: 500;
+            padding: 15px;
+            background: #007AFF;
+            color: #FFF;
+            border: 1px solid #3A4647;
+            border-radius: 12px;
+            margin: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.3);
+            animation: popIn .3s ease-out;
+        }
+        .item.fuzzy-match {
+            font-size: 20px;
+            padding: 15px;
+            background: #005BB5;
+            color: #FFF;
+            border: 1px solid #3A4647;
+            border-radius: 12px;
+            margin: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.2);
+            animation: popIn .3s ease-out;
+        }
+        @keyframes popIn {
+            from { transform: scale(.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007AFF;
+            color: #FFF;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,.4);
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .floating-btn:hover {
+            background: #005BB5;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.7);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn .3s ease-in;
+        }
+        .modal-content {
+            background: #2D3839;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 600px;
+            color: #FFF;
+            position: relative;
+            animation: modalPop .3s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-content h2 {
+            font-size: 24px;
+            color: #007AFF;
+            margin-bottom: 15px;
+        }
+        .modal-content h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            color: #E8ECEF;
+        }
+        .modal-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #E8ECEF;
+            cursor: pointer;
+        }
+        @keyframes shake {
+            0% { transform: scale(1.02) rotate(0deg); }
+            25% { transform: scale(1.02) rotate(2deg); }
+            50% { transform: scale(1.02) rotate(0deg); }
+            75% { transform: scale(1.02) rotate(-2deg); }
+            100% { transform: scale(1.02) rotate(0deg); }
+        }
+        .clear-btn:active {
+            animation: rotate .3s ease-out;
+        }
+        @keyframes rotate {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            #search { font-size: 16px; }
+            .item { font-size: 14px; }
+            .item.match { font-size: 20px; }
+            .item.fuzzy-match { font-size: 18px; }
+            .modal-content { margin: 15% 10px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Placeholder for your pricing list content -->
+    <h1>Ceník Kiosku</h1>
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Hledej položku..." oninput="filterItems()">
+        <span class="clear-btn" onclick="clearSearch()">✖ Zavřít</span>
+    </div>
+    <div class="category">
+        <h2>Pípa, točené</h2>
+        <div class="item"><span>Zlatý Bažant 12 0,3l</span><span>39 Kč</span></div>
+        <div class="item"><span>Zlatý Bažant 12 0,5l</span><span>65 Kč</span></div>
+        <!-- Your additional items here -->
+    </div>
+    <!-- Additional categories and items from your provided code -->
+    <div class="category">
+        <h2>Jídlo</h2>
+        <div class="item"><span>Klobása + chléb + hořčice</span><span>90 Kč</span></div>
+        <!-- Your additional items here -->
+    </div>
+    <!-- Include all other categories as per your provided code -->
+    <div class="floating-btn" onclick="openModal()">🍹</div>
+    <div class="modal" id="recipesModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <h2>Recepty na nápoje</h2>
+            <!-- Your recipe content here -->
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script>
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+        // Your provided JavaScript for filtering items
+        function levenshteinDistance(a, b) {
+            const m = [];
+            for (let i = 0; i <= b.length; i++) m[i] = [i];
+            for (let j = 0; j <= a.length; j++) m[0][j] = j;
+            for (let i = 1; i <= b.length; i++)
+                for (let j = 1; j <= a.length; j++)
+                    m[i][j] = b.charAt(i - 1) === a.charAt(j - 1) ? m[i - 1][j - 1] : Math.min(
+                        m[i - 1][j - 1] + 1,
+                        m[i][j - 1] + 1,
+                        m[i - 1][j] + 1
+                    );
+            return m[b.length][a.length];
+        }
+        const items = Array.from(document.querySelectorAll('.item')).map(item => ({
+            element: item,
+            text: item.querySelector('span').textContent.toLowerCase()
+        }));
+        function filterItems() {
+            const s = document.getElementById('search').value.toLowerCase().trim();
+            const c = document.querySelectorAll('.category');
+            const b = document.querySelector('.clear-btn');
+            b.style.display = s ? 'block' : 'none';
+            let h = false;
+            items.forEach(i => {
+                i.element.classList.remove('match', 'fuzzy-match');
+                i.element.classList.add('hidden');
+            });
+            if (!s) {
+                c.forEach(c => {
+                    c.classList.remove('hidden');
+                    c.querySelector('h2').style.display = 'block';
+                });
+                items.forEach(i => i.element.classList.remove('hidden'));
+            } else {
+                c.forEach(c => c.classList.add('hidden'));
+                const w = s.split(/\s+/);
+                items.forEach(i => {
+                    let m = false, f = false, d = Infinity;
+                    const t = i.text.split(/\s+/);
+                    w.forEach(s => t.forEach(t => {
+                        if (t.startsWith(s) || t.includes(s)) m = true;
+                        else {
+                            const d = levenshteinDistance(s, t);
+                            const x = Math.min(3, Math.floor(t.length / 3));
+                            if (d <= x && d < f) f = true;
+                        }
+                    }));
+                    if (m) {
+                        i.element.classList.remove('hidden');
+                        i.element.classList.add('match');
+                        h = true;
+                    } else if (f) {
+                        i.element.classList.remove('hidden');
+                        i.element.classList.add('fuzzy-match');
+                        h = true;
+                    }
+                });
+                if (h) items.forEach(i => {
+                    if (!i.element.classList.contains('hidden')) {
+                        i.element.parentElement.classList.remove('hidden');
+                        i.element.parentElement.querySelector('h2').style.display = 'none';
+                    }
+                });
+            }
+        }
+        function clearSearch() {
+            document.getElementById('search').value = '';
+            document.getElementById('search').style.animation = 'shake .3s ease-out';
+            setTimeout(() => { document.getElementById('search').style.animation = ''; }, 300);
+            filterItems();
+        }
+        function openModal() {
+            document.getElementById('recipesModal').style.display = 'block';
+        }
+        function closeModal() {
+            document.getElementById('recipesModal').style.display = 'none';
+        }
+        window.onclick = e => {
+            const m = document.getElementById('recipesModal');
+            if (e.target === m) m.style.display = 'none';
+        };
+
+        // Authentication check
+        const supabase = initializeSupabase();
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!session) {
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
+    <!-- Note: Insert your full pricing list and recipes content here -->
+</body>
+</html>
