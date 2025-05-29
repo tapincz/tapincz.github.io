@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Stránka nenalezena | Tapin.cz</title>
+    <title>404 - Stránka nenalezena | tapin.cz</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen">
-    <div class="text-center bg-white p-8 rounded shadow">
-        <h1 class="text-5xl font-bold text-red-600">404</h1>
-        <h2 class="text-2xl font-semibold mt-4">Stránka nenalezena</h2>
-        <p class="mt-4 text-lg">Omlouváme se, ale stránka, kterou hledáte, neexistuje.</p>
-        <a href="index.html" class="mt-6 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Zpět na domovskou stránku</a>
+<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen">
+    <div class="text-center bg-gray-800 p-10 rounded-xl shadow-2xl">
+        <h1 class="text-6xl font-bold text-red-500 pulse">404</h1>
+        <h2 class="text-3xl font-semibold mt-4">Stránka nenalezena</h2>
+        <p class="mt-4 text-lg max-w-md mx-auto">Jejda, tady nic není. Zkuste se vrátit na <a href="index.html" class="text-blue-400 hover:underline">domovskou stránku</a>.</p>
+        <a href="index.html" class="mt-6 inline-block bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300">Zpět na domů</a>
     </div>
 </body>
 </html>
