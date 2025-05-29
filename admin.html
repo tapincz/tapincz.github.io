@@ -3,81 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | tapin.cz</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-out;
-        }
-    </style>
+    <title>Přihlášení</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-900 text-white font-sans min-h-screen">
-    <header class="bg-gradient-to-r from-blue-800 to-blue-600 p-4 sticky top-0 z-10 shadow-lg">
-        <nav class="container mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold tracking-tight">tapin.cz</h1>
-            <ul class="flex space-x-6 text-lg">
-                <li><a href="index.html" class="hover:text-blue-300 transition-colors duration-300">Domů</a></li>
-                <li><a href="admin.html" class="hover:text-blue-300 transition-colors duration-300">Admin</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main class="container mx-auto my-12 px-4">
-        <div id="auth-section" class="max-w-md mx-auto bg-gray-800 p-8 rounded-xl shadow-2xl fade-in">
-            <h2 class="text-2xl font-semibold mb-6 text-center">Přihlášení do admin panelu</h2>
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium">E-mail</label>
-                <input type="email" id="email" class="mt-1 p-3 w-full bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Zadejte e-mail">
-            </div>
-            <div class="mb-6">
-                <label for="password" class="block text-sm font-medium">Heslo</label>
-                <input type="password" id="password" class="mt-1 p-3 w-full bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Zadejte heslo">
-            </div>
-            <button onclick="signIn()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">Přihlásit se</button>
-            <p id="auth-message" class="mt-4 text-center"></p>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+    <div id="login-container" class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-blue-400 text-center mb-6">Přihlášení</h1>
+        <div class="space-y-4">
+            <input id="email" type="email" placeholder="Email" class="w-full p-3 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <input id="password" type="password" placeholder="Heslo" class="w-full p-3 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <label class="flex items-center space-x-2">
+                <input id="remember" type="checkbox" class="h-4 w-4 text-blue-600">
+                <span class="text-gray-300">Zapamatovat na týden</span>
+            </label>
+            <button id="login-btn" class="w-full p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Přihlásit se</button>
+            <p id="error-message" class="text-red-500 text-center hidden"></p>
         </div>
-        <div id="admin-content" class="hidden max-w-2xl mx-auto bg-gray-800 p-8 rounded-xl shadow-2xl fade-in">
-            <h2 class="text-2xl font-semibold mb-6">Admin panel</h2>
-            <p class="text-lg mb-4">Vítejte v administraci tapin.cz. Vyberte sekci:</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <a href="cenik.html" class="bg-blue-600 text-white py-3 px-6 rounded-lg text-center hover:bg-blue-700 transition-all duration-300">Přejít na Ceník</a>
-                <a href="sekani.html" class="bg-blue-600 text-white py-3 px-6 rounded-lg text-center hover:bg-blue-700 transition-all duration-300">Přejít na Sekání</a>
-            </div>
+    </div>
+    <div id="dashboard-container" class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg hidden">
+        <h1 class="text-2xl font-bold text-blue-400 text-center mb-6">Dashboard</h1>
+        <div class="space-y-4">
+            <a href="cenik.html" class="block p-3 bg-blue-600 rounded-lg text-center hover:bg-blue-700 transition">Ceník</a>
+            <a href="mapa.html" class="block p-3 bg-blue-600 rounded-lg text-center hover:bg-blue-700 transition">Mapa</a>
+            <button id="logout-btn" class="w-full p-3 bg-red-600 rounded-lg hover:bg-red-700 transition">Odhlásit se</button>
         </div>
-    </main>
-
-    <footer class="bg-blue-900 text-center p-6">
-        <p class="text-sm">© 2025 tapin.cz. Všechna práva vyhrazena.</p>
-    </footer>
-
+    </div>
+    <script src="auth.js"></script>
     <script>
-        const supabase = Supabase.createClient('https://nytrwrlnqfauwsiuhtav.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55dHJ3cmxucWZhdXdzaXVodGF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MjEzMzIsImV4cCI6MjA2NDA5NzMzMn0.WQkD46yB8ZsRtRuEbmRXo4PHH5QCIecwLdV0WA3nUcs');
+        const supabase = initializeSupabase();
+        
+        // Check if user is already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('dashboard-container').classList.remove('hidden');
+            }
+        });
 
-        async function signIn() {
+        // Handle login
+        document.getElementById('login-btn').addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const message = document.getElementById('auth-message');
+            const remember = document.getElementById('remember').checked;
+            const errorMessage = document.getElementById('error-message');
 
-            const { error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
             });
 
             if (error) {
-                message.textContent = 'Chyba přihlášení: ' + error.message;
-                message.classList.add('text-red-500');
-            } else {
-                message.textContent = 'Přihlášení úspěšné!';
-                message.classList.add('text-green-500');
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('admin-content').classList.remove('hidden');
+                errorMessage.textContent = 'Chyba přihlášení: ' + error.message;
+                errorMessage.classList.remove('hidden');
+                return;
             }
-        }
+
+            if (remember) {
+                localStorage.setItem('supabase_session', JSON.stringify(data.session));
+                const expiresAt = new Date(data.session.expires_at * 1000);
+                const oneWeek = new Date();
+                oneWeek.setDate(oneWeek.getDate() + 7);
+                if (expiresAt > oneWeek) {
+                    data.session.expires_at = Math.floor(oneWeek.getTime() / 1000);
+                }
+            }
+
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+        });
+
+        // Handle logout
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            localStorage.removeItem('supabase_session');
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('login-container').classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
