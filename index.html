@@ -2,17 +2,51 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Úvodní stránka</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pracujeme na webu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, Roboto, sans-serif;
+            background: #1C2526;
+            color: #FFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+            user-select: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #007AFF;
+        }
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #E8ECEF;
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            p { font-size: 16px; }
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <div class="text-center">
-        <h1 class="text-3xl font-bold text-blue-400">Na webu se pracuje.</h1>
-        <p class="mt-4 text-lg text-gray-300">Brzy tu bude něco skvělého!</p>
-        <a href="admin.html" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Přihlásit se</a>
+<body>
+    <div>
+        <h1>Na webu se pracuje.</h1>
+        <p>Brzy zpět s plnou parádou!</p>
     </div>
 </body>
 </html>
