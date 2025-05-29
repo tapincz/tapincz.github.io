@@ -1,0 +1,545 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sekací zóny a Pracovní čas</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f4f9;
+            overscroll-behavior: none;
+        }
+        #map {
+            height: 100vh;
+            z-index: 1;
+        }
+        .controls-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(100%);
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .controls-container.open {
+            transform: translateY(0);
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            z-index: 999;
+        }
+        .overlay.open {
+            display: block;
+        }
+        .controls-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 1001;
+        }
+        .controls-toggle:hover {
+            background: #0056b3;
+        }
+        .controls, .zone-list, .timer-section {
+            background: white;
+            padding: 20px;
+            margin: 0;
+            border-radius: 8px;
+        }
+        .controls {
+            border-bottom: 1px solid #eee;
+        }
+        .timer-section {
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+        }
+        .controls button, .timer-section button {
+            padding: 12px 20px;
+            margin: 8px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            touch-action: manipulation;
+            transition: background 0.2s;
+        }
+        .controls button:hover, .timer-section button:hover {
+            background: #0056b3;
+        }
+        .timer-section button.stop-btn {
+            background: #dc3545;
+        }
+        .timer-section button.stop-btn:hover {
+            background: #c82333;
+        }
+        .zone-list h3, .timer-section h3 {
+            margin: 0 0 15px;
+            font-size: 20px;
+            color: #333;
+        }
+        .zone-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .zone-list li {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .zone-list li:last-child {
+            border-bottom: none;
+        }
+        .zone-list button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            touch-action: manipulation;
+        }
+        .zone-list .mow-btn {
+            background: #28a745;
+            color: white;
+        }
+        .zone-list .mow-btn:hover {
+            background: #218838;
+        }
+        .zone-list .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .zone-list .delete-btn:hover {
+            background: #c82333;
+        }
+        .timer-display {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+        @media (max-width: 600px) {
+            .controls button, .timer-section button {
+                display: block;
+                width: calc(100% - 16px);
+                margin: 8px;
+            }
+            .controls-container {
+                max-height: 70vh;
+            }
+        }
+        @media (max-width: 430px) and (max-height: 932px) { /* iPhone 15 */
+            .controls-container {
+                max-height: 50vh;
+            }
+            .controls button, .timer-section button {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .zone-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .zone-list button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        .leaflet-container {
+            cursor: crosshair !important;
+        }
+        .leaflet-draw-polyline {
+            stroke: red;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="overlay" id="overlay"></div>
+    <button class="controls-toggle" id="toggleControls"><i class="fas fa-chevron-up"></i></button>
+    <div class="controls-container" id="controlsContainer">
+        <div class="controls">
+            <button id="drawZone"><i class="fas fa-draw-polygon"></i> Kreslit oblast</button>
+            <button id="clearAll">Smazat všechny oblasti</button>
+        </div>
+        <div class="zone-list">
+            <h3>Seznam zón</h3>
+            <ul id="zoneList"></ul>
+        </div>
+        <div class="timer-section">
+            <h3>Pracovní čas</h3>
+            <div id="timerDisplay">Odpracováno: 00:00:00</div>
+            <button id="startShift">Začít směnu</button>
+            <button id="startPause">Přidat pauzu</button>
+            <button id="endShift" class="stop-btn">Ukončit směnu</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializace mapy
+        const map = L.map('map').setView([49.4287294, 14.2014521], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Generování UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Funkce pro interpolaci barev
+        function interpolateColor(progress) {
+            const r1 = 40, g1 = 167, b1 = 69; // Zelená (#28a745)
+            const r2 = 220, g2 = 53, b2 = 69; // Červená (#dc3545)
+            const r = Math.round(r1 + (r2 - r1) * progress);
+            const g = Math.round(g1 + (g2 - g1) * progress);
+            const b = Math.round(b1 + (b2 - b1) * progress);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Funkce pro určení barvy zóny
+        function getZoneColor(lastMowed, interval) {
+            if (!lastMowed) return 'red';
+            const lastMowedDate = new Date(lastMowed);
+            const now = new Date();
+            const diffDays = (now - lastMowedDate) / (1000 * 60 * 60 * 24);
+            const progress = Math.min(diffDays / interval, 1);
+            return interpolateColor(progress);
+        }
+
+        // Načtení zón z localStorage
+        let zones = JSON.parse(localStorage.getItem('mowingZones')) || [];
+        const zoneLayers = {};
+
+        // Funkce pro zobrazení zón na mapě
+        function renderZones() {
+            Object.keys(zoneLayers).forEach(id => {
+                map.removeLayer(zoneLayers[id]);
+                delete zoneLayers[id];
+            });
+
+            zones.forEach(zone => {
+                const color = getZoneColor(zone.lastMowed, zone.mowInterval);
+                const poly = L.polygon(zone.coordinates, {
+                    color: color,
+                    weight: 2,
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                zoneLayers[zone.id] = poly;
+
+                poly.bindPopup(`
+                    <b>Zóna: ${zone.name}</b><br>
+                    Interval sekání: <input type="number" id="interval-${zone.id}" value="${zone.mowInterval}" min="1"> dní<br>
+                    <button onclick="updateZone('${zone.id}')">Uložit</button>
+                    <button onclick="markAsMowed('${zone.id}')">Označit jako posekané</button>
+                    <button onclick="deleteZone('${zone.id}')">Smazat</button>
+                `);
+            });
+
+            renderZoneList();
+        }
+
+        // Funkce pro zobrazení seznamu zón
+        function renderZoneList() {
+            const zoneList = document.getElementById('zoneList');
+            zoneList.innerHTML = '';
+            zones.forEach(zone => {
+                const color = getZoneColor(zone.lastMowed, zone.mowInterval);
+                const lastMowed = zone.lastMowed ? new Date(zone.lastMowed).toLocaleDateString('cs-CZ') : 'Nikdy';
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span style="color: ${color};">●</span> ${zone.name} - Poslední sekání: ${lastMowed}, Interval: ${zone.mowInterval} dní
+                    <button class="mow-btn" onclick="markAsMowed('${zone.id}')">Posekat</button>
+                    <button class="delete-btn" onclick="deleteZone('${zone.id}')">Smazat</button>
+                `;
+                zoneList.appendChild(li);
+            });
+        }
+
+        // Funkce pro uložení zón
+        function saveZones() {
+            localStorage.setItem('mowingZones', JSON.stringify(zones));
+            renderZones();
+        }
+
+        // Funkce pro aktualizaci zóny
+        window.updateZone = function(id) {
+            const zone = zones.find(z => z.id === id);
+            const intervalInput = document.getElementById(`interval-${id}`);
+            zone.mowInterval = parseInt(intervalInput.value) || 14;
+            zone.name = prompt('Zadejte název zóny:', zone.name) || zone.name;
+            saveZones();
+        };
+
+        // Funkce pro označení jako posekané
+        window.markAsMowed = function(id) {
+            const zone = zones.find(z => z.id === id);
+            zone.lastMowed = new Date().toISOString();
+            alert(`Zóna ${zone.name} označena jako posekaná.`);
+            saveZones();
+        };
+
+        // Funkce pro smazání zóny
+        window.deleteZone = function(id) {
+            if (confirm('Opravdu smazat tuto zónu?')) {
+                zones = zones.filter(z => z.id !== id);
+                saveZones();
+            }
+        };
+
+        // Funkce pro smazání všech zón
+        document.getElementById('clearAll').addEventListener('click', () => {
+            if (confirm('Opravdu smazat všechny zóny?')) {
+                zones = [];
+                localStorage.removeItem('mowingZones');
+                renderZones();
+            }
+        });
+
+        // Kreslení polygonu
+        let drawing = false;
+        let currentPoly = null;
+        let tempLine = null;
+        let points = [];
+
+        document.getElementById('drawZone').addEventListener('click', () => {
+            drawing = true;
+            points = [];
+            map.getContainer().style.cursor = 'crosshair';
+            if (currentPoly) map.removeLayer(currentPoly);
+            if (tempLine) map.removeLayer(tempLine);
+            currentPoly = L.polyline([], { color: 'red', weight: 2 }).addTo(map);
+        });
+
+        map.on('click', (e) => {
+            if (!drawing) return;
+            points.push([e.latlng.lat, e.latlng.lng]);
+            currentPoly.addLatLng(e.latlng);
+            if (points.length >= 3) {
+                document.addEventListener('keydown', onKeyPress);
+            }
+        });
+
+        map.on('mousemove', (e) => {
+            if (!drawing || points.length === 0) return;
+            if (tempLine) map.removeLayer(tempLine);
+            tempLine = L.polyline([points[points.length - 1], [e.latlng.lat, e.latlng.lng]], {
+                color: 'red',
+                weight: 2,
+                dashArray: '5, 10'
+            }).addTo(map);
+        });
+
+        function onKeyPress(e) {
+            if (e.key === 'Enter' && points.length >= 3) {
+                drawing = false;
+                map.getContainer().style.cursor = '';
+                document.removeEventListener('keydown', onKeyPress);
+                if (tempLine) map.removeLayer(tempLine);
+                map.removeLayer(currentPoly);
+                const name = prompt('Zadejte název zóny:') || 'Zóna ' + (zones.length + 1);
+                zones.push({
+                    id: generateUUID(),
+                    coordinates: points,
+                    name: name,
+                    lastMowed: null,
+                    mowInterval: 14
+                });
+                saveZones();
+            } else if (e.key === 'Escape') {
+                drawing = false;
+                map.getContainer().style.cursor = '';
+                document.removeEventListener('keydown', onKeyPress);
+                if (tempLine) map.removeLayer(tempLine);
+                if (currentPoly) map.removeLayer(currentPoly);
+            }
+        }
+
+        // Ovládání vyjížděcího panelu
+        const controlsContainer = document.getElementById('controlsContainer');
+        const toggleControls = document.getElementById('toggleControls');
+        const overlay = document.getElementById('overlay');
+        toggleControls.addEventListener('click', () => {
+            const isOpen = controlsContainer.classList.contains('open');
+            controlsContainer.classList.toggle('open');
+            overlay.classList.toggle('open');
+            toggleControls.innerHTML = `<i class="fas fa-chevron-${isOpen ? 'up' : 'down'}"></i>`;
+        });
+        overlay.addEventListener('click', () => {
+            controlsContainer.classList.remove('open');
+            overlay.classList.remove('open');
+            toggleControls.innerHTML = '<i class="fas fa-chevron-up"></i>';
+        });
+
+        // Počítadlo pracovního času
+        let shift = JSON.parse(localStorage.getItem('shift')) || {
+            startTime: null,
+            pauses: [],
+            endTime: null,
+            totalWorked: 0
+        };
+        let timerInterval = null;
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function updateTimer() {
+            if (!shift.startTime || shift.endTime) return;
+            const now = new Date();
+            let totalSeconds = Math.floor((now - new Date(shift.startTime)) / 1000);
+            shift.pauses.forEach(pause => {
+                if (pause.start && pause.end) {
+                    totalSeconds -= Math.floor((new Date(pause.end) - new Date(pause.start)) / 1000);
+                } else if (pause.start) {
+                    totalSeconds -= Math.floor((now - new Date(pause.start)) / 1000);
+                }
+            });
+            document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(totalSeconds)}`;
+            shift.totalWorked = totalSeconds;
+            localStorage.setItem('shift', JSON.stringify(shift));
+        }
+
+        document.getElementById('startShift').addEventListener('click', () => {
+            if (!shift.startTime || shift.endTime) {
+                shift = {
+                    startTime: new Date().toISOString(),
+                    pauses: [],
+                    endTime: null,
+                    totalWorked: 0
+                };
+                timerInterval = setInterval(updateTimer, 1000);
+                document.getElementById('startShift').disabled = true;
+                document.getElementById('startPause').disabled = false;
+                document.getElementById('endShift').disabled = false;
+                updateTimer();
+            }
+        });
+
+        document.getElementById('startPause').addEventListener('click', () => {
+            const lastPause = shift.pauses[shift.pauses.length - 1];
+            if (lastPause && !lastPause.end) {
+                lastPause.end = new Date().toISOString();
+            } else {
+                shift.pauses.push({ start: new Date().toISOString(), end: null });
+            }
+            localStorage.setItem('shift', JSON.stringify(shift));
+            updateTimer();
+        });
+
+        document.getElementById('endShift').addEventListener('click', () => {
+            if (shift.startTime && !shift.endTime) {
+                shift.endTime = new Date().toISOString();
+                clearInterval(timerInterval);
+                updateTimer();
+                alert(`Směna ukončena. Celkový odpracovaný čas: ${formatTime(shift.totalWorked)}`);
+                document.getElementById('startShift').disabled = false;
+                document.getElementById('startPause').disabled = true;
+                document.getElementById('endShift').disabled = true;
+                localStorage.setItem('shift', JSON.stringify(shift));
+            }
+        });
+
+        // Inicializace časovače
+        if (shift.startTime && !shift.endTime) {
+            document.getElementById('startShift').disabled = true;
+            document.getElementById('startPause').disabled = false;
+            document.getElementById('endShift').disabled = false;
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        } else {
+            document.getElementById('startPause').disabled = true;
+            document.getElementById('endShift').disabled = true;
+            document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(shift.totalWorked || 0)}`;
+        }
+
+        // Periodická aktualizace zobrazení pro plynulou změnu barvy
+        setInterval(renderZones, 12 * 60 * 60 * 1000); // Aktualizace každých 12 hodin
+
+        // Inicializace zón
+        renderZones();
+    </script>
+</body>
+</html>
