@@ -2,51 +2,106 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pracujeme na webu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tapin.cz - Vaše brána k moderním řešením a inspiraci">
+    <title>Tapin.cz - Domovská stránka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: -apple-system, Roboto, sans-serif;
-            background: #1C2526;
-            color: #FFF;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in;
-            user-select: none;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        h1 {
-            font-size: 32px;
-            font-weight: 600;
-            color: #007AFF;
-        }
-        p {
-            font-size: 18px;
-            margin-top: 10px;
-            color: #E8ECEF;
-        }
-        @media (max-width: 600px) {
-            h1 { font-size: 24px; }
-            p { font-size: 16px; }
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .hero-bg { background: linear-gradient(to right, #4f46e5, #7c3aed); }
     </style>
 </head>
-<body>
-    <div>
-        <h1>BANDA</h1>
-        <p>pen*s check 23:20!!!</p>
-    </div>
+<body class="bg-gray-100 text-gray-900">
+    <!-- Navigace -->
+    <nav class="bg-white shadow-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">Tapin.cz</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#domu" class="text-gray-600 hover:text-indigo-600 px-3 py-2">Domů</a>
+                    <a href="#o-nas" class="text-gray-600 hover:text-indigo-600 px-3 py-2">O nás</a>
+                    <a href="#sluzby" class="text-gray-600 hover:text-indigo-600 px-3 py-2">Služby</a>
+                    <a href="#kontakt" class="text-gray-600 hover:text-indigo-600 px-3 py-2">Kontakt</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hlavní sekce -->
+    <section id="domu" class="hero-bg text-white h-screen flex items-center justify-center">
+        <div class="text-center max-w-3xl mx-auto px-4">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-6">Vítejte na Tapin.cz</h1>
+            <p class="text-lg sm:text-xl mb-8">Objevte moderní řešení pro váš byznys a inspirujte se s námi.</p>
+            <a href="#kontakt" class="inline-block bg-white text-indigo-600 font-semibold py-3 px-6 rounded-lg hover:bg-indigo-100 transition">Začněte nyní</a>
+        </div>
+    </section>
+
+    <!-- O nás -->
+    <section id="o-nas" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8">O nás</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto">
+                Jsme tým inovátorů, kteří pomáhají firmám růst pomocí moderních technologií a kreativních řešení. Naše mise je přinášet hodnotu a inspiraci.
+            </p>
+        </div>
+    </section>
+
+    <!-- Služby -->
+    <section id="sluzby" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Naše služby</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <h3 class="text-xl font-semibold mb-4">Webový vývoj</h3>
+                    <p class="text-gray-600">Vytváříme moderní a responzivní weby, které osloví vaše zákazníky.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <h3 class="text-xl font-semibold mb-4">Digitální marketing</h3>
+                    <p class="text-gray-600">Pomáháme vám oslovit správné publikum a zvýšit povědomí o vaší značce.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                    <h3 class="text-xl font-semibold mb-4">Konzultace</h3>
+                    <p class="text-gray-600">Nabízíme strategické poradenství pro růst vašeho podnikání.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kontakt -->
+    <section id="kontakt" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8">Kontaktujte nás</h2>
+            <div class="max-w-lg mx-auto">
+                <div class="space-y-4">
+                    <input type="text" placeholder="Vaše jméno" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    <input type="email" placeholder="Váš e-mail" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    <textarea placeholder="Vaše zpráva" rows="5" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
+                    <button class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition">Odeslat</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Patička -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 Tapin.cz. Všechna práva vyhrazena.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Plynulé posouvání při kliknutí na odkazy v navigaci
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
