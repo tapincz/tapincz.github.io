@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/xlsx.full.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -236,7 +237,7 @@
                     csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                     return csv;
                 } catch (e) {
-                    console.error(e);
+                    console.error('Error processing XLSX file:', e);
                     return "";
                 }
             }
@@ -247,14 +248,26 @@
         // Inicializace Supabase
         const supabaseUrl = 'https://mvjhwsyhnwdkcvvbhelb.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12amh3c3lobndka2N2dmJoZWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NzI3NDIsImV4cCI6MjA2NDQ0ODc0Mn0.6qKONzbx05xA6eJy3rPp0yAvdaz34aVX_W9yafG7e4U';
-        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+        let supabase;
+        try {
+            supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        } catch (e) {
+            console.error('Failed to initialize Supabase:', e);
+            alert('Nepodařilo se inicializovat databázi. Mapa bude fungovat bez ukládání dat.');
+        }
 
         // Inicializace mapy
-        const map = L.map('map').setView([49.4287294, 14.2014521], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
-        }).addTo(map);
+        let map;
+        try {
+            map = L.map('map').setView([49.4287294, 14.2014521], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(map);
+        } catch (e) {
+            console.error('Error initializing map:', e);
+            alert('Nepodařilo se inicializovat mapu.');
+        }
 
         // Generování UUID
         function generateUUID() {
@@ -289,13 +302,24 @@
         const zoneLayers = {};
 
         async function loadZones() {
-            const { data, error } = await supabase.from('mowing_zones').select('*');
-            if (error) {
-                console.error('Error loading zones:', error);
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping zone load.');
+                renderZones();
                 return;
             }
-            zones = data || [];
-            renderZones();
+            try {
+                const { data, error } = await supabase.from('mowing_zones').select('*');
+                if (error) {
+                    console.error('Error loading zones:', error);
+                    alert('Nepodařilo se načíst zóny z databáze.');
+                    return;
+                }
+                zones = data || [];
+                renderZones();
+            } catch (e) {
+                console.error('Error in loadZones:', e);
+                alert('Chyba při načítání zón.');
+            }
         }
 
         // Funkce pro zobrazení zón na mapě
@@ -346,83 +370,135 @@
 
         // Funkce pro uložení zón do Supabase
         async function saveZones() {
-            const { error } = await supabase.from('mowing_zones').delete().neq('id', '');
-            if (error) {
-                console.error('Error clearing zones:', error);
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping zone save.');
+                renderZones();
                 return;
             }
-            if (zones.length > 0) {
-                const { error: insertError } = await supabase.from('mowing_zones').insert(zones);
-                if (insertError) {
-                    console.error('Error saving zones:', insertError);
+            try {
+                const { error } = await supabase.from('mowing_zones').delete().neq('id', '');
+                if (error) {
+                    console.error('Error clearing zones:', error);
+                    alert('Nepodařilo se smazat stávající zóny.');
                     return;
                 }
+                if (zones.length > 0) {
+                    const { error: insertError } = await supabase.from('mowing_zones').insert(zones);
+                    if (insertError) {
+                        console.error('Error saving zones:', insertError);
+                        alert('Nepodařilo se uložit zóny.');
+                        return;
+                    }
+                }
+                renderZones();
+            } catch (e) {
+                console.error('Error in saveZones:', e);
+                alert('Chyba při ukládání zón.');
             }
-            renderZones();
         }
 
         // Funkce pro aktualizaci zóny
         window.updateZone = async function(id) {
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping zone update.');
+                return;
+            }
             const zone = zones.find(z => z.id === id);
             const intervalInput = document.getElementById(`interval-${id}`);
             const newInterval = parseInt(intervalInput.value) || 14;
             const newName = prompt('Zadejte název zóny:', zone.name) || zone.name;
 
-            const { error } = await supabase
-                .from('mowing_zones')
-                .update({ name: newName, mow_interval: newInterval })
-                .eq('id', id);
-            if (error) {
-                console.error('Error updating zone:', error);
-                return;
-            }
+            try {
+                const { error } = await supabase
+                    .from('mowing_zones')
+                    .update({ name: newName, mow_interval: newInterval })
+                    .eq('id', id);
+                if (error) {
+                    console.error('Error updating zone:', error);
+                    alert('Nepodařilo se aktualizovat zónu.');
+                    return;
+                }
 
-            zone.name = newName;
-            zone.mow_interval = newInterval;
-            renderZones();
+                zone.name = newName;
+                zone.mow_interval = newInterval;
+                renderZones();
+            } catch (e) {
+                console.error('Error in updateZone:', e);
+                alert('Chyba při aktualizaci zóny.');
+            }
         };
 
         // Funkce pro označení jako posekané
         window.markAsMowed = async function(id) {
-            const zone = zones.find(z => z.id === id);
-            const now = new Date().toISOString();
-            const { error } = await supabase
-                .from('mowing_zones')
-                .update({ last_mowed: now })
-                .eq('id', id);
-            if (error) {
-                console.error('Error marking zone as mowed:', error);
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping mow update.');
                 return;
             }
+            const zone = zones.find(z => z.id === id);
+            const now = new Date().toISOString();
+            try {
+                const { error } = await supabase
+                    .from('mowing_zones')
+                    .update({ last_mowed: now })
+                    .eq('id', id);
+                if (error) {
+                    console.error('Error marking zone as mowed:', error);
+                    alert('Nepodařilo se označit zónu jako posekanou.');
+                    return;
+                }
 
-            zone.last_mowed = now;
-            alert(`Zóna ${zone.name} označena jako posekaná.`);
-            renderZones();
+                zone.last_mowed = now;
+                alert(`Zóna ${zone.name} označena jako posekaná.`);
+                renderZones();
+            } catch (e) {
+                console.error('Error in markAsMowed:', e);
+                alert('Chyba při označení zóny jako posekané.');
+            }
         };
 
         // Funkce pro smazání zóny
         window.deleteZone = async function(id) {
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping zone deletion.');
+                return;
+            }
             if (confirm('Opravdu smazat tuto zónu?')) {
-                const { error } = await supabase.from('mowing_zones').delete().eq('id', id);
-                if (error) {
-                    console.error('Error deleting zone:', error);
-                    return;
+                try {
+                    const { error } = await supabase.from('mowing_zones').delete().eq('id', id);
+                    if (error) {
+                        console.error('Error deleting zone:', error);
+                        alert('Nepodařilo se smazat zónu.');
+                        return;
+                    }
+                    zones = zones.filter(z => z.id !== id);
+                    renderZones();
+                } catch (e) {
+                    console.error('Error in deleteZone:', e);
+                    alert('Chyba při mazání zóny.');
                 }
-                zones = zones.filter(z => z.id !== id);
-                renderZones();
             }
         };
 
         // Funkce pro smazání všech zón
         document.getElementById('clearAll').addEventListener('click', async () => {
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping clear all zones.');
+                return;
+            }
             if (confirm('Opravdu smazat všechny zóny?')) {
-                const { error } = await supabase.from('mowing_zones').delete().neq('id', '');
-                if (error) {
-                    console.error('Error clearing zones:', error);
-                    return;
+                try {
+                    const { error } = await supabase.from('mowing_zones').delete().neq('id', '');
+                    if (error) {
+                        console.error('Error clearing zones:', error);
+                        alert('Nepodařilo se smazat všechny zóny.');
+                        return;
+                    }
+                    zones = [];
+                    renderZones();
+                } catch (e) {
+                    console.error('Error in clearAll:', e);
+                    alert('Chyba při mazání všech zón.');
                 }
-                zones = [];
-                renderZones();
             }
         });
 
@@ -476,10 +552,19 @@
                     mow_interval: 14
                 };
                 zones.push(newZone);
-                const { error } = await supabase.from('mowing_zones').insert([newZone]);
-                if (error) {
-                    console.error('Error saving new zone:', error);
-                    zones = zones.filter(z => z.id !== newZone.id);
+                if (supabase) {
+                    try {
+                        const { error } = await supabase.from('mowing_zones').insert([newZone]);
+                        if (error) {
+                            console.error('Error saving new zone:', error);
+                            alert('Nepodařilo se uložit novou zónu.');
+                            zones = zones.filter(z => z.id !== newZone.id);
+                        }
+                    } catch (e) {
+                        console.error('Error in onKeyPress:', e);
+                        alert('Chyba při ukládání nové zóny.');
+                        zones = zones.filter(z => z.id !== newZone.id);
+                    }
                 }
                 renderZones();
             } else if (e.key === 'Escape') {
@@ -517,27 +602,48 @@
         let timerInterval = null;
 
         async function loadShift() {
-            const { data, error } = await supabase
-                .from('shifts')
-                .select('*')
-                .order('start_time', { ascending: false })
-                .limit(1);
-            if (error) {
-                console.error('Error loading shift:', error);
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping shift load.');
+                initializeTimer();
                 return;
             }
-            if (data && data.length > 0) {
-                shift = data[0];
+            try {
+                const { data, error } = await supabase
+                    .from('shifts')
+                    .select('*')
+                    .order('start_time', { ascending: false })
+                    .limit(1);
+                if (error) {
+                    console.error('Error loading shift:', error);
+                    alert('Nepodařilo se načíst směnu.');
+                    return;
+                }
+                if (data && data.length > 0) {
+                    shift = data[0];
+                }
+                initializeTimer();
+            } catch (e) {
+                console.error('Error in loadShift:', e);
+                alert('Chyba při načítání směny.');
             }
-            initializeTimer();
         }
 
         async function saveShift() {
-            const { error } = await supabase
-                .from('shifts')
-                .upsert([shift], { onConflict: 'id' });
-            if (error) {
-                console.error('Error saving shift:', error);
+            if (!supabase) {
+                console.warn('Supabase not initialized, skipping shift save.');
+                return;
+            }
+            try {
+                const { error } = await supabase
+                    .from('shifts')
+                    .upsert([shift], { onConflict: 'id' });
+                if (error) {
+                    console.error('Error saving shift:', error);
+                    alert('Nepodařilo se uložit směnu.');
+                }
+            } catch (e) {
+                console.error('Error in saveShift:', e);
+                alert('Chyba při ukládání směny.');
             }
         }
 
@@ -608,16 +714,21 @@
 
         // Inicializace časovače
         function initializeTimer() {
-            if (shift.start_time && !shift.end_time) {
-                document.getElementById('startShift').disabled = true;
-                document.getElementById('startPause').disabled = false;
-                document.getElementById('endShift').disabled = false;
-                timerInterval = setInterval(updateTimer, 1000);
-                updateTimer();
-            } else {
-                document.getElementById('startPause').disabled = true;
-                document.getElementById('endShift').disabled = true;
-                document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(shift.total_worked || 0)}`;
+            try {
+                if (shift.start_time && !shift.end_time) {
+                    document.getElementById('startShift').disabled = true;
+                    document.getElementById('startPause').disabled = false;
+                    document.getElementById('endShift').disabled = false;
+                    timerInterval = setInterval(updateTimer, 1000);
+                    updateTimer();
+                } else {
+                    document.getElementById('startPause').disabled = true;
+                    document.getElementById('endShift').disabled = true;
+                    document.getElementById('timerDisplay').textContent = `Odpracováno: ${formatTime(shift.total_worked || 0)}`;
+                }
+            } catch (e) {
+                console.error('Error initializing timer:', e);
+                alert('Chyba při inicializaci časovače.');
             }
         }
 
@@ -625,8 +736,15 @@
         setInterval(renderZones, 12 * 60 * 60 * 1000); // Aktualizace každých 12 hodin
 
         // Inicializace zón a směny
-        loadZones();
-        loadShift();
+        try {
+            loadZones();
+            loadShift();
+        } catch (e) {
+            console.error('Error during initialization:', e);
+            alert('Chyba při inicializaci aplikace.');
+            renderZones(); // Pokračovat s prázdnými zónami
+            initializeTimer(); // Pokračovat s výchozí směnou
+        }
     </script>
 </body>
 </html>
