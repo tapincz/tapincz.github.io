@@ -3,979 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tapin.cz | Moderní digitální řešení</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Pro moji milovanou Sofinku ❤️</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #8b5cf6;
-            --accent: #ec4899;
-            --dark: #1e293b;
-            --light: #f8fafc;
-            --gray: #64748b;
-            --light-gray: #e2e8f0;
-            --transition: all 0.3s ease;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        * {
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff0f5;
+            color: #333;
+            text-align: center;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background-color: var(--light);
-            overflow-x: hidden;
-        }
-
         .container {
-            width: 100%;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px;
         }
-
-        /* Header & Navigation */
-        header {
-            background-color: rgba(255, 255, 255, 0.95);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
+        h1 {
+            color: #ff69b4;
+            font-size: 2.5em;
         }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
+        .heart {
+            color: #ff69b4;
+            font-size: 1.5em;
+            animation: pulse 1.5s infinite;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: var(--primary);
-            text-decoration: none;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
         }
-
-        .logo span {
-            color: var(--accent);
-        }
-
-        .logo i {
-            margin-right: 10px;
-            font-size: 2rem;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-
-        nav ul li {
-            margin-left: 30px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            font-size: 1rem;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        nav ul li a:hover {
-            color: var(--primary);
-        }
-
-        nav ul li a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--primary);
-            transition: var(--transition);
-        }
-
-        nav ul li a:hover::after {
-            width: 100%;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            box-shadow: var(--shadow);
-        }
-
-        .cta-button:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--dark);
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 180px 0 100px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 50px;
-        }
-
-        .hero-text {
-            flex: 1;
-            max-width: 600px;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .hero h1 span {
-            color: var(--primary);
-            position: relative;
-        }
-
-        .hero h1 span::after {
-            content: '';
-            position: absolute;
-            bottom: 5px;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background-color: rgba(37, 99, 235, 0.2);
-            z-index: -1;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--gray);
-            margin-bottom: 40px;
-            max-width: 500px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .secondary-button {
-            background-color: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .secondary-button:hover {
-            background-color: rgba(37, 99, 235, 0.1);
-        }
-
-        .hero-image {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-
-        .hero-image img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* Features Section */
-        .features {
-            padding: 100px 0;
+        .message {
             background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        .section-header {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 60px;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .section-header p {
-            font-size: 1.1rem;
-            color: var(--gray);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background-color: white;
-            border-radius: 16px;
-            padding: 30px;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 1.8rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-
-        .feature-card p {
-            color: var(--gray);
-        }
-
-        /* How it Works */
-        .how-it-works {
-            padding: 100px 0;
-            background-color: var(--light);
-        }
-
-        .steps {
+        .photo-gallery {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 40px;
-            max-width: 1000px;
-            margin: 0 auto;
+            gap: 10px;
+            margin: 20px 0;
         }
-
-        .step {
-            flex: 1;
-            min-width: 250px;
-            max-width: 300px;
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 auto 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 25px;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background-color: var(--light-gray);
-            z-index: 1;
-        }
-
-        .step h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-
-        .step p {
-            color: var(--gray);
-        }
-
-        /* Testimonials */
-        .testimonials {
-            padding: 100px 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            text-align: center;
-        }
-
-        .testimonials .section-header h2,
-        .testimonials .section-header p {
-            color: white;
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .testimonial-card {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: left;
-            transition: var(--transition);
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-10px);
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .testimonial-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .testimonial-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-right: 15px;
+        .photo-gallery img {
+            width: 150px;
+            height: 150px;
             object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s;
         }
-
-        .testimonial-info h4 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
+        .photo-gallery img:hover {
+            transform: scale(1.05);
         }
-
-        .testimonial-info p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        .testimonial-content {
-            font-style: italic;
-            line-height: 1.8;
-        }
-
-        .rating {
-            color: #ffd700;
-            margin-top: 15px;
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 100px 0;
-            background-color: white;
-            text-align: center;
-        }
-
-        .cta-content {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 50px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .cta-content p {
-            font-size: 1.1rem;
-            color: var(--gray);
-            margin-bottom: 30px;
-        }
-
-        .cta-form {
-            display: flex;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .cta-form input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid var(--light-gray);
-            border-radius: 50px 0 0 50px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .cta-form input:focus {
-            border-color: var(--primary);
-        }
-
-        .cta-form button {
-            background-color: var(--primary);
+        .button {
+            background-color: #ff69b4;
             color: white;
             border: none;
-            padding: 0 30px;
-            border-radius: 0 50px 50px 0;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
             cursor: pointer;
-            transition: var(--transition);
+            margin: 10px;
+            transition: background-color 0.3s;
         }
-
-        .cta-form button:hover {
-            background-color: var(--primary-dark);
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 70px 0 30px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 50px;
-        }
-
-        .footer-logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .footer-logo span {
-            color: var(--accent);
-        }
-
-        .footer-about p {
-            color: var(--light-gray);
-            margin-bottom: 20px;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .social-icons a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .social-icons a:hover {
-            background-color: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .footer-heading {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-heading::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background-color: var(--primary);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: var(--light-gray);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-            padding-left: 5px;
-        }
-
-        .footer-contact p {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            color: var(--light-gray);
-        }
-
-        .footer-contact i {
-            margin-right: 10px;
-            color: var(--primary);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--light-gray);
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .hero-text {
-                max-width: 100%;
-            }
-            
-            .hero-buttons {
-                justify-content: center;
-            }
-            
-            .hero p {
-                margin: 0 auto 40px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-            }
-            
-            .cta-form {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .cta-form input,
-            .cta-form button {
-                width: 100%;
-                border-radius: 50px;
-            }
-            
-            .step:not(:last-child)::after {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            
-            .section-header h2 {
-                font-size: 2rem;
-            }
-            
-            .cta-content {
-                padding: 30px 20px;
-            }
-            
-            .cta-content h2 {
-                font-size: 2rem;
-            }
+        .button:hover {
+            background-color: #ff1493;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="logo">
-                <i class="fas fa-bolt"></i>
-                tapin<span>.cz</span>
-            </a>
-            <nav>
-                <ul>
-                    <li><a href="#home">Domů</a></li>
-                    <li><a href="#features">Funkce</a></li>
-                    <li><a href="#how-it-works">Jak to funguje</a></li>
-                    <li><a href="#testimonials">Recenze</a></li>
-                    <li><a href="#contact">Kontakt</a></li>
-                </ul>
-            </nav>
-            <a href="#contact" class="cta-button">Vyzkoušet zdarma</a>
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container hero-content">
-            <div class="hero-text">
-                <h1>Transformujte svůj <span>online business</span> s Tapin</h1>
-                <p>Moderní řešení pro růst vašeho podnikání. Spojujeme technologie a kreativitu pro vaše úspěchy v digitálním světě.</p>
-                <div class="hero-buttons">
-                    <a href="#contact" class="cta-button">Začít nyní</a>
-                    <a href="#features" class="cta-button secondary-button">Zjistit více</a>
-                </div>
-            </div>
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600&q=80" alt="Tapin Dashboard">
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>Naše výjimečné funkce</h2>
-                <p>Objevte nástroje, které vám pomohou dosáhnout vašich obchodních cílů</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3>Rychlý výkon</h3>
-                    <p>Naše platforma je optimalizována pro maximální rychlost a výkon, takže nikdy neztratíte zákazníka.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <h3>Špičková bezpečnost</h3>
-                    <p>Vaše data jsou v bezpečí díky nejmodernějším šifrovacím technologiím a pravidelným auditům.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-sync-alt"></i>
-                    </div>
-                    <h3>Automatizace</h3>
-                    <p>Automatizujte rutinní úkoly a soustřeďte se na to, co je pro váš byznys skutečně důležité.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Pokročilé analýzy</h3>
-                    <p>Získejte hluboké poznatky o vašem podnikání díky intuitivním analytickým nástrojům.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Plně responzivní</h3>
-                    <p>Vaše aplikace bude perfektně fungovat na všech zařízeních bez ohledu na velikost obrazovky.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>24/7 Podpora</h3>
-                    <p>Náš tým odborníků je vám k dispozici nonstop, abyste mohli podnikat bez přerušení.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How it Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <h2>Jak Tapin funguje</h2>
-                <p>Začněte využívat naše řešení během několika jednoduchých kroků</p>
-            </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Vytvoření účtu</h3>
-                    <p>Zaregistrujte se během 30 sekund a získejte přístup k naší platformě.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Přizpůsobení</h3>
-                    <p>Nastavte si Tapin podle potřeb vašeho podnikání pomocí jednoduchých nástrojů.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Integrace</h3>
-                    <p>Propojte Tapin se svými stávajícími nástroji a službami.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3>Spuštění</h3>
-                    <p>Začněte využívat všechny výhody a sledujte růst vašeho podnikání.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <div class="section-header">
-                <h2>Co říkají naši klienti</h2>
-                <p>Přidejte se k tisícům spokojených podnikatelů, kteří využívají Tapin</p>
-            </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Klient" class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Eva Nováková</h4>
-                            <p>Majitelka e-shopu</p>
-                        </div>
-                    </div>
-                    <div class="testimonial-content">
-                        <p>"Tapin nám pomohl ztrojnásobit konverzní poměr během prvních tří měsíců. Jejich analytické nástroje odhalily skryté příležitosti, které jsme dříve přehlíželi."</p>
-                        <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Klient" class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Jan Procházka</h4>
-                            <p>Marketingový ředitel</p>
-                        </div>
-                    </div>
-                    <div class="testimonial-content">
-                        <p>"Automatizace pomocí Tapin nám ušetřila desítky hodin měsíčně. Tým navíc neustále přidává nové funkce, které nás udržují krok s konkurencí."</p>
-                        <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Klient" class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Petra Svobodová</h4>
-                            <p>Startup zakladatelka</p>
-                        </div>
-                    </div>
-                    <div class="testimonial-content">
-                        <p>"Jako malá firma oceníme především přehlednost a snadné ovládání. Tapin nám umožnil růst bez nutnosti budovat vlastní IT tým."</p>
-                        <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section" id="contact">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Začněte ještě dnes!</h2>
-                <p>Připojte se k tisícům podnikatelů, kteří už využívají Tapin pro růst svého podnikání. Zaregistrujte se a získejte 14 dní zdarma.</p>
-                <div class="cta-form">
-                    <input type="email" placeholder="Zadejte svůj email">
-                    <button class="cta-button">Vyzkoušet zdarma</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <a href="#" class="footer-logo">
-                        <i class="fas fa-bolt"></i>
-                        tapin<span>.cz</span>
-                    </a>
-                    <p>Moderní řešení pro růst vašeho podnikání. Spojujeme technologie a kreativitu pro vaše úspěchy v digitálním světě.</p>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links-container">
-                    <h3 class="footer-heading">Rychlé odkazy</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Domů</a></li>
-                        <li><a href="#features">Funkce</a></li>
-                        <li><a href="#how-it-works">Jak to funguje</a></li>
-                        <li><a href="#testimonials">Recenze</a></li>
-                        <li><a href="#contact">Kontakt</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links-container">
-                    <h3 class="footer-heading">Produkty</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Tapin Business</a></li>
-                        <li><a href="#">Tapin Analytics</a></li>
-                        <li><a href="#">Tapin Marketing</a></li>
-                        <li><a href="#">Tapin Automate</a></li>
-                        <li><a href="#">Tapin CRM</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Kontakt</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> Václavské náměstí 837, Praha</p>
-                    <p><i class="fas fa-phone-alt"></i> +420 123 456 789</p>
-                    <p><i class="fas fa-envelope"></i> info@tapin.cz</p>
-                    <p><i class="fas fa-clock"></i> Po-Pá: 9:00 - 17:00</p>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2023 Tapin.cz. Všechna práva vyhrazena.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const navMenu = document.querySelector('nav ul');
+    <div class="container">
+        <h1>Sofinko, miluji tě <span class="heart">❤️</span></h1>
         
-        mobileMenuBtn.addEventListener('click', () => {
-            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-        });
-
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            if (window.scrollY > 100) {
-                header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-                header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-            } else {
-                header.style.boxShadow = 'none';
-                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-            }
-        });
-
-        // Form submission
-        const ctaForm = document.querySelector('.cta-form');
-        if (ctaForm) {
-            ctaForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const emailInput = this.querySelector('input[type="email"]');
-                if (emailInput.value) {
-                    alert(`Děkujeme! Na adresu ${emailInput.value} vám brzy přijde přístup k Tapin zdarma.`);
-                    emailInput.value = '';
-                }
-            });
-        }
-    </script>
+        <div class="message">
+            <p>Každý den, kdy jsem s tebou, je jako malý zázrak.</p>
+            <p>Tvůj úsměv mě nabíjí energií, tvůj hlas je ta nejkrásnější melodie.</p>
+            <p>Děkuji ti za všechno, co pro mě děláš.</p>
+        </div>
+        
+        <h2>Naše společné vzpomínky</h2>
+        <div class="photo-gallery">
+            <!-- Zde můžeš přidat fotky - nahraď src cestou k tvým obrázkům -->
+            <img src="foto1.jpg" alt="Naše společné foto">
+            <img src="foto2.jpg" alt="Další společné foto">
+            <img src="foto3.jpg" alt="Ještě jedno foto">
+            <!-- Přidej další fotky podle potřeby -->
+        </div>
+        
+        <div class="message">
+            <h3>Proč tě tak miluji:</h3>
+            <ul style="text-align: left; display: inline-block;">
+                <li>Jsi ta nejkrásnější dívka na světě</li>
+                <li>Máš úžasné srdce</li>
+                <li>Dokážeš mě rozesmát i v těch nejhorších dnech</li>
+                <li>Jsi moje opora a inspirace</li>
+                <li>S tebou je každý den výjimečný</li>
+            </ul>
+        </div>
+        
+        <button class="button" onclick="alert('Sofinko, miluji tě nade vše! ❤️')">Stiskni mě</button>
+        
+        <p>Vytvořeno s láskou jen pro tebe, má drahá Sofinko.</p>
+    </div>
 </body>
 </html>
