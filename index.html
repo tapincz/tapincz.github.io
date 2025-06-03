@@ -3,111 +3,938 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tapin.cz - Vaše budoucnost začíná zde">
-    <title>Tapin.cz - Budoucnost je teď</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <title>Tapin.cz | Moderní digitální řešení</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hero-bg { 
-            background: linear-gradient(135deg, #1e1b4b, #4c1d95);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .hover-scale { transition: transform 0.3s ease; }
-        .hover-scale:hover { transform: scale(1.05); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(37, 99, 235, 0.2);
+            z-index: -1;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .secondary-button {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .secondary-button:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* How it Works */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--light-gray);
+            z-index: 1;
+        }
+
+        .step h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .step p {
+            color: var(--gray);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .testimonials .section-header h2,
+        .testimonials .section-header p {
+            color: white;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .testimonial-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .testimonial-info h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .testimonial-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .testimonial-content {
+            font-style: italic;
+            line-height: 1.8;
+        }
+
+        .rating {
+            color: #ffd700;
+            margin-top: 15px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background-color: white;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 50px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .cta-content p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .cta-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: 50px 0 0 50px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .cta-form input:focus {
+            border-color: var(--primary);
+        }
+
+        .cta-form button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 50px 50px 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cta-form button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 70px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .footer-logo span {
+            color: var(--accent);
+        }
+
+        .footer-about p {
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-heading {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        .footer-contact i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text {
+                max-width: 100%;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero p {
+                margin: 0 auto 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .cta-form {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .cta-form input,
+            .cta-form button {
+                width: 100%;
+                border-radius: 50px;
+            }
+            
+            .step:not(:last-child)::after {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .cta-content {
+                padding: 30px 20px;
+            }
+            
+            .cta-content h2 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <!-- Navigace -->
-    <nav class="fixed w-full z-20 bg-gray-900/80 backdrop-blur-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-            <a href="/" class="text-3xl font-bold text-indigo-400">Tapin.cz</a>
-            <div class="flex space-x-6">
-                <a href="#domu" class="text-gray-300 hover:text-indigo-400 transition">Domů</a>
-                <a href="#o-nas" class="text-gray-300 hover:text-indigo-400 transition">O nás</a>
-                <a href="#sluzby" class="text-gray-300 hover:text-indigo-400 transition">Služby</a>
-                <a href="#kontakt" class="text-gray-300 hover:text-indigo-400 transition">Kontakt</a>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-bolt"></i>
+                tapin<span>.cz</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Domů</a></li>
+                    <li><a href="#features">Funkce</a></li>
+                    <li><a href="#how-it-works">Jak to funguje</a></li>
+                    <li><a href="#testimonials">Recenze</a></li>
+                    <li><a href="#contact">Kontakt</a></li>
+                </ul>
+            </nav>
+            <a href="#contact" class="cta-button">Vyzkoušet zdarma</a>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>Transformujte svůj <span>online business</span> s Tapin</h1>
+                <p>Moderní řešení pro růst vašeho podnikání. Spojujeme technologie a kreativitu pro vaše úspěchy v digitálním světě.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="cta-button">Začít nyní</a>
+                    <a href="#features" class="cta-button secondary-button">Zjistit více</a>
+                </div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Hlavní sekce -->
-    <section id="domu" class="hero-bg h-screen flex items-center justify-center relative overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-20">
-            <div class="w-full h-full bg-[radial-gradient(circle_at_center,_#4f46e5_0%,_transparent_70%)]"></div>
-        </div>
-        <div class="text-center max-w-4xl mx-auto px-4 z-10">
-            <h1 class="text-5xl sm:text-7xl font-extrabold mb-6 animate-fade-in">Budoucnost je teď</h1>
-            <p class="text-xl sm:text-2xl mb-8 opacity-80 animate-slide-up">Připojte se k revoluci s Tapin.cz a objevte inovace, které mění svět.</p>
-            <a href="#kontakt" class="inline-block bg-indigo-500 text-white font-semibold py-4 px-8 rounded-full hover:bg-indigo-600 transition hover-scale animate-slide-up delay-100">Začít teď</a>
-        </div>
-    </section>
-
-    <!-- O nás -->
-    <section id="o-nas" class="py-20 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-4xl font-bold mb-8 animate-fade-in">Kdo jsme</h2>
-            <p class="text-lg text-gray-300 max-w-3xl mx-auto animate-slide-up">
-                Tapin.cz je tým vizionářů, kteří transformují nápady na realitu. Kombinujeme technologie budoucnosti s kreativitou, abychom posunuli vaše podnikání na novou úroveň.
-            </p>
-        </div>
-    </section>
-
-    <!-- Služby -->
-    <section id="sluzby" class="py-20 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12 animate-fade-in">Co nabízíme</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">Web 3.0 vývoj</h3>
-                    <p class="text-gray-300">Budujeme decentralizované a interaktivní weby, které definují budoucnost internetu.</p>
-                </div>
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up delay-100">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">AI řešení</h3>
-                    <p class="text-gray-300">Využíváme umělou inteligenci k automatizaci a optimalizaci vašich procesů.</p>
-                </div>
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up delay-200">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">Strategické inovace</h3>
-                    <p class="text-gray-300">Pomáháme vám navrhnout a realizovat strategie pro rychlý růst.</p>
-                </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600&q=80" alt="Tapin Dashboard">
             </div>
         </div>
     </section>
 
-    <!-- Kontakt -->
-    <section id="kontakt" class="py-20 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12 animate-fade-in">Spojte se s námi</h2>
-            <div class="max-w-lg mx-auto space-y-6">
-                <input type="text" placeholder="Vaše jméno" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400">
-                <input type="email" placeholder="Váš e-mail" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400">
-                <textarea placeholder="Vaše zpráva" rows="5" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400"></textarea>
-                <button class="w-full bg-indigo-500 text-white py-4 rounded-xl hover:bg-indigo-600 transition hover-scale">Odeslat zprávu</button>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Naše výjimečné funkce</h2>
+                <p>Objevte nástroje, které vám pomohou dosáhnout vašich obchodních cílů</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Rychlý výkon</h3>
+                    <p>Naše platforma je optimalizována pro maximální rychlost a výkon, takže nikdy neztratíte zákazníka.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Špičková bezpečnost</h3>
+                    <p>Vaše data jsou v bezpečí díky nejmodernějším šifrovacím technologiím a pravidelným auditům.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Automatizace</h3>
+                    <p>Automatizujte rutinní úkoly a soustřeďte se na to, co je pro váš byznys skutečně důležité.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Pokročilé analýzy</h3>
+                    <p>Získejte hluboké poznatky o vašem podnikání díky intuitivním analytickým nástrojům.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Plně responzivní</h3>
+                    <p>Vaše aplikace bude perfektně fungovat na všech zařízeních bez ohledu na velikost obrazovky.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Podpora</h3>
+                    <p>Náš tým odborníků je vám k dispozici nonstop, abyste mohli podnikat bez přerušení.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Patička -->
-    <footer class="bg-gray-900 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
-            <p>© 2025 Tapin.cz. Vytvořeno s vášní pro budoucnost.</p>
+    <!-- How it Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>Jak Tapin funguje</h2>
+                <p>Začněte využívat naše řešení během několika jednoduchých kroků</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Vytvoření účtu</h3>
+                    <p>Zaregistrujte se během 30 sekund a získejte přístup k naší platformě.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Přizpůsobení</h3>
+                    <p>Nastavte si Tapin podle potřeb vašeho podnikání pomocí jednoduchých nástrojů.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Integrace</h3>
+                    <p>Propojte Tapin se svými stávajícími nástroji a službami.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Spuštění</h3>
+                    <p>Začněte využívat všechny výhody a sledujte růst vašeho podnikání.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Co říkají naši klienti</h2>
+                <p>Přidejte se k tisícům spokojených podnikatelů, kteří využívají Tapin</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Klient" class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Eva Nováková</h4>
+                            <p>Majitelka e-shopu</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-content">
+                        <p>"Tapin nám pomohl ztrojnásobit konverzní poměr během prvních tří měsíců. Jejich analytické nástroje odhalily skryté příležitosti, které jsme dříve přehlíželi."</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Klient" class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Jan Procházka</h4>
+                            <p>Marketingový ředitel</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-content">
+                        <p>"Automatizace pomocí Tapin nám ušetřila desítky hodin měsíčně. Tým navíc neustále přidává nové funkce, které nás udržují krok s konkurencí."</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Klient" class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Petra Svobodová</h4>
+                            <p>Startup zakladatelka</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-content">
+                        <p>"Jako malá firma oceníme především přehlednost a snadné ovládání. Tapin nám umožnil růst bez nutnosti budovat vlastní IT tým."</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Začněte ještě dnes!</h2>
+                <p>Připojte se k tisícům podnikatelů, kteří už využívají Tapin pro růst svého podnikání. Zaregistrujte se a získejte 14 dní zdarma.</p>
+                <div class="cta-form">
+                    <input type="email" placeholder="Zadejte svůj email">
+                    <button class="cta-button">Vyzkoušet zdarma</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <a href="#" class="footer-logo">
+                        <i class="fas fa-bolt"></i>
+                        tapin<span>.cz</span>
+                    </a>
+                    <p>Moderní řešení pro růst vašeho podnikání. Spojujeme technologie a kreativitu pro vaše úspěchy v digitálním světě.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links-container">
+                    <h3 class="footer-heading">Rychlé odkazy</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Domů</a></li>
+                        <li><a href="#features">Funkce</a></li>
+                        <li><a href="#how-it-works">Jak to funguje</a></li>
+                        <li><a href="#testimonials">Recenze</a></li>
+                        <li><a href="#contact">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-container">
+                    <h3 class="footer-heading">Produkty</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Tapin Business</a></li>
+                        <li><a href="#">Tapin Analytics</a></li>
+                        <li><a href="#">Tapin Marketing</a></li>
+                        <li><a href="#">Tapin Automate</a></li>
+                        <li><a href="#">Tapin CRM</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3 class="footer-heading">Kontakt</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Václavské náměstí 837, Praha</p>
+                    <p><i class="fas fa-phone-alt"></i> +420 123 456 789</p>
+                    <p><i class="fas fa-envelope"></i> info@tapin.cz</p>
+                    <p><i class="fas fa-clock"></i> Po-Pá: 9:00 - 17:00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Tapin.cz. Všechna práva vyhrazena.</p>
+            </div>
         </div>
     </footer>
 
     <script>
-        // GSAP animace pro plynulé načítání
-        gsap.from(".animate-fade-in", { opacity: 0, duration: 1, ease: "power2.out" });
-        gsap.from(".animate-slide-up", { y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: "power2.out" });
-
-        // Plynulé posouvání
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -117,155 +944,38 @@
             });
         });
 
-        // GSAP ScrollTrigger pro animace při scrollování
-        gsap.utils.toArray('.hover-scale').forEach(element => {
-            gsap.from(element, {
-                scrollTrigger: {
-                    trigger: element,
-                    start: "top 80%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out"
-            });
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navMenu = document.querySelector('nav ul');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
         });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tapin.cz - Vaše budoucnost začíná zde">
-    <title>Tapin.cz - Budoucnost je teď</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hero-bg { 
-            background: linear-gradient(135deg, #1e1b4b, #4c1d95);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .hover-scale { transition: transform 0.3s ease; }
-        .hover-scale:hover { transform: scale(1.05); }
-    </style>
-</head>
-<body class="bg-gray-900 text-white">
-    <!-- Navigace -->
-    <nav class="fixed w-full z-20 bg-gray-900/80 backdrop-blur-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-            <a href="/" class="text-3xl font-bold text-indigo-400">Tapin.cz</a>
-            <div class="flex space-x-6">
-                <a href="#domu" class="text-gray-300 hover:text-indigo-400 transition">Domů</a>
-                <a href="#o-nas" class="text-gray-300 hover:text-indigo-400 transition">O nás</a>
-                <a href="#sluzby" class="text-gray-300 hover:text-indigo-400 transition">Služby</a>
-                <a href="#kontakt" class="text-gray-300 hover:text-indigo-400 transition">Kontakt</a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Hlavní sekce -->
-    <section id="domu" class="hero-bg h-screen flex items-center justify-center relative overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-20">
-            <div class="w-full h-full bg-[radial-gradient(circle_at_center,_#4f46e5_0%,_transparent_70%)]"></div>
-        </div>
-        <div class="text-center max-w-4xl mx-auto px-4 z-10">
-            <h1 class="text-5xl sm:text-7xl font-extrabold mb-6 animate-fade-in">Budoucnost je teď</h1>
-            <p class="text-xl sm:text-2xl mb-8 opacity-80 animate-slide-up">Připojte se k revoluci s Tapin.cz a objevte inovace, které mění svět.</p>
-            <a href="#kontakt" class="inline-block bg-indigo-500 text-white font-semibold py-4 px-8 rounded-full hover:bg-indigo-600 transition hover-scale animate-slide-up delay-100">Začít teď</a>
-        </div>
-    </section>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.boxShadow = 'none';
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
 
-    <!-- O nás -->
-    <section id="o-nas" class="py-20 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-4xl font-bold mb-8 animate-fade-in">Kdo jsme</h2>
-            <p class="text-lg text-gray-300 max-w-3xl mx-auto animate-slide-up">
-                Tapin.cz je tým vizionářů, kteří transformují nápady na realitu. Kombinujeme technologie budoucnosti s kreativitou, abychom posunuli vaše podnikání na novou úroveň.
-            </p>
-        </div>
-    </section>
-
-    <!-- Služby -->
-    <section id="sluzby" class="py-20 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12 animate-fade-in">Co nabízíme</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">Web 3.0 vývoj</h3>
-                    <p class="text-gray-300">Budujeme decentralizované a interaktivní weby, které definují budoucnost internetu.</p>
-                </div>
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up delay-100">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">AI řešení</h3>
-                    <p class="text-gray-300">Využíváme umělou inteligenci k automatizaci a optimalizaci vašich procesů.</p>
-                </div>
-                <div class="bg-gray-800 p-8 rounded-xl hover-scale transition animate-slide-up delay-200">
-                    <h3 class="text-2xl font-semibold mb-4 text-indigo-400">Strategické inovace</h3>
-                    <p class="text-gray-300">Pomáháme vám navrhnout a realizovat strategie pro rychlý růst.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Kontakt -->
-    <section id="kontakt" class="py-20 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12 animate-fade-in">Spojte se s námi</h2>
-            <div class="max-w-lg mx-auto space-y-6">
-                <input type="text" placeholder="Vaše jméno" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400">
-                <input type="email" placeholder="Váš e-mail" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400">
-                <textarea placeholder="Vaše zpráva" rows="5" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white placeholder-gray-400"></textarea>
-                <button class="w-full bg-indigo-500 text-white py-4 rounded-xl hover:bg-indigo-600 transition hover-scale">Odeslat zprávu</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Patička -->
-    <footer class="bg-gray-900 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
-            <p>© 2025 Tapin.cz. Vytvořeno s vášní pro budoucnost.</p>
-        </div>
-    </footer>
-
-    <script>
-        // GSAP animace pro plynulé načítání
-        gsap.from(".animate-fade-in", { opacity: 0, duration: 1, ease: "power2.out" });
-        gsap.from(".animate-slide-up", { y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: "power2.out" });
-
-        // Plynulé posouvání
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        // Form submission
+        const ctaForm = document.querySelector('.cta-form');
+        if (ctaForm) {
+            ctaForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const emailInput = this.querySelector('input[type="email"]');
+                if (emailInput.value) {
+                    alert(`Děkujeme! Na adresu ${emailInput.value} vám brzy přijde přístup k Tapin zdarma.`);
+                    emailInput.value = '';
+                }
             });
-        });
-
-        // GSAP ScrollTrigger pro animace při scrollování
-        gsap.utils.toArray('.hover-scale').forEach(element => {
-            gsap.from(element, {
-                scrollTrigger: {
-                    trigger: element,
-                    start: "top 80%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out"
-            });
-        });
+        }
     </script>
 </body>
 </html>
