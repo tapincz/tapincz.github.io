@@ -11,6 +11,7 @@
             --light: #f8f9fa;
             --dark: #343a40;
             --success: #28a745;
+            --warning: #ffc107;
         }
         
         * {
@@ -124,6 +125,13 @@
             border-top: 1px solid #ddd;
         }
         
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
         @media (max-width: 600px) {
             .input-field {
                 min-width: 100%;
@@ -140,7 +148,17 @@
         <h1>Výpočet Denní Tržby</h1>
         
         <div class="section">
-            <h2 class="section-title">Hotovost</h2>
+            <h2 class="section-title">Počáteční stav</h2>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="zaklad">Základ (hotovost v kase ráno)</label>
+                    <input type="number" id="zaklad" min="0" value="0">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Hotovost v kase na konci dne</h2>
             <div class="input-group">
                 <div class="input-field">
                     <label for="5000">5000 Kč</label>
@@ -185,6 +203,8 @@
                     <input type="number" id="10" min="0" value="0">
                 </div>
             </div>
+            
+            <p class="info-text">Pozn.: V kase vždy nechávám všechny drobné a tisícovku ve stovkách</p>
         </div>
         
         <div class="section">
@@ -197,42 +217,28 @@
             </div>
         </div>
         
-        <div class="section">
-            <h2 class="section-title">Další údaje</h2>
-            <div class="input-group">
-                <div class="input-field">
-                    <label for="zaklad">Daňový základ (Kč)</label>
-                    <input type="number" id="zaklad" min="0" value="0">
-                </div>
-                <div class="input-field">
-                    <label for="dph">DPH (Kč)</label>
-                    <input type="number" id="dph" min="0" value="0">
-                </div>
-            </div>
-        </div>
-        
-        <button onclick="vypocitat()">Vypočítat tržbu</button>
+        <button onclick="vypocitat()">Vypočítat denní tržbu</button>
         
         <div class="result" id="result" style="display: none;">
             <h2 class="section-title">Výsledky</h2>
             <div class="result-item">
-                <span>Hotovost:</span>
-                <span id="hotovost">0 Kč</span>
+                <span>Hotovost v kase na konci dne:</span>
+                <span id="kasa-konec">0 Kč</span>
             </div>
             <div class="result-item">
-                <span>Karty:</span>
-                <span id="karty-vysledek">0 Kč</span>
-            </div>
-            <div class="result-item">
-                <span>Daňový základ:</span>
+                <span>Základ (hotovost ráno):</span>
                 <span id="zaklad-vysledek">0 Kč</span>
             </div>
             <div class="result-item">
-                <span>DPH:</span>
-                <span id="dph-vysledek">0 Kč</span>
+                <span>Tržba v hotovosti:</span>
+                <span id="hotovost-trzba">0 Kč</span>
+            </div>
+            <div class="result-item">
+                <span>Tržba na kartách:</span>
+                <span id="karty-vysledek">0 Kč</span>
             </div>
             <div class="result-total">
-                <span>Celková tržba:</span>
+                <span>Celková denní tržba:</span>
                 <span id="celkem">0 Kč</span>
             </div>
         </div>
@@ -240,7 +246,10 @@
     
     <script>
         function vypocitat() {
-            // Hotovost
+            // Základ (hotovost ráno)
+            const zaklad = parseInt(document.getElementById('zaklad').value) || 0;
+            
+            // Hotovost na konci dne
             const bankovky = [
                 {hodnota: 5000, id: '5000'},
                 {hodnota: 2000, id: '2000'},
@@ -253,27 +262,24 @@
                 {hodnota: 10, id: '10'}
             ];
             
-            let hotovost = 0;
+            let kasaKonec = 0;
             bankovky.forEach(b => {
                 const pocet = parseInt(document.getElementById(b.id).value) || 0;
-                hotovost += pocet * b.hodnota;
+                kasaKonec += pocet * b.hodnota;
             });
             
             // Karty
             const karty = parseInt(document.getElementById('karty').value) || 0;
             
-            // Daňové údaje
-            const zaklad = parseInt(document.getElementById('zaklad').value) || 0;
-            const dph = parseInt(document.getElementById('dph').value) || 0;
-            
-            // Celkem
-            const celkem = hotovost + karty;
+            // Výpočty
+            const hotovostTrzba = kasaKonec - zaklad;
+            const celkem = hotovostTrzba + karty;
             
             // Zobrazení výsledků
-            document.getElementById('hotovost').textContent = hotovost.toLocaleString('cs-CZ') + ' Kč';
-            document.getElementById('karty-vysledek').textContent = karty.toLocaleString('cs-CZ') + ' Kč';
             document.getElementById('zaklad-vysledek').textContent = zaklad.toLocaleString('cs-CZ') + ' Kč';
-            document.getElementById('dph-vysledek').textContent = dph.toLocaleString('cs-CZ') + ' Kč';
+            document.getElementById('kasa-konec').textContent = kasaKonec.toLocaleString('cs-CZ') + ' Kč';
+            document.getElementById('hotovost-trzba').textContent = hotovostTrzba.toLocaleString('cs-CZ') + ' Kč';
+            document.getElementById('karty-vysledek').textContent = karty.toLocaleString('cs-CZ') + ' Kč';
             document.getElementById('celkem').textContent = celkem.toLocaleString('cs-CZ') + ' Kč';
             
             document.getElementById('result').style.display = 'block';
