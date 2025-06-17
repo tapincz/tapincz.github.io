@@ -8,48 +8,86 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body { 
-            background: linear-gradient(135deg, #1f2937, #111827); 
-            color: #f3f4f6; 
+            background: linear-gradient(135deg, #1e1e2e, #2a2a3c); 
+            color: #e5e7eb; 
             font-family: 'Inter', sans-serif; 
+            overflow-x: hidden;
         }
-        .container { transition: all 0.3s ease; }
-        .card { background: #1e293b; border-radius: 1rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+        .container { transition: all 0.3s ease; padding: 2rem; }
+        .card { 
+            background: #25253a; 
+            border-radius: 1.25rem; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
+            padding: 1.5rem; 
+            border: 1px solid rgba(59, 130, 246, 0.2); 
+        }
         .item { 
             transition: all 0.3s ease; 
-            background: #334155; 
-            border-radius: 0.75rem; 
+            background: #2f2f47; 
+            border-radius: 1rem; 
             padding: 1rem; 
-            margin-bottom: 0.5rem; 
+            margin-bottom: 0.75rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: relative; 
+            overflow: hidden;
         }
         .item:hover { 
             transform: translateY(-4px); 
-            background: #3b82f6; 
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3); 
+            background: linear-gradient(45deg, #3b82f6, #60a5fa); 
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4); 
             color: white; 
+        }
+        .item .text-container { 
+            max-width: 70%; 
+            overflow: hidden; 
+            white-space: nowrap; 
+            text-overflow: ellipsis; 
+            position: relative; 
+        }
+        .item .text-container:hover::after { 
+            content: attr(data-fulltext); 
+            position: absolute; 
+            top: -2rem; 
+            left: 0; 
+            background: #1e293b; 
+            color: white; 
+            padding: 0.5rem; 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
+            z-index: 10; 
+            white-space: normal; 
+            max-width: 300px; 
+            font-size: 0.9rem; 
         }
         .cart-item { 
             transition: all 0.3s ease; 
-            background: #334155; 
-            border-radius: 0.75rem; 
-            padding: 0.75rem; 
-            margin-bottom: 0.5rem; 
+            background: #2f2f47; 
+            border-radius: 1rem; 
+            padding: 1rem; 
+            margin-bottom: 0.75rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
         }
-        .cart-item:hover { background: #475569; }
+        .cart-item:hover { background: #3b82f6; color: white; }
         .category-tab { 
-            padding: 0.75rem 1.5rem; 
-            border-radius: 9999px; 
-            background: #4b5563; 
-            color: #d1d5db; 
+            padding: 0.75rem 1.75rem; 
+            border-radius: 2rem; 
+            background: linear-gradient(45deg, #4b5563, #6b7280); 
+            color: #e5e7eb; 
             transition: all 0.3s ease; 
-            font-weight: 500; 
+            font-weight: 600; 
+            margin-right: 0.5rem; 
         }
         .category-tab:hover { 
-            background: #60a5fa; 
+            background: linear-gradient(45deg, #60a5fa, #93c5fd); 
             color: white; 
             transform: scale(1.1); 
         }
         .category-tab.active { 
-            background: #2563eb; 
+            background: linear-gradient(45deg, #2563eb, #3b82f6); 
             color: white; 
             transform: scale(1.1); 
         }
@@ -60,62 +98,85 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.7); 
+            background: rgba(0, 0, 0, 0.8); 
             z-index: 1000; 
         }
         .modal-content { 
-            background: #1e293b; 
+            background: #25253a; 
             margin: 10% auto; 
-            padding: 1.5rem; 
-            border-radius: 1rem; 
+            padding: 2rem; 
+            border-radius: 1.5rem; 
             width: 90%; 
             max-width: 600px; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
-            transform: scale(0.9); 
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); 
+            transform: translateY(-50px); 
             opacity: 0; 
             transition: transform 0.4s ease, opacity 0.4s ease; 
         }
         .modal-content.show { 
-            transform: scale(1); 
+            transform: translateY(0); 
             opacity: 1; 
         }
-        .payment-modal { max-width: 450px; }
-        .cash-input { 
-            font-size: clamp(1.25rem, 4vw, 1.5rem); 
-            padding: 0.75rem; 
-            border-radius: 0.5rem; 
-            background: #334155; 
+        .payment-modal { max-width: 500px; }
+        .custom-input { 
+            font-size: clamp(1.1rem, 3.5vw, 1.3rem); 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            background: #2f2f47; 
             color: white; 
+            border: 1px solid rgba(59, 130, 246, 0.3); 
             transition: all 0.3s ease; 
+            outline: none; 
         }
-        .cash-input:focus { 
+        .custom-input:focus { 
+            border-color: #3b82f6; 
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
             transform: scale(1.02); 
         }
+        .custom-textarea { 
+            resize: none; 
+            font-size: clamp(1rem, 3vw, 1.2rem); 
+            line-height: 1.5; 
+        }
+        .custom-button { 
+            transition: all 0.3s ease; 
+            border-radius: 1rem; 
+            font-weight: 600; 
+            padding: 0.75rem 1.5rem; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .custom-button::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); 
+            transition: 0.5s; 
+        }
+        .custom-button:hover::before { left: 100%; }
+        .custom-button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
+        }
         .shortcut-hint { 
-            font-size: clamp(0.65rem, 2vw, 0.75rem); 
+            font-size: clamp(0.7rem, 2vw, 0.8rem); 
             color: #9ca3af; 
             transition: opacity 0.3s ease; 
-        }
-        .button { 
-            transition: all 0.3s ease; 
-            border-radius: 0.5rem; 
-            font-weight: 600; 
-        }
-        .button:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
         }
         .toast { 
             position: fixed; 
             bottom: 30px; 
             right: 30px; 
             padding: 1rem 2rem; 
-            border-radius: 0.75rem; 
+            border-radius: 1rem; 
             color: white; 
             z-index: 2000; 
             transform: translateY(100px); 
             transition: transform 0.4s ease, opacity 0.4s ease; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); 
         }
         .toast.show { 
             transform: translateY(0); 
@@ -123,74 +184,67 @@
         }
         .toast-success { background: #10b981; }
         .toast-error { background: #ef4444; }
-        .input-focus { 
-            transition: all 0.3s ease; 
-            background: #334155; 
-            color: white; 
-            border: 1px solid #4b5563; 
-        }
-        .input-focus:focus { 
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
-            transform: scale(1.02); 
-        }
         .text-adaptive { 
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem); 
+            font-size: clamp(1rem, 2.8vw, 1.2rem); 
             line-height: 1.4; 
         }
         .text-title { 
-            font-size: clamp(1.5rem, 4vw, 2rem); 
+            font-size: clamp(1.8rem, 4.5vw, 2.5rem); 
         }
         .text-price { 
-            font-size: clamp(0.9rem, 2.5vw, 1rem); 
-            font-weight: 600; 
+            font-size: clamp(1rem, 2.8vw, 1.2rem); 
+            font-weight: 700; 
         }
         @media (max-width: 640px) {
-            .category-tab { padding: 0.5rem 1rem; font-size: 0.85rem; }
-            .modal-content { margin: 15% auto; padding: 1rem; }
-            .button { padding: 0.5rem; }
             .container { padding: 1rem; }
+            .card { padding: 1rem; }
+            .item { padding: 0.75rem; }
+            .category-tab { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .modal-content { margin: 15% auto; padding: 1.5rem; }
+            .custom-button { padding: 0.5rem 1rem; }
+            .text-container { max-width: 60%; }
         }
     </style>
 </head>
 <body>
-    <div class="container mx-auto p-8 max-w-7xl">
+    <div class="container mx-auto max-w-7xl">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-title font-extrabold text-white">Pokladní systém</h1>
             <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Menu -->
-            <div class="card p-6 col-span-2">
+            <div class="card col-span-2">
                 <h2 class="text-title font-semibold mb-4 text-white">Menu</h2>
                 <div class="mb-6 flex flex-col sm:flex-row gap-4">
-                    <input id="search" type="text" placeholder="Vyhledat položku..." class="input-focus p-3 rounded-lg w-full sm:w-1/3">
+                    <input id="search" type="text" placeholder="Vyhledat položku..." class="custom-input p-3 w-full sm:w-1/3">
                     <div id="categories" class="flex flex-wrap gap-3 mt-2"></div>
                 </div>
                 <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
             </div>
             <!-- Košík -->
-            <div class="card p-6">
+            <div class="card">
                 <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
                 <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
-                        <button id="clear-cart" class="button bg-red-600 text-white px-4 py-2"><i class="fas fa-trash mr-2"></i>Vyprázdnit <span class="shortcut-hint">(Ctrl+C)</span></button>
+                        <button id="clear-cart" class="custom-button bg-red-600 text-white px-4 py-2"><i class="fas fa-trash mr-2"></i>Vyprázdnit <span class="shortcut-hint">(Ctrl+C)</span></button>
                     </div>
                     <div class="space-y-4">
-                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="input-focus p-3 rounded-lg w-full">
-                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="input-focus p-3 rounded-lg w-full h-28"></textarea>
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input p-3 w-full">
+                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="custom-input custom-textarea p-3 w-full h-28"></textarea>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <button id="pay-cash" class="button bg-green-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost <span class="shortcut-hint">(Ctrl+P)</span></button>
-                        <button id="pay-card" class="button bg-blue-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
-                        <button id="pay-qr" class="button bg-purple-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-qrcode mr-2"></i>QR</button>
+                        <button id="pay-cash" class="custom-button bg-green-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost <span class="shortcut-hint">(Ctrl+P)</span></button>
+                        <button id="pay-card" class="custom-button bg-blue-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
+                        <button id="pay-qr" class="custom-button bg-purple-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-qrcode mr-2"></i>QR</button>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button id="export" class="button bg-gray-600 text-white px-4 py-2"><i class="fas fa-download mr-2"></i>Export JSON</button>
-                        <button id="history" class="button bg-yellow-600 text-white px-4 py-2"><i class="fas fa-history mr-2"></i>Historie</button>
+                        <button id="export" class="custom-button bg-gray-600 text-white px-4 py-2"><i class="fas fa-download mr-2"></i>Export JSON</button>
+                        <button id="history" class="custom-button bg-yellow-600 text-white px-4 py-2"><i class="fas fa-history mr-2"></i>Historie</button>
                     </div>
-                    <button id="print-receipt" class="button bg-indigo-600 text-white px-4 py-2 w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku <span class="shortcut-hint">(Ctrl+R)</span></button>
+                    <button id="print-receipt" class="custom-button bg-indigo-600 text-white px-4 py-2 w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku <span class="shortcut-hint">(Ctrl+R)</span></button>
                 </div>
             </div>
         </div>
@@ -201,7 +255,7 @@
         <div class="modal-content">
             <h2 class="text-title font-semibold mb-4 text-white">Historie transakcí</h2>
             <div id="history-content" class="max-h-[50vh] overflow-y-auto"></div>
-            <button id="close-history" class="button bg-red-600 text-white px-4 py-2 rounded-lg mt-4 w-full">Zavřít <span class="shortcut-hint">(Esc)</span></button>
+            <button id="close-history" class="custom-button bg-red-600 text-white px-4 py-2 mt-4 w-full">Zavřít <span class="shortcut-hint">(Esc)</span></button>
         </div>
     </div>
 
@@ -211,12 +265,12 @@
             <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
             <div class="mb-6">
                 <p class="text-adaptive">Celkem k úhradě: <span id="cash-total">0 Kč</span></p>
-                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="cash-input w-full mt-3">
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="custom-input w-full mt-3">
                 <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
             </div>
             <div class="flex gap-3">
-                <button id="confirm-cash" class="button bg-green-600 text-white px-4 py-2 flex-1">Potvrdit</button>
-                <button id="cancel-cash" class="button bg-red-600 text-white px-4 py-2 flex-1">Zrušit</button>
+                <button id="confirm-cash" class="custom-button bg-green-600 text-white px-4 py-2 flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="custom-button bg-red-600 text-white px-4 py-2 flex-1">Zrušit</button>
             </div>
         </div>
     </div>
@@ -242,7 +296,7 @@
             { id: 14, category: "Jídlo", name: "Vepřový řízek v housce (150 g)", price: 150 },
             { id: 15, category: "Jídlo", name: "Vepřový řízek (150 g)", price: 130 },
             { id: 16, category: "Jídlo", name: "Klobása (100 g) + chléb (50 g) + hořčice (10 g)", price: 90 },
-            { id: 17, category: "Jídlo", name: "Grilovaný hermelín (100 g) + brusinková omáčka (30 g) + chléb (50 g)", price: 90 },
+            { id: 17, category: "Jídlo", name: "Grilový hermelín (100 g) + brusinková omáčka (30 g) + chléb (50 g)", price: 90 },
             { id: 18, category: "Jídlo", name: "Párky (2 ks, 100 g) + chléb (50 g) + hořčice/kečup (10 g)", price: 80 },
             { id: 19, category: "Jídlo", name: "Párek v rohlíku (50 g párek, 80 g rohlík)", price: 50 },
             { id: 20, category: "Jídlo", name: "Hamburger kuřecí (150 g)", price: 80 },
@@ -351,12 +405,14 @@
                 p.name.toLowerCase().includes(search.toLowerCase())
             );
             menuDiv.innerHTML = filtered.map(product => `
-                <div class="item flex items-center justify-between" data-id="${product.id}">
-                    <div class="flex-1">
-                        <span class="text-adaptive font-medium text-white truncate">${product.name}</span>
-                        <div class="text-adaptive text-gray-400">${product.category}</div>
+                <div class="item" data-id="${product.id}">
+                    <div class="text-container text-adaptive font-medium text-white" data-fulltext="${product.name}">
+                        ${product.name}
                     </div>
-                    <span class="text-price text-green-400">${product.price} Kč</span>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-price text-green-400">${product.price} Kč</span>
+                        <span class="text-adaptive text-gray-400">${product.category}</span>
+                    </div>
                 </div>
             `).join('');
             menuDiv.querySelectorAll('.item').forEach(item => 
@@ -396,10 +452,9 @@
             cartDiv.innerHTML = cart.map((item, index) => {
                 const itemTotal = item.price * item.quantity;
                 return `
-                    <div class="cart-item flex items-center justify-between">
-                        <div class="flex-1 truncate">
-                            <span class="text-adaptive font-medium text-white">${item.name}</span>
-                            <span class="text-adaptive text-gray-400">(${item.quantity}x)</span>
+                    <div class="cart-item">
+                        <div class="text-container text-adaptive font-medium text-white" data-fulltext="${item.name}">
+                            ${item.name} (${item.quantity}x)
                         </div>
                         <div class="flex items-center space-x-4">
                             <button onclick="updateQuantity(${index}, -1)" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-minus"></i></button>
