@@ -2,454 +2,671 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Ceník Kiosku</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokladní systém</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        body { 
+            background: linear-gradient(135deg, #1f2937, #111827); 
+            color: #f3f4f6; 
+            font-family: 'Inter', sans-serif; 
         }
-        body {
-            font-family: -apple-system, Roboto, sans-serif;
-            background: #1C2526;
-            color: #FFF;
-            margin: 15px;
-            user-select: none;
-            overflow-x: hidden;
-            animation: fadeIn 0.5s ease-in;
+        .container { transition: all 0.3s ease; }
+        .card { background: #1e293b; border-radius: 1rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+        .item { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            border-radius: 0.75rem; 
+            padding: 1rem; 
+            margin-bottom: 0.5rem; 
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .item:hover { 
+            transform: translateY(-4px); 
+            background: #3b82f6; 
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3); 
+            color: white; 
         }
-        h1 {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 600;
-            color: #FFF;
-            margin-bottom: 15px;
+        .cart-item { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            border-radius: 0.75rem; 
+            padding: 0.75rem; 
+            margin-bottom: 0.5rem; 
         }
-        .search-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
+        .cart-item:hover { background: #475569; }
+        .category-tab { 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 9999px; 
+            background: #4b5563; 
+            color: #d1d5db; 
+            transition: all 0.3s ease; 
+            font-weight: 500; 
         }
-        #search {
-            width: 100%;
-            padding: 12px 40px 12px 12px;
-            font-size: 18px;
-            border: 1px solid #3A4647;
-            border-radius: 12px;
-            background: #2D3839;
-            color: #FFF;
-            transition: transform 0.2s, box-shadow 0.2s;
-            touch-action: manipulation;
+        .category-tab:hover { 
+            background: #60a5fa; 
+            color: white; 
+            transform: scale(1.1); 
         }
-        #search:focus {
-            outline: none;
-            transform: scale(1.02);
-            box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
+        .category-tab.active { 
+            background: #2563eb; 
+            color: white; 
+            transform: scale(1.1); 
         }
-        .clear-btn {
-            display: none;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #E8ECEF;
-            cursor: pointer;
-            padding: 5px;
-            transition: transform 0.3s;
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.7); 
+            z-index: 1000; 
         }
-        .clear-btn:hover {
-            transform: translateY(-50%) rotate(90deg);
+        .modal-content { 
+            background: #1e293b; 
+            margin: 10% auto; 
+            padding: 1.5rem; 
+            border-radius: 1rem; 
+            width: 90%; 
+            max-width: 600px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            transform: scale(0.9); 
+            opacity: 0; 
+            transition: transform 0.4s ease, opacity 0.4s ease; 
         }
-        .category {
-            margin-bottom: 20px;
-            background: #2D3839;
-            border-radius: 12px;
-            overflow: hidden;
-            animation: slideIn 0.5s ease-out;
+        .modal-content.show { 
+            transform: scale(1); 
+            opacity: 1; 
         }
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .payment-modal { max-width: 450px; }
+        .cash-input { 
+            font-size: clamp(1.25rem, 4vw, 1.5rem); 
+            padding: 0.75rem; 
+            border-radius: 0.5rem; 
+            background: #334155; 
+            color: white; 
+            transition: all 0.3s ease; 
         }
-        .category.hidden {
-            display: none;
+        .cash-input:focus { 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
+            transform: scale(1.02); 
         }
-        .category h2 {
-            font-size: 20px;
-            font-weight: 500;
-            background: #007AFF;
-            color: #FFF;
-            padding: 10px;
-            margin-bottom: 10px;
+        .shortcut-hint { 
+            font-size: clamp(0.65rem, 2vw, 0.75rem); 
+            color: #9ca3af; 
+            transition: opacity 0.3s ease; 
         }
-        .item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 15px;
-            font-size: 16px;
-            background: #3A4647;
-            margin: 5px 10px;
-            border-radius: 8px;
-            transition: transform 0.2s;
-            animation: slideIn 0.3s ease-out;
+        .button { 
+            transition: all 0.3s ease; 
+            border-radius: 0.5rem; 
+            font-weight: 600; 
         }
-        .item:hover {
-            transform: translateY(-2px);
+        .button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
         }
-        .item.hidden {
-            display: none;
+        .toast { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            padding: 1rem 2rem; 
+            border-radius: 0.75rem; 
+            color: white; 
+            z-index: 2000; 
+            transform: translateY(100px); 
+            transition: transform 0.4s ease, opacity 0.4s ease; 
         }
-        .item.match {
-            font-size: 24px;
-            font-weight: 500;
-            padding: 15px;
-            background: #007AFF;
-            color: #FFF;
-            border: 1px solid #3A4647;
-            border-radius: 12px;
-            margin: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            animation: popIn 0.3s ease-out;
+        .toast.show { 
+            transform: translateY(0); 
+            opacity: 1; 
         }
-        .item.fuzzy-match {
-            font-size: 20px;
-            padding: 15px;
-            background: #005BB5;
-            color: #FFF;
-            border: 1px solid #3A4647;
-            border-radius: 12px;
-            margin: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            animation: popIn 0.3s ease-out;
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        .input-focus { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            color: white; 
+            border: 1px solid #4b5563; 
         }
-        @keyframes popIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .input-focus:focus { 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
+            transform: scale(1.02); 
         }
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #007AFF;
-            color: #FFF;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            animation: pulse 2s infinite;
+        .text-adaptive { 
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem); 
+            line-height: 1.4; 
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .text-title { 
+            font-size: clamp(1.5rem, 4vw, 2rem); 
         }
-        .floating-btn:hover {
-            background: #005BB5;
+        .text-price { 
+            font-size: clamp(0.9rem, 2.5vw, 1rem); 
+            font-weight: 600; 
         }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            overflow-y: auto;
-            animation: fadeIn 0.3s ease-in;
-        }
-        .modal-content {
-            background: #2D3839;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 16px;
-            max-width: 600px;
-            color: #FFF;
-            position: relative;
-            animation: modalPop 0.3s ease-out;
-        }
-        @keyframes modalPop {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-content h2 {
-            font-size: 24px;
-            color: #007AFF;
-            margin-bottom: 15px;
-        }
-        .modal-content h3 {
-            font-size: 18px;
-            margin-top: 15px;
-            color: #E8ECEF;
-        }
-        .modal-content p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-        .modal-content ul {
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            color: #E8ECEF;
-            cursor: pointer;
-        }
-        .error-message {
-            color: #FF3B30;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-        }
-        @media (max-width: 600px) {
-            h1 { font-size: 24px; }
-            #search { font-size: 16px; padding: 10px 35px 10px 10px; }
-            .item { font-size: 14px; padding: 10px 12px; }
-            .item.match { font-size: 20px; padding: 12px; }
-            .item.fuzzy-match { font-size: 18px; padding: 12px; }
-            .modal-content { margin: 15% 10px; padding: 15px; }
-            .category h2 { font-size: 18px; }
-        }
-        @media (max-width: 400px) {
-            h1 { font-size: 20px; }
-            #search { font-size: 14px; }
-            .item { font-size: 12px; }
-            .modal-content h2 { font-size: 20px; }
+        @media (max-width: 640px) {
+            .category-tab { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            .modal-content { margin: 15% auto; padding: 1rem; }
+            .button { padding: 0.5rem; }
+            .container { padding: 1rem; }
         }
     </style>
 </head>
 <body>
-    <h1>Ceník Kiosku</h1>
-    <div class="search-container">
-        <input type="text" id="search" placeholder="Hledej položku..." aria-label="Hledat položky v ceníku" oninput="debouncedFilterItems()">
-        <span class="clear-btn" onclick="clearSearch()" aria-label="Vymazat hledání">✖</span>
-    </div>
-    <div class="error-message" id="errorMessage">Nepodařilo se načíst data. Zkuste to znovu.</div>
-    <div class="category">
-        <h2>Pípa, točené</h2>
-        <div class="item"><span>Zlatý Bažant 12 0,3l</span><span>39 Kč</span></div>
-        <div class="item"><span>Zlatý Bažant 12 0,5l</span><span>65 Kč</span></div>
-        <div class="item"><span>Krušovice 11 0,3l</span><span>36 Kč</span></div>
-        <div class="item"><span>Krušovice 11 0,5l</span><span>60 Kč</span></div>
-        <div class="item"><span>Zlatopramen Citron Radler 0,3l</span><span>36 Kč</span></div>
-        <div class="item"><span>Zlatopramen Citron Radler 0,5l</span><span>60 Kč</span></div>
-        <div class="item"><span>Malinovka 0,3l</span><span>36 Kč</span></div>
-        <div class="item"><span>Malinovka 0,5l</span><span>60 Kč</span></div>
-        <div class="item"><span>Bilý hrozn 0,3l</span><span>36 Kč</span></div>
-        <div class="item"><span>Bilý hrozn 0,5l</span><span>60 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Jídlo</h2>
-        <div class="item"><span>Vepřové koleno zadní (1 kg, s kostí)</span><span>250 Kč</span></div>
-        <div class="item"><span>Belgické vafle (1 ks, se šlehačkou, čokoládou, zmrzlinou)</span><span>120 Kč</span></div>
-        <div class="item"><span>Belgické vafle (1 ks, se šlehačkou, čokoládou)</span><span>80 Kč</span></div>
-        <div class="item"><span>Vepřový řízek v housce (150 g)</span><span>150 Kč</span></div>
-        <div class="item"><span>Vepřový řízek (150 g)</span><span>130 Kč</span></div>
-        <div class="item"><span>Klobása (100 g) + chléb (50 g) + hořčice (10 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Grilovaný hermelín (100 g) + brusinková omáčka (30 g) + chléb (50 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Párky (2 ks, 100 g) + chléb (50 g) + hořčice/kečup (10 g)</span><span>80 Kč</span></div>
-        <div class="item"><span>Párek v rohlíku (50 g párek, 80 g rohlík)</span><span>50 Kč</span></div>
-        <div class="item"><span>Hamburger kuřecí (150 g)</span><span>80 Kč</span></div>
-        <div class="item"><span>Cheeseburger kuřecí (150 g, sýr 20 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Langoš (200 g, česnek, kečup 20 g, sýr 50 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Smažený sýr v housce (100 g sýr, 80 g houska)</span><span>110 Kč</span></div>
-        <div class="item"><span>Smažený kuřecí řízek v housce (100 g řízek, 80 g houska)</span><span>110 Kč</span></div>
-        <div class="item"><span>Smažený sýr (100 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Smažený kuřecí řízek (100 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Hranolky (150 g)</span><span>80 Kč</span></div>
-        <div class="item"><span>Pizza (různé druhy, 400 g)</span><span>200 Kč</span></div>
-        <div class="item"><span>Palačinky (2 ks, 100 g) + džem (40 g) + šlehačka (30 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Palačinky (2 ks, 100 g) + zmrzlina (100 g)</span><span>130 Kč</span></div>
-        <div class="item"><span>Bramboráčky (3 ks, 150 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Kuřecí stripsy (4 ks, 120 g)</span><span>90 Kč</span></div>
-        <div class="item"><span>Hovězí hamburger Black Angus (150 g) + slanina (20 g) + sýr (20 g) + zelenina</span><span>190 Kč</span></div>
-        <div class="item"><span>Tvarohové borůvkové knedlíky (5 ks, 200 g) + šlehačka (30 g) + poleva (40 g)</span><span>180 Kč</span></div>
-        <div class="item"><span>Chléb navíc (50 g)</span><span>5 Kč</span></div>
-        <div class="item"><span>Kečup/tatarka/hořčice (20 ml)</span><span>20 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Sladkosti a drobnosti</h2>
-        <div class="item"><span>Malá modrá mléčná čokoláda Zvíkov (60 g)</span><span>50 Kč</span></div>
-        <div class="item"><span>Big Chew žvýkačka (10 g)</span><span>5 Kč</span></div>
-        <div class="item"><span>Pendrek (20 g)</span><span>10 Kč</span></div>
-        <div class="item"><span>Lízátko (15 g)</span><span>10 Kč</span></div>
-        <div class="item"><span>Tatranky (50 g)</span><span>25 Kč</span></div>
-        <div class="item"><span>Miňonky (50 g)</span><span>25 Kč</span></div>
-        <div class="item"><span>Orbit žvýkačky (14 g)</span><span>25 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Nápoje - plechovky a lahve</h2>
-        <div class="item"><span>Plzeň plech (0,5 l)</span><span>60 Kč</span></div>
-        <div class="item"><span>Pepsi plech (0,33 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Relax džus (0,25 l)</span><span>30 Kč</span></div>
-        <div class="item"><span>Medovina Zvíkov (0,5 l)</span><span>150 Kč</span></div>
-        <div class="item"><span>Zón limonáda (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Cracker (0,33 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Zlatý Bažant plech (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Birell plech (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Kozel sklo (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Gambrinus plech (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Tanja voda perlivá/neperlivá (0,5 l)</span><span>25 Kč</span></div>
-        <div class="item"><span>Mattoni (0,5 l)</span><span>35 Kč</span></div>
-        <div class="item"><span>Ledový čaj (0,5 l)</span><span>45 Kč</span></div>
-        <div class="item"><span>Big Shock (0,25 l)</span><span>45 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Káva a teplé nápoje</h2>
-        <div class="item"><span>Turecká káva (200 ml)</span><span>40 Kč</span></div>
-        <div class="item"><span>Rozpustná káva (200 ml)</span><span>50 Kč</span></div>
-        <div class="item"><span>Espresso (30 ml)</span><span>60 Kč</span></div>
-        <div class="item"><span>Espresso s mlékem (50 ml)</span><span>70 Kč</span></div>
-        <div class="item"><span>Cappuccino (150 ml)</span><span>75 Kč</span></div>
-        <div class="item"><span>Latte (200 ml)</span><span>80 Kč</span></div>
-        <div class="item"><span>Čaj (200 ml)</span><span>40 Kč</span></div>
-        <div class="item"><span>Horká čokoláda (150 ml)</span><span>70 Kč</span></div>
-        <div class="item"><span>Mlíčko navíc (50 ml)</span><span>10 Kč</span></div>
-        <div class="item"><span>Grog (200 ml)</span><span>80 Kč</span></div>
-        <div class="item"><span>Svařák (200 ml)</span><span>80 Kč</span></div>
-        <div class="item"><span>Icedové latte (300 ml)</span><span>45 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Alkohol</h2>
-        <div class="item"><span>Víno (100 ml, bílé/červené)</span><span>50 Kč</span></div>
-        <div class="item"><span>Prosecco (100 ml)</span><span>40 Kč</span></div>
-        <div class="item"><span>Aperol (150 ml)</span><span>130 Kč</span></div>
-        <div class="item"><span>Tvrdý alkohol (20 ml)</span><span>40 Kč</span></div>
-        <div class="item"><span>Tvrdý alkohol (40 ml)</span><span>60 Kč</span></div>
-        <div class="item"><span>Teplý Aperol (150 ml)</span><span>130 Kč</span></div>
-        <div class="item"><span>Aperol Spritz (300 ml)</span><span>150 Kč</span></div>
-        <div class="item"><span>Beefeater Pink & Tonic (300 ml)</span><span>130 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Pochutiny</h2>
-        <div class="item"><span>TUC krekry (50 g)</span><span>35 Kč</span></div>
-        <div class="item"><span>Slané tyčinky (50 g)</span><span>40 Kč</span></div>
-        <div class="item"><span>Krupky (50 g)</span><span>30 Kč</span></div>
-        <div class="item"><span>Solené brambůrky (75 g)</span><span>45 Kč</span></div>
-    </div>
-    <div class="category">
-        <h2>Bagety</h2>
-        <div class="item"><span>Bageta pepperoni (200 g)</span><span>80 Kč</span></div>
-        <div class="item"><span>Bageta sýr & rajče (200 g)</span><span>80 Kč</span></div>
-    </div>
-    <div class="floating-btn" onclick="openModal()" aria-label="Otevřít recepty">🍹</div>
-    <div class="modal" id="recipesModal" role="dialog" aria-labelledby="recipesTitle">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()" aria-label="Zavřít recepty">×</span>
-            <h2 id="recipesTitle">Recepty na nápoje</h2>
-            <h3>Svařák</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>200 ml červeného vína (suché nebo polosuché)</li>
-                <li>5 g (1 lžička) krystalového cukru</li>
-                <li>2 hřebíčky</li>
-                <li>1 cm skořicové kůry</li>
-                <li>1 plátek pomeranče (5 mm tlustý)</li>
-            </ul>
-            <p><strong>Postup:</strong> V hrnci zahřejte víno s cukrem, hřebíčky, skořicí a pomerančem na 70 °C (nevařte, aby se zachovala chuť). Přeceďte a podávejte teplé v keramickém hrnku.</p>
-            <h3>Grog</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>40 ml tmavého rumu (např. Tuzemák)</li>
-                <li>150 ml horké vody (80 °C)</li>
-                <li>10 g (1 lžička) medu</li>
-                <li>15 ml (1 lžíce) čerstvé citronové šťávy</li>
-                <li>1 plátek citronu (5 g)</li>
-            </ul>
-            <p><strong>Postup:</strong> Do sklenky nalijte rum, přidejte med a citronovou šťávu. Zalijte horkou vodou, promíchejte a ozdobte plátkem citronu. Podávejte horké.</p>
-            <h3>Horká čokoláda</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>20 g hořké čokolády (min. 70 % kakaa)</li>
-                <li>150 ml plnotučného mléka</li>
-                <li>1 g (špetka) mleté skořice</li>
-                <li>5 g (1 lžička) krystalového cukru</li>
-                <li>30 g šlehačky (volitelné)</li>
-            </ul>
-            <p><strong>Postup:</strong> V hrnci zahřejte mléko na 80 °C, přidejte nalámanou čokoládu, skořici a cukr. Míchejte, dokud se čokoláda nerozpustí. Nalijte do hrnku, případně ozdobte šlehačkou.</p>
-            <h3>Víno</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>100 ml bílého nebo červeného vína (dle preference)</li>
-            </ul>
-            <p><strong>Postup:</strong> Červené víno podávejte při 16–18 °C, bílé vychlazené na 8–10 °C. Nalijte do vinné sklenky a podávejte.</p>
-            <h3>Prosecco</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>100 ml prosecca (vychlazené na 6–8 °C)</li>
-                <li>1 plátek citronu nebo 1 jahoda (volitelné)</li>
-            </ul>
-            <p><strong>Postup:</strong> Nalijte vychlazené prosecco do flétny na šampaňské. Přidejte citron nebo jahodu pro ozdobu a podávejte.</p>
-            <h3>Aperol</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>50 ml Aperolu</li>
-                <li>3 kostky ledu</li>
-                <li>1 plátek pomeranče (5 mm)</li>
-            </ul>
-            <p><strong>Postup:</strong> Do sklenky s ledem nalijte Aperol. Ozdobte plátkem pomeranče a podávejte jako aperitiv.</p>
-            <h3>Aperol Spritz</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>60 ml prosecco (vychlazené)</li>
-                <li>40 ml Aperol</li>
-                <li>20 ml perlivé vody</li>
-                <li>3 kostky ledu</li>
-                <li>1 plátek pomeranče (5 mm)</li>
-            </ul>
-            <p><strong>Postup:</strong> Do sklenice s ledem nalijte prosecco, Aperol a perlivou vodu. Jemně promíchejte, přidejte plátek pomeranče a podávejte vychlazené.</p>
-            <h3>Teplý Aperol</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>100 ml bílého vína (suché)</li>
-                v<li>
-                <li>50 ml Aperol</li>
-                <li>10 g (1 lžička) medu</li>
-                v<li>
-                <li>1 plátek pomeranče (5 mm)</li>
-            </ul>
-            </p>
-            <p><strong>Postup:</strong> V hrnci zahřejte víno s Aperolem, medem a pomerančem na 60–70 °C (nevařte). Přeceďte do sklenky a podávejte teplé.</p>
-            <h3>Beefeater Pink & Tonic</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>40 ml Beefeater Pink ginu</li>
-                <li>120 ml toniku (vychlazený)</li>
-                <li>
-                <li>3 kostky ledu</li>
-                l<li>
-                <li>1 plátek jahody nebo grapefruitu (5 mm)</li>
-            </ul>
-            </p>
-            <p><strong>Postup:</strong> Do sklenky s ledem nalijte gin a tonik. Jemně promíchejte, přidejte plátek jahody nebo grapefruitu a podávejte vychlazené.</p>
-            <h3>Iced Latte</h3>
-            <p><strong>Ingredience:</strong></p>
-            <ul>
-                <li>1 kávová kapsle (30 ml espresso, např. Nespresso)</li>
-                <li>150 ml plnotučného mléka (vychlazené, 4–6 °C)</li>
-                <li>100 g kostek ledu (4–8 kostek)</li>
-                <li>10 g (2 lžičky) krystalového cukru nebo sirupu (volitelné)</li>
-            </ul>
-            </ul>
-            <p><strong>Postup:</strong> Uvařte espresso z kapsle do malé šálku a nechte vychladnout na pokojovou teplotu (5 minut). Do vysoké sklenice (300 ml) vložte kostky ledu, nalijte vychlazené mléko a přidejte cukr nebo sirup, pokud chcete sladší chuť. Pomalu nalijte espresso přes led, aby se vytvořily vrstvy. Jemně promíchejte lžičkou a podávejte s brčkem.</p>
+    <div class="container mx-auto p-8 max-w-7xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-title font-extrabold text-white">Pokladní systém</h1>
+            <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Menu -->
+            <div class="card p-6 col-span-2">
+                <h2 class="text-title font-semibold mb-4 text-white">Menu</h2>
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                    <input id="search" type="text" placeholder="Vyhledat položku..." class="input-focus p-3 rounded-lg w-full sm:w-1/3">
+                    <div id="categories" class="flex flex-wrap gap-3 mt-2"></div>
+                </div>
+                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+            </div>
+            <!-- Košík -->
+            <div class="card p-6">
+                <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
+                <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
+                        <button id="clear-cart" class="button bg-red-600 text-white px-4 py-2"><i class="fas fa-trash mr-2"></i>Vyprázdnit <span class="shortcut-hint">(Ctrl+C)</span></button>
+                    </div>
+                    <div class="space-y-4">
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="input-focus p-3 rounded-lg w-full">
+                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="input-focus p-3 rounded-lg w-full h-28"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button id="pay-cash" class="button bg-green-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost <span class="shortcut-hint">(Ctrl+P)</span></button>
+                        <button id="pay-card" class="button bg-blue-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
+                        <button id="pay-qr" class="button bg-purple-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-qrcode mr-2"></i>QR</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="export" class="button bg-gray-600 text-white px-4 py-2"><i class="fas fa-download mr-2"></i>Export JSON</button>
+                        <button id="history" class="button bg-yellow-600 text-white px-4 py-2"><i class="fas fa-history mr-2"></i>Historie</button>
+                    </div>
+                    <button id="print-receipt" class="button bg-indigo-600 text-white px-4 py-2 w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku <span class="shortcut-hint">(Ctrl+R)</span></button>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="fileLoader.js"></script>
-    <script src="uiLogic.js"></script>
+
+    <!-- Modal pro historii -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Historie transakcí</h2>
+            <div id="history-content" class="max-h-[50vh] overflow-y-auto"></div>
+            <button id="close-history" class="button bg-red-600 text-white px-4 py-2 rounded-lg mt-4 w-full">Zavřít <span class="shortcut-hint">(Esc)</span></button>
+        </div>
+    </div>
+
+    <!-- Modal pro platbu hotovostí -->
+    <div id="cash-modal" class="modal">
+        <div class="modal-content payment-modal">
+            <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
+            <div class="mb-6">
+                <p class="text-adaptive">Celkem k úhradě: <span id="cash-total">0 Kč</span></p>
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="cash-input w-full mt-3">
+                <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
+            </div>
+            <div class="flex gap-3">
+                <button id="confirm-cash" class="button bg-green-600 text-white px-4 py-2 flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="button bg-red-600 text-white px-4 py-2 flex-1">Zrušit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast pro notifikace -->
+    <div id="toast" class="toast" style="display: none;"></div>
+
+    <script>
+        const products = [
+            { id: 1, category: "Pípa, točené", name: "Zlatý Bažant 12 0,3l", price: 39 },
+            { id: 2, category: "Pípa, točené", name: "Zlatý Bažant 12 0,5l", price: 65 },
+            { id: 3, category: "Pípa, točené", name: "Krušovice 11 0,3l", price: 36 },
+            { id: 4, category: "Pípa, točené", name: "Krušovice 11 0,5l", price: 60 },
+            { id: 5, category: "Pípa, točené", name: "Zlatopramen Citron Radler 0,3l", price: 36 },
+            { id: 6, category: "Pípa, točené", name: "Zlatopramen Citron Radler 0,5l", price: 60 },
+            { id: 7, category: "Pípa, točené", name: "Malinovka 0,3l", price: 36 },
+            { id: 8, category: "Pípa, točené", name: "Malinovka 0,5l", price: 60 },
+            { id: 9, category: "Pípa, točené", name: "Bilý hrozn 0,3l", price: 36 },
+            { id: 10, category: "Pípa, točené", name: "Bilý hrozn 0,5l", price: 60 },
+            { id: 11, category: "Jídlo", name: "Vepřové koleno zadní (1 kg, s kostí)", price: 250 },
+            { id: 12, category: "Jídlo", name: "Belgické vafle (1 ks, se šlehačkou, čokoládou, zmrzlinou)", price: 120 },
+            { id: 13, category: "Jídlo", name: "Belgické vafle (1 ks, se šlehačkou, čokoládou)", price: 80 },
+            { id: 14, category: "Jídlo", name: "Vepřový řízek v housce (150 g)", price: 150 },
+            { id: 15, category: "Jídlo", name: "Vepřový řízek (150 g)", price: 130 },
+            { id: 16, category: "Jídlo", name: "Klobása (100 g) + chléb (50 g) + hořčice (10 g)", price: 90 },
+            { id: 17, category: "Jídlo", name: "Grilovaný hermelín (100 g) + brusinková omáčka (30 g) + chléb (50 g)", price: 90 },
+            { id: 18, category: "Jídlo", name: "Párky (2 ks, 100 g) + chléb (50 g) + hořčice/kečup (10 g)", price: 80 },
+            { id: 19, category: "Jídlo", name: "Párek v rohlíku (50 g párek, 80 g rohlík)", price: 50 },
+            { id: 20, category: "Jídlo", name: "Hamburger kuřecí (150 g)", price: 80 },
+            { id: 21, category: "Jídlo", name: "Cheeseburger kuřecí (150 g, sýr 20 g)", price: 90 },
+            { id: 22, category: "Jídlo", name: "Langoš (200 g, česnek, kečup 20 g, sýr 50 g)", price: 90 },
+            { id: 23, category: "Jídlo", name: "Smažený sýr v housce (100 g sýr, 80 g houska)", price: 110 },
+            { id: 24, category: "Jídlo", name: "Smažený kuřecí řízek v housce (100 g řízek, 80 g houska)", price: 110 },
+            { id: 25, category: "Jídlo", name: "Smažený sýr (100 g)", price: 90 },
+            { id: 26, category: "Jídlo", name: "Smažený kuřecí řízek (100 g)", price: 90 },
+            { id: 27, category: "Jídlo", name: "Hranolky (150 g)", price: 80 },
+            { id: 28, category: "Jídlo", name: "Pizza (různé druhy, 400 g)", price: 200 },
+            { id: 29, category: "Jídlo", name: "Palačinky (2 ks, 100 g) + džem (40 g) + šlehačka (30 g)", price: 90 },
+            { id: 30, category: "Jídlo", name: "Palačinky (2 ks, 100 g) + zmrzlina (100 g)", price: 130 },
+            { id: 31, category: "Jídlo", name: "Bramboráčky (3 ks, 150 g)", price: 90 },
+            { id: 32, category: "Jídlo", name: "Kuřecí stripsy (4 ks, 120 g)", price: 90 },
+            { id: 33, category: "Jídlo", name: "Hovězí hamburger Black Angus (150 g) + slanina (20 g) + sýr (20 g) + zelenina", price: 190 },
+            { id: 34, category: "Jídlo", name: "Tvarohové borůvkové knedlíky (5 ks, 200 g) + šlehačka (30 g) + poleva (40 g)", price: 180 },
+            { id: 35, category: "Jídlo", name: "Chléb navíc (50 g)", price: 5 },
+            { id: 36, category: "Jídlo", name: "Kečup/tatarka/hořčice (20 ml)", price: 20 },
+            { id: 37, category: "Sladkosti a drobnosti", name: "Malá modrá mléčná čokoláda Zvíkov (60 g)", price: 50 },
+            { id: 38, category: "Sladkosti a drobnosti", name: "Big Chew žvýkačka (10 g)", price: 5 },
+            { id: 39, category: "Sladkosti a drobnosti", name: "Pendrek (20 g)", price: 10 },
+            { id: 40, category: "Sladkosti a drobnosti", name: "Lízátko (15 g)", price: 10 },
+            { id: 41, category: "Sladkosti a drobnosti", name: "Tatranky (50 g)", price: 25 },
+            { id: 42, category: "Sladkosti a drobnosti", name: "Miňonky (50 g)", price: 25 },
+            { id: 43, category: "Sladkosti a drobnosti", name: "Orbit žvýkačky (14 g)", price: 25 },
+            { id: 44, category: "Nápoje - plechovky a lahve", name: "Plzeň plech (0,5 l)", price: 60 },
+            { id: 45, category: "Nápoje - plechovky a lahve", name: "Pepsi plech (0,33 l)", price: 45 },
+            { id: 46, category: "Nápoje - plechovky a lahve", name: "Relax džus (0,25 l)", price: 30 },
+            { id: 47, category: "Nápoje - plechovky a lahve", name: "Medovina Zvíkov (0,5 l)", price: 150 },
+            { id: 48, category: "Nápoje - plechovky a lahve", name: "Zón limonáda (0,5 l)", price: 45 },
+            { id: 49, category: "Nápoje - plechovky a lahve", name: "Cracker (0,33 l)", price: 45 },
+            { id: 50, category: "Nápoje - plechovky a lahve", name: "Zlatý Bažant plech (0,5 l)", price: 45 },
+            { id: 51, category: "Nápoje - plechovky a lahve", name: "Birell plech (0,5 l)", price: 45 },
+            { id: 52, category: "Nápoje - plechovky a lahve", name: "Kozel sklo (0,5 l)", price: 45 },
+            { id: 53, category: "Nápoje - plechovky a lahve", name: "Gambrinus plech (0,5 l)", price: 45 },
+            { id: 54, category: "Nápoje - plechovky a lahve", name: "Tanja voda perlivá/neperlivá (0,5 l)", price: 25 },
+            { id: 55, category: "Nápoje - plechovky a lahve", name: "Mattoni (0,5 l)", price: 35 },
+            { id: 56, category: "Nápoje - plechovky a lahve", name: "Ledový čaj (0,5 l)", price: 45 },
+            { id: 57, category: "Nápoje - plechovky a lahve", name: "Big Shock (0,25 l)", price: 45 },
+            { id: 58, category: "Káva a teplé nápoje", name: "Turecká káva (200 ml)", price: 40 },
+            { id: 59, category: "Káva a teplé nápoje", name: "Rozpustná káva (200 ml)", price: 50 },
+            { id: 60, category: "Káva a teplé nápoje", name: "Espresso (30 ml)", price: 60 },
+            { id: 61, category: "Káva a teplé nápoje", name: "Espresso s mlékem (50 ml)", price: 70 },
+            { id: 62, category: "Káva a teplé nápoje", name: "Cappuccino (150 ml)", price: 75 },
+            { id: 63, category: "Káva a teplé nápoje", name: "Latte (200 ml)", price: 80 },
+            { id: 64, category: "Káva a teplé nápoje", name: "Čaj (200 ml)", price: 40 },
+            { id: 65, category: "Káva a teplé nápoje", name: "Horká čokoláda (150 ml)", price: 70 },
+            { id: 66, category: "Káva a teplé nápoje", name: "Mlíčko navíc (50 ml)", price: 10 },
+            { id: 67, category: "Káva a teplé nápoje", name: "Grog (200 ml)", price: 80 },
+            { id: 68, category: "Káva a teplé nápoje", name: "Svařák (200 ml)", price: 80 },
+            { id: 69, category: "Káva a teplé nápoje", name: "Icedové latte (300 ml)", price: 45 },
+            { id: 70, category: "Alkohol", name: "Víno (100 ml, bílé/červené)", price: 50 },
+            { id: 71, category: "Alkohol", name: "Prosecco (100 ml)", price: 40 },
+            { id: 72, category: "Alkohol", name: "Aperol (150 ml)", price: 130 },
+            { id: 73, category: "Alkohol", name: "Tvrdý alkohol (20 ml)", price: 40 },
+            { id: 74, category: "Alkohol", name: "Tvrdý alkohol (40 ml)", price: 60 },
+            { id: 75, category: "Alkohol", name: "Teplý Aperol (150 ml)", price: 130 },
+            { id: 76, category: "Alkohol", name: "Aperol Spritz (300 ml)", price: 150 },
+            { id: 77, category: "Alkohol", name: "Beefeater Pink & Tonic (300 ml)", price: 130 },
+            { id: 78, category: "Pochutiny", name: "TUC krekry (50 g)", price: 35 },
+            { id: 79, category: "Pochutiny", name: "Slané tyčinky (50 g)", price: 40 },
+            { id: 80, category: "Pochutiny", name: "Krupky (50 g)", price: 30 },
+            { id: 81, category: "Pochutiny", name: "Solené brambůrky (75 g)", price: 45 }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let history = JSON.parse(localStorage.getItem('history') || '[]');
+
+        // Zobrazení aktuálního data
+        function updateDate() {
+            document.getElementById('current-date').textContent = new Date().toLocaleString('cs-CZ', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        // Zobrazení notifikací
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type === 'success' ? 'toast-success' : 'toast-error'} show`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.style.display = 'none'; }, 400);
+            }, 3000);
+        }
+
+        // Zobrazení kategorií
+        function displayCategories() {
+            const categoriesDiv = document.getElementById('categories');
+            const categories = ['Vše', ...new Set(products.map(p => p.category))];
+            categoriesDiv.innerHTML = categories.map(cat => 
+                `<span class="category-tab ${cat === 'Vše' ? 'active' : ''}" data-category="${cat}">${cat}</span>`
+            ).join('');
+            categoriesDiv.querySelectorAll('.category-tab').forEach(tab => 
+                tab.addEventListener('click', () => filterMenu(tab.dataset.category))
+            );
+        }
+
+        // Filtrování a zobrazení menu
+        function displayMenu(category = 'Vše', search = '') {
+            const menuDiv = document.getElementById('menu');
+            const filtered = products.filter(p => 
+                (category === 'Vše' || p.category === category) &&
+                p.name.toLowerCase().includes(search.toLowerCase())
+            );
+            menuDiv.innerHTML = filtered.map(product => `
+                <div class="item flex items-center justify-between" data-id="${product.id}">
+                    <div class="flex-1">
+                        <span class="text-adaptive font-medium text-white truncate">${product.name}</span>
+                        <div class="text-adaptive text-gray-400">${product.category}</div>
+                    </div>
+                    <span class="text-price text-green-400">${product.price} Kč</span>
+                </div>
+            `).join('');
+            menuDiv.querySelectorAll('.item').forEach(item => 
+                item.addEventListener('click', () => {
+                    const productId = parseInt(item.dataset.id);
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        addToCart(product);
+                        showToast(`${product.name} přidán do košíku`);
+                    }
+                })
+            );
+        }
+
+        // Přidání do košíku
+        function addToCart(product) {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            saveCart();
+            updateCart();
+        }
+
+        // Aktualizace košíku
+        function updateCart() {
+            const cartDiv = document.getElementById('cart');
+            const totalSpan = document.getElementById('total');
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            if (discount < 0 || discount > 100) {
+                showToast('Sleva musí být mezi 0 a 100%', 'error');
+                document.getElementById('discount').value = '';
+                return;
+            }
+            cartDiv.innerHTML = cart.map((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                return `
+                    <div class="cart-item flex items-center justify-between">
+                        <div class="flex-1 truncate">
+                            <span class="text-adaptive font-medium text-white">${item.name}</span>
+                            <span class="text-adaptive text-gray-400">(${item.quantity}x)</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="updateQuantity(${index}, -1)" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-minus"></i></button>
+                            <span class="text-price text-green-400">${itemTotal} Kč</span>
+                            <button onclick="updateQuantity(${index}, 1)" class="text-green-400 hover:text-green-600 transition"><i class="fas fa-plus"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            total = discount ? total * (1 - discount / 100) : total;
+            totalSpan.textContent = `${Math.round(total)} Kč`;
+        }
+
+        // Úprava množství
+        function updateQuantity(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+                showToast('Položka odebrána z košíku');
+            }
+            saveCart();
+            updateCart();
+        }
+
+        // Odebrání z košíku
+        function removeFromCart(index) {
+            const itemName = cart[index].name;
+            cart.splice(index, 1);
+            saveCart();
+            updateCart();
+            showToast(`${itemName} odebrán z košíku`);
+        }
+
+        // Uložení košíku
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // Vyprázdnění košíku
+        document.getElementById('clear-cart').addEventListener('click', () => {
+            if (cart.length === 0) {
+                showToast('Košík je již prázdný', 'error');
+                return;
+            }
+            cart = [];
+            saveCart();
+            updateCart();
+            showToast('Košík vyprázdněn');
+        });
+
+        // Filtrování podle kategorie
+        function filterMenu(category) {
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            displayMenu(category, document.getElementById('search').value);
+        }
+
+        // Vyhledávání
+        document.getElementById('search').addEventListener('input', e => {
+            const activeCategory = document.querySelector('.category-tab.active').dataset.category;
+            displayMenu(activeCategory, e.target.value);
+        });
+
+        // Zpracování platby
+        function processPayment(method, receivedAmount = null) {
+            const notes = document.getElementById('notes').value;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount / 100);
+            if (!cart.length) {
+                showToast('Košík je prázdný!', 'error');
+                return;
+            }
+            
+            const transaction = {
+                id: Date.now(),
+                cart: [...cart],
+                total: Math.round(total),
+                method,
+                notes,
+                date: new Date().toLocaleString('cs-CZ'),
+                change: receivedAmount ? Math.round((receivedAmount - total) * 100) / 100 : null
+            };
+            history.push(transaction);
+            localStorage.setItem('history', JSON.stringify(history));
+            
+            let message = `Platba ${method} provedena! Celkem: ${Math.round(total)} Kč`;
+            if (receivedAmount && receivedAmount > total) {
+                message += `\nVráceno: ${(receivedAmount - total).toFixed(2)} Kč`;
+            }
+            showToast(message);
+            
+            cart = [];
+            document.getElementById('notes').value = '';
+            document.getElementById('discount').value = '';
+            saveCart();
+            updateCart();
+        }
+
+        // Platba hotovostí s výpočtem vrácených peněz
+        document.getElementById('pay-cash').addEventListener('click', () => {
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * 
+                         (1 - (parseFloat(document.getElementById('discount').value) || 0) / 100);
+            if (!cart.length) {
+                showToast('Košík je prázdný!', 'error');
+                return;
+            }
+            
+            const cashModal = document.getElementById('cash-modal');
+            const cashTotal = document.getElementById('cash-total');
+            const cashAmount = document.getElementById('cash-amount');
+            const cashChange = document.getElementById('cash-change');
+            
+            cashTotal.textContent = `${Math.round(total)} Kč`;
+            cashAmount.value = '';
+            cashChange.textContent = '0 Kč';
+            cashModal.style.display = 'block';
+            cashModal.querySelector('.modal-content').classList.add('show');
+            
+            cashAmount.addEventListener('input', () => {
+                const received = parseFloat(cashAmount.value) || 0;
+                const change = received - total;
+                cashChange.textContent = change > 0 ? `${change.toFixed(2)} Kč` : '0 Kč';
+            });
+            
+            document.getElementById('confirm-cash').onclick = () => {
+                const received = parseFloat(cashAmount.value) || 0;
+                if (received < total) {
+                    showToast('Nedostatečná částka!', 'error');
+                    return;
+                }
+                processPayment('Hotovost', received);
+                cashModal.style.display = 'none';
+            };
+            
+            document.getElementById('cancel-cash').onclick = () => {
+                cashModal.querySelector('.modal-content').classList.remove('show');
+                setTimeout(() => { cashModal.style.display = 'none'; }, 400);
+            };
+        });
+
+        // Ostatní platby
+        document.getElementById('pay-card').addEventListener('click', () => processPayment('Karta'));
+        document.getElementById('pay-qr').addEventListener('click', () => processPayment('QR'));
+
+        // Tisk účtenky
+        document.getElementById('print-receipt').addEventListener('click', () => {
+            if (!cart.length) {
+                showToast('Košík je prázdný!', 'error');
+                return;
+            }
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount / 100);
+            const notes = document.getElementById('notes').value;
+            
+            const receiptWindow = window.open('', '_blank');
+            receiptWindow.document.write(`
+                <html>
+                <head>
+                    <title>Účtenka</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; max-width: 300px; margin: 0 auto; }
+                        h1 { font-size: 18px; text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                        th, td { padding: 5px; text-align: left; }
+                        .total { font-weight: bold; }
+                        .notes { font-style: italic; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Účtenka</h1>
+                    <p>Datum: ${new Date().toLocaleString('cs-CZ')}</p>
+                    <table>
+                        <tr><th>Položka</th><th>Množství</th><th>Cena</th></tr>
+                        ${cart.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}x</td>
+                                <td>${(item.price * item.quantity)} Kč</td>
+                            </tr>
+                        `).join('')}
+                        ${discount ? `<tr><td colspan="2">Sleva (${discount}%)</td><td>-${Math.round(total * discount / (100 - discount))} Kč</td></tr>` : ''}
+                        <tr class="total"><td colspan="2">Celkem</td><td>${Math.round(total)} Kč</td></tr>
+                    </table>
+                    ${notes ? `<p class="notes">Poznámky: ${notes}</p>` : ''}
+                    <p style="text-align: center;">Děkujeme za nákup!</p>
+                </body>
+                </html>
+            `);
+            receiptWindow.document.close();
+            receiptWindow.print();
+        });
+
+        // Export JSON
+        document.getElementById('export').addEventListener('click', () => {
+            if (!cart.length && !history.length) {
+                showToast('Žádná data k exportu!', 'error');
+                return;
+            }
+            const data = JSON.stringify({ cart, history }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pokladna_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data exportována');
+        });
+
+        // Historie
+        document.getElementById('history').addEventListener('click', () => {
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-content');
+            if (!history.length) {
+                content.innerHTML = '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
+            } else {
+                content.innerHTML = history.map(t => `
+                    <div class="p-4 border-b bg-gray-700 rounded-lg transition-all duration-300 hover:bg-gray-600">
+                        <div class="flex justify-between">
+                            <span class="text-adaptive"><strong>ID:</strong> ${t.id}</span>
+                            <span class="text-adaptive"><strong>Datum:</strong> ${t.date}</span>
+                        </div>
+                        <div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div>
+                        <div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>
+                        ${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}
+                        <div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
+                        ${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}
+                    </div>
+                `).join('');
+            }
+            modal.style.display = 'block';
+            modal.querySelector('.modal-content').classList.add('show');
+        });
+
+        document.getElementById('close-history').addEventListener('click', () => {
+            const modal = document.getElementById('history-modal');
+            modal.querySelector('.modal-content').classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 400);
+        });
+
+        // Klávesové zkratky
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const historyModal = document.getElementById('history-modal');
+                const cashModal = document.getElementById('cash-modal');
+                if (historyModal.style.display === 'block') {
+                    historyModal.querySelector('.modal-content').classList.remove('show');
+                    setTimeout(() => { historyModal.style.display = 'none'; }, 400);
+                }
+                if (cashModal.style.display === 'block') {
+                    cashModal.querySelector('.modal-content').classList.remove('show');
+                    setTimeout(() => { cashModal.style.display = 'none'; }, 400);
+                }
+            }
+            if (e.ctrlKey && e.key === 'c') document.getElementById('clear-cart').click();
+            if (e.ctrlKey && e.key === 'p') document.getElementById('pay-cash').click();
+            if (e.ctrlKey && e.key === 'r') document.getElementById('print-receipt').click();
+        });
+
+        // Inicializace
+        updateDate();
+        displayCategories();
+        displayMenu();
+        updateCart();
+        setInterval(updateDate, 60000); // Aktualizace času každou minutu
+    </script>
 </body>
 </html>
