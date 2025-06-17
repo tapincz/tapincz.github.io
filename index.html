@@ -7,77 +7,190 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); }
+        body { 
+            background: linear-gradient(135deg, #1f2937, #111827); 
+            color: #f3f4f6; 
+            font-family: 'Inter', sans-serif; 
+        }
         .container { transition: all 0.3s ease; }
-        .item { transition: all 0.2s ease; }
-        .item:hover { transform: translateY(-2px); background-color: #dbeafe; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        .cart-item { transition: all 0.2s ease; }
-        .cart-item:hover { background-color: #f3f4f6; }
-        .category-tab { padding: 0.75rem 1.5rem; border-radius: 9999px; background-color: #e5e7eb; transition: all 0.2s ease; }
-        .category-tab:hover { background-color: #d1d5db; transform: scale(1.05); }
-        .category-tab.active { background-color: #2563eb; color: white; transform: scale(1.05); }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; }
-        .modal-content { background: white; margin: 10% auto; padding: 24px; border-radius: 1rem; width: 90%; max-width: 600px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); transform: scale(0.95); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; }
-        .modal-content.show { transform: scale(1); opacity: 1; }
-        .payment-modal { max-width: 400px; }
-        .cash-input { font-size: 1.5rem; padding: 0.75rem; border-radius: 0.5rem; transition: all 0.2s ease; }
-        .cash-input:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
-        .shortcut-hint { font-size: 0.75rem; color: #6b7280; transition: opacity 0.2s ease; }
-        .button { transition: all 0.2s ease; }
-        .button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; border-radius: 0.5rem; color: white; z-index: 2000; transform: translateY(100px); transition: transform 0.3s ease, opacity 0.3s ease; }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast-success { background-color: #10b981; }
-        .toast-error { background-color: #ef4444; }
-        .input-focus { transition: all 0.2s ease; }
-        .input-focus:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); transform: scale(1.01); }
+        .card { background: #1e293b; border-radius: 1rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+        .item { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            border-radius: 0.75rem; 
+            padding: 1rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .item:hover { 
+            transform: translateY(-4px); 
+            background: #3b82f6; 
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3); 
+            color: white; 
+        }
+        .cart-item { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            border-radius: 0.75rem; 
+            padding: 0.75rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .cart-item:hover { background: #475569; }
+        .category-tab { 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 9999px; 
+            background: #4b5563; 
+            color: #d1d5db; 
+            transition: all 0.3s ease; 
+            font-weight: 500; 
+        }
+        .category-tab:hover { 
+            background: #60a5fa; 
+            color: white; 
+            transform: scale(1.1); 
+        }
+        .category-tab.active { 
+            background: #2563eb; 
+            color: white; 
+            transform: scale(1.1); 
+        }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.7); 
+            z-index: 1000; 
+        }
+        .modal-content { 
+            background: #1e293b; 
+            margin: 10% auto; 
+            padding: 1.5rem; 
+            border-radius: 1rem; 
+            width: 90%; 
+            max-width: 600px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            transform: scale(0.9); 
+            opacity: 0; 
+            transition: transform 0.4s ease, opacity 0.4s ease; 
+        }
+        .modal-content.show { 
+            transform: scale(1); 
+            opacity: 1; 
+        }
+        .payment-modal { max-width: 450px; }
+        .cash-input { 
+            font-size: clamp(1.25rem, 4vw, 1.5rem); 
+            padding: 0.75rem; 
+            border-radius: 0.5rem; 
+            background: #334155; 
+            color: white; 
+            transition: all 0.3s ease; 
+        }
+        .cash-input:focus { 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
+            transform: scale(1.02); 
+        }
+        .shortcut-hint { 
+            font-size: clamp(0.65rem, 2vw, 0.75rem); 
+            color: #9ca3af; 
+            transition: opacity 0.3s ease; 
+        }
+        .button { 
+            transition: all 0.3s ease; 
+            border-radius: 0.5rem; 
+            font-weight: 600; 
+        }
+        .button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+        }
+        .toast { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            padding: 1rem 2rem; 
+            border-radius: 0.75rem; 
+            color: white; 
+            z-index: 2000; 
+            transform: translateY(100px); 
+            transition: transform 0.4s ease, opacity 0.4s ease; 
+        }
+        .toast.show { 
+            transform: translateY(0); 
+            opacity: 1; 
+        }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        .input-focus { 
+            transition: all 0.3s ease; 
+            background: #334155; 
+            color: white; 
+            border: 1px solid #4b5563; 
+        }
+        .input-focus:focus { 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
+            transform: scale(1.02); 
+        }
+        .text-adaptive { 
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem); 
+            line-height: 1.4; 
+        }
+        .text-title { 
+            font-size: clamp(1.5rem, 4vw, 2rem); 
+        }
+        .text-price { 
+            font-size: clamp(0.9rem, 2.5vw, 1rem); 
+            font-weight: 600; 
+        }
         @media (max-width: 640px) {
-            .category-tab { font-size: 0.75rem; padding: 0.5rem 1rem; }
-            .item { font-size: 0.875rem; }
-            .modal-content { margin: 20% auto; padding: 16px; }
-            .cash-input { font-size: 1.25rem; }
+            .category-tab { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            .modal-content { margin: 15% auto; padding: 1rem; }
+            .button { padding: 0.5rem; }
+            .container { padding: 1rem; }
         }
     </style>
 </head>
-<body class="font-sans antialiased">
-    <div class="container mx-auto p-6 max-w-7xl">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-4xl font-extrabold text-gray-800">Pokladní systém</h1>
-            <div class="text-sm text-gray-600">Datum: <span id="current-date"></span></div>
+<body>
+    <div class="container mx-auto p-8 max-w-7xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-title font-extrabold text-white">Pokladní systém</h1>
+            <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Menu -->
-            <div class="bg-white p-6 rounded-2xl shadow-xl col-span-2">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Menu</h2>
-                <div class="mb-4 flex flex-col sm:flex-row gap-3">
-                    <input id="search" type="text" placeholder="Vyhledat položku..." class="p-3 border rounded-lg w-full sm:w-1/3 focus:outline-none input-focus bg-gray-50">
-                    <div id="categories" class="flex flex-wrap gap-2 mt-2"></div>
+            <div class="card p-6 col-span-2">
+                <h2 class="text-title font-semibold mb-4 text-white">Menu</h2>
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                    <input id="search" type="text" placeholder="Vyhledat položku..." class="input-focus p-3 rounded-lg w-full sm:w-1/3">
+                    <div id="categories" class="flex flex-wrap gap-3 mt-2"></div>
                 </div>
-                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[65vh] overflow-y-auto pr-2"></div>
+                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
             </div>
             <!-- Košík -->
-            <div class="bg-white p-6 rounded-2xl shadow-xl">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Košík</h2>
+            <div class="card p-6">
+                <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
                 <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-semibold text-gray-700">Celkem: <span id="total">0 Kč</span></h3>
-                        <button id="clear-cart" class="button bg-red-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-trash mr-2"></i>Vyprázdnit <span class="shortcut-hint">(Ctrl+C)</span></button>
+                        <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
+                        <button id="clear-cart" class="button bg-red-600 text-white px-4 py-2"><i class="fas fa-trash mr-2"></i>Vyprázdnit <span class="shortcut-hint">(Ctrl+C)</span></button>
                     </div>
-                    <div class="space-y-3">
-                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="p-3 border rounded-lg w-full focus:outline-none input-focus bg-gray-50">
-                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="p-3 border rounded-lg w-full h-24 focus:outline-none input-focus bg-gray-50"></textarea>
+                    <div class="space-y-4">
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="input-focus p-3 rounded-lg w-full">
+                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="input-focus p-3 rounded-lg w-full h-28"></textarea>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <button id="pay-cash" class="button bg-green-500 text-white px-4 py-2 rounded-lg flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost <span class="shortcut-hint">(Ctrl+P)</span></button>
-                        <button id="pay-card" class="button bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
-                        <button id="pay-qr" class="button bg-purple-500 text-white px-4 py-2 rounded-lg flex items-center justify-center"><i class="fas fa-qrcode mr-2"></i>QR</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button id="pay-cash" class="button bg-green-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost <span class="shortcut-hint">(Ctrl+P)</span></button>
+                        <button id="pay-card" class="button bg-blue-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
+                        <button id="pay-qr" class="button bg-purple-600 text-white px-4 py-2 flex items-center justify-center"><i class="fas fa-qrcode mr-2"></i>QR</button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <button id="export" class="button bg-gray-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-download mr-2"></i>Export JSON</button>
-                        <button id="history" class="button bg-yellow-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-history mr-2"></i>Historie</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="export" class="button bg-gray-600 text-white px-4 py-2"><i class="fas fa-download mr-2"></i>Export JSON</button>
+                        <button id="history" class="button bg-yellow-600 text-white px-4 py-2"><i class="fas fa-history mr-2"></i>Historie</button>
                     </div>
-                    <button id="print-receipt" class="button bg-indigo-500 text-white px-4 py-2 rounded-lg w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku <span class="shortcut-hint">(Ctrl+R)</span></button>
+                    <button id="print-receipt" class="button bg-indigo-600 text-white px-4 py-2 w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku <span class="shortcut-hint">(Ctrl+R)</span></button>
                 </div>
             </div>
         </div>
@@ -86,24 +199,24 @@
     <!-- Modal pro historii -->
     <div id="history-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700">Historie transakcí</h2>
+            <h2 class="text-title font-semibold mb-4 text-white">Historie transakcí</h2>
             <div id="history-content" class="max-h-[50vh] overflow-y-auto"></div>
-            <button id="close-history" class="button bg-red-500 text-white px-4 py-2 rounded-lg mt-4 w-full">Zavřít <span class="shortcut-hint">(Esc)</span></button>
+            <button id="close-history" class="button bg-red-600 text-white px-4 py-2 rounded-lg mt-4 w-full">Zavřít <span class="shortcut-hint">(Esc)</span></button>
         </div>
     </div>
 
     <!-- Modal pro platbu hotovostí -->
     <div id="cash-modal" class="modal">
         <div class="modal-content payment-modal">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700">Platba hotovostí</h2>
-            <div class="mb-4">
-                <p class="text-lg">Celkem k úhradě: <span id="cash-total">0 Kč</span></p>
-                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="cash-input border w-full p-2 mt-2 bg-gray-50">
-                <p class="mt-2 text-lg">Vrátit: <span id="cash-change">0 Kč</span></p>
+            <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
+            <div class="mb-6">
+                <p class="text-adaptive">Celkem k úhradě: <span id="cash-total">0 Kč</span></p>
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="cash-input w-full mt-3">
+                <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
             </div>
-            <div class="flex gap-2">
-                <button id="confirm-cash" class="button bg-green-500 text-white px-4 py-2 rounded-lg flex-1">Potvrdit</button>
-                <button id="cancel-cash" class="button bg-red-500 text-white px-4 py-2 rounded-lg flex-1">Zrušit</button>
+            <div class="flex gap-3">
+                <button id="confirm-cash" class="button bg-green-600 text-white px-4 py-2 flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="button bg-red-600 text-white px-4 py-2 flex-1">Zrušit</button>
             </div>
         </div>
     </div>
@@ -115,14 +228,85 @@
         const products = [
             { id: 1, category: "Pípa, točené", name: "Zlatý Bažant 12 0,3l", price: 39 },
             { id: 2, category: "Pípa, točené", name: "Zlatý Bažant 12 0,5l", price: 65 },
-            { id: 3, category: "Jídlo", name: "Vepřové koleno zadní (1 kg)", price: 250 },
-            { id: 4, category: "Jídlo", name: "Belgické vafle (1 ks, se šlehačkou)", price: 80 },
-            { id: 5, category: "Sladkosti a drobnosti", name: "Tatranky (50 g)", price: 25 },
-            { id: 6, category: "Nápoje - plechovky a lahve", name: "Pepsi plech (0,33 l)", price: 45 },
-            { id: 7, category: "Káva a teplé nápoje", name: "Espresso (30 ml)", price: 60 },
-            { id: 8, category: "Alkohol", name: "Aperol Spritz (300 ml)", price: 150 },
-            { id: 9, category: "Pochutiny", name: "Solené brambůrky (75 g)", price: 45 },
-            { id: 10, category: "Bagety", name: "Bageta pepperoni (200 g)", price: 80 }
+            { id: 3, category: "Pípa, točené", name: "Krušovice 11 0,3l", price: 36 },
+            { id: 4, category: "Pípa, točené", name: "Krušovice 11 0,5l", price: 60 },
+            { id: 5, category: "Pípa, točené", name: "Zlatopramen Citron Radler 0,3l", price: 36 },
+            { id: 6, category: "Pípa, točené", name: "Zlatopramen Citron Radler 0,5l", price: 60 },
+            { id: 7, category: "Pípa, točené", name: "Malinovka 0,3l", price: 36 },
+            { id: 8, category: "Pípa, točené", name: "Malinovka 0,5l", price: 60 },
+            { id: 9, category: "Pípa, točené", name: "Bilý hrozn 0,3l", price: 36 },
+            { id: 10, category: "Pípa, točené", name: "Bilý hrozn 0,5l", price: 60 },
+            { id: 11, category: "Jídlo", name: "Vepřové koleno zadní (1 kg, s kostí)", price: 250 },
+            { id: 12, category: "Jídlo", name: "Belgické vafle (1 ks, se šlehačkou, čokoládou, zmrzlinou)", price: 120 },
+            { id: 13, category: "Jídlo", name: "Belgické vafle (1 ks, se šlehačkou, čokoládou)", price: 80 },
+            { id: 14, category: "Jídlo", name: "Vepřový řízek v housce (150 g)", price: 150 },
+            { id: 15, category: "Jídlo", name: "Vepřový řízek (150 g)", price: 130 },
+            { id: 16, category: "Jídlo", name: "Klobása (100 g) + chléb (50 g) + hořčice (10 g)", price: 90 },
+            { id: 17, category: "Jídlo", name: "Grilovaný hermelín (100 g) + brusinková omáčka (30 g) + chléb (50 g)", price: 90 },
+            { id: 18, category: "Jídlo", name: "Párky (2 ks, 100 g) + chléb (50 g) + hořčice/kečup (10 g)", price: 80 },
+            { id: 19, category: "Jídlo", name: "Párek v rohlíku (50 g párek, 80 g rohlík)", price: 50 },
+            { id: 20, category: "Jídlo", name: "Hamburger kuřecí (150 g)", price: 80 },
+            { id: 21, category: "Jídlo", name: "Cheeseburger kuřecí (150 g, sýr 20 g)", price: 90 },
+            { id: 22, category: "Jídlo", name: "Langoš (200 g, česnek, kečup 20 g, sýr 50 g)", price: 90 },
+            { id: 23, category: "Jídlo", name: "Smažený sýr v housce (100 g sýr, 80 g houska)", price: 110 },
+            { id: 24, category: "Jídlo", name: "Smažený kuřecí řízek v housce (100 g řízek, 80 g houska)", price: 110 },
+            { id: 25, category: "Jídlo", name: "Smažený sýr (100 g)", price: 90 },
+            { id: 26, category: "Jídlo", name: "Smažený kuřecí řízek (100 g)", price: 90 },
+            { id: 27, category: "Jídlo", name: "Hranolky (150 g)", price: 80 },
+            { id: 28, category: "Jídlo", name: "Pizza (různé druhy, 400 g)", price: 200 },
+            { id: 29, category: "Jídlo", name: "Palačinky (2 ks, 100 g) + džem (40 g) + šlehačka (30 g)", price: 90 },
+            { id: 30, category: "Jídlo", name: "Palačinky (2 ks, 100 g) + zmrzlina (100 g)", price: 130 },
+            { id: 31, category: "Jídlo", name: "Bramboráčky (3 ks, 150 g)", price: 90 },
+            { id: 32, category: "Jídlo", name: "Kuřecí stripsy (4 ks, 120 g)", price: 90 },
+            { id: 33, category: "Jídlo", name: "Hovězí hamburger Black Angus (150 g) + slanina (20 g) + sýr (20 g) + zelenina", price: 190 },
+            { id: 34, category: "Jídlo", name: "Tvarohové borůvkové knedlíky (5 ks, 200 g) + šlehačka (30 g) + poleva (40 g)", price: 180 },
+            { id: 35, category: "Jídlo", name: "Chléb navíc (50 g)", price: 5 },
+            { id: 36, category: "Jídlo", name: "Kečup/tatarka/hořčice (20 ml)", price: 20 },
+            { id: 37, category: "Sladkosti a drobnosti", name: "Malá modrá mléčná čokoláda Zvíkov (60 g)", price: 50 },
+            { id: 38, category: "Sladkosti a drobnosti", name: "Big Chew žvýkačka (10 g)", price: 5 },
+            { id: 39, category: "Sladkosti a drobnosti", name: "Pendrek (20 g)", price: 10 },
+            { id: 40, category: "Sladkosti a drobnosti", name: "Lízátko (15 g)", price: 10 },
+            { id: 41, category: "Sladkosti a drobnosti", name: "Tatranky (50 g)", price: 25 },
+            { id: 42, category: "Sladkosti a drobnosti", name: "Miňonky (50 g)", price: 25 },
+            { id: 43, category: "Sladkosti a drobnosti", name: "Orbit žvýkačky (14 g)", price: 25 },
+            { id: 44, category: "Nápoje - plechovky a lahve", name: "Plzeň plech (0,5 l)", price: 60 },
+            { id: 45, category: "Nápoje - plechovky a lahve", name: "Pepsi plech (0,33 l)", price: 45 },
+            { id: 46, category: "Nápoje - plechovky a lahve", name: "Relax džus (0,25 l)", price: 30 },
+            { id: 47, category: "Nápoje - plechovky a lahve", name: "Medovina Zvíkov (0,5 l)", price: 150 },
+            { id: 48, category: "Nápoje - plechovky a lahve", name: "Zón limonáda (0,5 l)", price: 45 },
+            { id: 49, category: "Nápoje - plechovky a lahve", name: "Cracker (0,33 l)", price: 45 },
+            { id: 50, category: "Nápoje - plechovky a lahve", name: "Zlatý Bažant plech (0,5 l)", price: 45 },
+            { id: 51, category: "Nápoje - plechovky a lahve", name: "Birell plech (0,5 l)", price: 45 },
+            { id: 52, category: "Nápoje - plechovky a lahve", name: "Kozel sklo (0,5 l)", price: 45 },
+            { id: 53, category: "Nápoje - plechovky a lahve", name: "Gambrinus plech (0,5 l)", price: 45 },
+            { id: 54, category: "Nápoje - plechovky a lahve", name: "Tanja voda perlivá/neperlivá (0,5 l)", price: 25 },
+            { id: 55, category: "Nápoje - plechovky a lahve", name: "Mattoni (0,5 l)", price: 35 },
+            { id: 56, category: "Nápoje - plechovky a lahve", name: "Ledový čaj (0,5 l)", price: 45 },
+            { id: 57, category: "Nápoje - plechovky a lahve", name: "Big Shock (0,25 l)", price: 45 },
+            { id: 58, category: "Káva a teplé nápoje", name: "Turecká káva (200 ml)", price: 40 },
+            { id: 59, category: "Káva a teplé nápoje", name: "Rozpustná káva (200 ml)", price: 50 },
+            { id: 60, category: "Káva a teplé nápoje", name: "Espresso (30 ml)", price: 60 },
+            { id: 61, category: "Káva a teplé nápoje", name: "Espresso s mlékem (50 ml)", price: 70 },
+            { id: 62, category: "Káva a teplé nápoje", name: "Cappuccino (150 ml)", price: 75 },
+            { id: 63, category: "Káva a teplé nápoje", name: "Latte (200 ml)", price: 80 },
+            { id: 64, category: "Káva a teplé nápoje", name: "Čaj (200 ml)", price: 40 },
+            { id: 65, category: "Káva a teplé nápoje", name: "Horká čokoláda (150 ml)", price: 70 },
+            { id: 66, category: "Káva a teplé nápoje", name: "Mlíčko navíc (50 ml)", price: 10 },
+            { id: 67, category: "Káva a teplé nápoje", name: "Grog (200 ml)", price: 80 },
+            { id: 68, category: "Káva a teplé nápoje", name: "Svařák (200 ml)", price: 80 },
+            { id: 69, category: "Káva a teplé nápoje", name: "Icedové latte (300 ml)", price: 45 },
+            { id: 70, category: "Alkohol", name: "Víno (100 ml, bílé/červené)", price: 50 },
+            { id: 71, category: "Alkohol", name: "Prosecco (100 ml)", price: 40 },
+            { id: 72, category: "Alkohol", name: "Aperol (150 ml)", price: 130 },
+            { id: 73, category: "Alkohol", name: "Tvrdý alkohol (20 ml)", price: 40 },
+            { id: 74, category: "Alkohol", name: "Tvrdý alkohol (40 ml)", price: 60 },
+            { id: 75, category: "Alkohol", name: "Teplý Aperol (150 ml)", price: 130 },
+            { id: 76, category: "Alkohol", name: "Aperol Spritz (300 ml)", price: 150 },
+            { id: 77, category: "Alkohol", name: "Beefeater Pink & Tonic (300 ml)", price: 130 },
+            { id: 78, category: "Pochutiny", name: "TUC krekry (50 g)", price: 35 },
+            { id: 79, category: "Pochutiny", name: "Slané tyčinky (50 g)", price: 40 },
+            { id: 80, category: "Pochutiny", name: "Krupky (50 g)", price: 30 },
+            { id: 81, category: "Pochutiny", name: "Solené brambůrky (75 g)", price: 45 }
         ];
 
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -143,7 +327,7 @@
             toast.style.display = 'block';
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => { toast.style.display = 'none'; }, 300);
+                setTimeout(() => { toast.style.display = 'none'; }, 400);
             }, 3000);
         }
 
@@ -167,12 +351,12 @@
                 p.name.toLowerCase().includes(search.toLowerCase())
             );
             menuDiv.innerHTML = filtered.map(product => `
-                <div class="item flex items-center justify-between p-4 bg-white rounded-lg" data-id="${product.id}">
+                <div class="item flex items-center justify-between" data-id="${product.id}">
                     <div class="flex-1">
-                        <span class="truncate font-medium">${product.name}</span>
-                        <div class="text-sm text-gray-500">${product.category}</div>
+                        <span class="text-adaptive font-medium text-white truncate">${product.name}</span>
+                        <div class="text-adaptive text-gray-400">${product.category}</div>
                     </div>
-                    <span class="font-semibold text-blue-600">${product.price} Kč</span>
+                    <span class="text-price text-green-400">${product.price} Kč</span>
                 </div>
             `).join('');
             menuDiv.querySelectorAll('.item').forEach(item => 
@@ -212,16 +396,16 @@
             cartDiv.innerHTML = cart.map((item, index) => {
                 const itemTotal = item.price * item.quantity;
                 return `
-                    <div class="cart-item flex items-center justify-between p-3 bg-white rounded-lg">
+                    <div class="cart-item flex items-center justify-between">
                         <div class="flex-1 truncate">
-                            <span class="font-medium">${item.name}</span>
-                            <span class="text-sm text-gray-500">(${item.quantity}x)</span>
+                            <span class="text-adaptive font-medium text-white">${item.name}</span>
+                            <span class="text-adaptive text-gray-400">(${item.quantity}x)</span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="updateQuantity(${index}, -1)" class="text-red-500 hover:text-red-700 transition"><i class="fas fa-minus"></i></button>
-                            <span class="font-semibold text-blue-600">${itemTotal} Kč</span>
-                            <button onclick="updateQuantity(${index}, 1)" class="text-green-500 hover:text-green-700 transition"><i class="fas fa-plus"></i></button>
-                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition"><i class="fas fa-trash"></i></button>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="updateQuantity(${index}, -1)" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-minus"></i></button>
+                            <span class="text-price text-green-400">${itemTotal} Kč</span>
+                            <button onclick="updateQuantity(${index}, 1)" class="text-green-400 hover:text-green-600 transition"><i class="fas fa-plus"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -354,7 +538,7 @@
             
             document.getElementById('cancel-cash').onclick = () => {
                 cashModal.querySelector('.modal-content').classList.remove('show');
-                setTimeout(() => { cashModal.style.display = 'none'; }, 300);
+                setTimeout(() => { cashModal.style.display = 'none'; }, 400);
             };
         });
 
@@ -432,19 +616,19 @@
             const modal = document.getElementById('history-modal');
             const content = document.getElementById('history-content');
             if (!history.length) {
-                content.innerHTML = '<p class="text-gray-500">Žádné transakce v historii.</p>';
+                content.innerHTML = '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
             } else {
                 content.innerHTML = history.map(t => `
-                    <div class="p-3 border-b bg-gray-50 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <div class="p-4 border-b bg-gray-700 rounded-lg transition-all duration-300 hover:bg-gray-600">
                         <div class="flex justify-between">
-                            <span><strong>ID:</strong> ${t.id}</span>
-                            <span><strong>Datum:</strong> ${t.date}</span>
+                            <span class="text-adaptive"><strong>ID:</strong> ${t.id}</span>
+                            <span class="text-adaptive"><strong>Datum:</strong> ${t.date}</span>
                         </div>
-                        <div><strong>Platba:</strong> ${t.method}</div>
-                        <div><strong>Celkem:</strong> ${t.total} Kč</div>
-                        ${t.change ? `<div><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}
-                        <div><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
-                        ${t.notes ? `<div><strong>Poznámky:</strong> ${t.notes}</div>` : ''}
+                        <div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div>
+                        <div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>
+                        ${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}
+                        <div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
+                        ${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}
                     </div>
                 `).join('');
             }
@@ -455,7 +639,7 @@
         document.getElementById('close-history').addEventListener('click', () => {
             const modal = document.getElementById('history-modal');
             modal.querySelector('.modal-content').classList.remove('show');
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
+            setTimeout(() => { modal.style.display = 'none'; }, 400);
         });
 
         // Klávesové zkratky
@@ -465,11 +649,11 @@
                 const cashModal = document.getElementById('cash-modal');
                 if (historyModal.style.display === 'block') {
                     historyModal.querySelector('.modal-content').classList.remove('show');
-                    setTimeout(() => { historyModal.style.display = 'none'; }, 300);
+                    setTimeout(() => { historyModal.style.display = 'none'; }, 400);
                 }
                 if (cashModal.style.display === 'block') {
                     cashModal.querySelector('.modal-content').classList.remove('show');
-                    setTimeout(() => { cashModal.style.display = 'none'; }, 300);
+                    setTimeout(() => { cashModal.style.display = 'none'; }, 400);
                 }
             }
             if (e.ctrlKey && e.key === 'c') document.getElementById('clear-cart').click();
