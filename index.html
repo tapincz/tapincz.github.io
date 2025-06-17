@@ -3,275 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokladní systém</title>
-    <!-- Pinned Tailwind CSS CDN version to avoid production warning -->
+    <meta name="description" content="Tapin - Pokladní systém pro tapin.cz">
+    <title>Tapin</title>
     <script src="https://cdn.tailwindcss.com/3.4.10"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { 
-            background: linear-gradient(135deg, #1e1e2e, #2a2a3c); 
-            color: #e5e7eb; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden;
-        }
-        .container { transition: all 0.3s ease; padding: 2rem; }
-        .card { 
-            background: #25253a; 
-            border-radius: 1.25rem; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
-            padding: 2rem; 
-            border: 1px solid rgba(59, 130, 246, 0.2); 
-        }
-        .item { 
-            transition: all 0.3s ease; 
-            background: #2f2f47; 
-            border-radius: 1rem; 
-            padding: 1.5rem; 
-            margin-bottom: 1rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: relative; 
-            overflow: hidden;
-        }
-        .item:hover { 
-            transform: translateY(-4px); 
-            background: linear-gradient(45deg, #3b82f6, #60a5fa); 
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4); 
-            color: white; 
-        }
-        .item .text-container { 
-            max-width: 80%; 
-            overflow: hidden; 
-            white-space: normal; 
-            text-overflow: clip; 
-            position: relative; 
-            line-height: 1.5; 
-        }
-        .item .text-container:hover::after { 
-            content: attr(data-fulltext); 
-            position: absolute; 
-            top: -2rem; 
-            left: 0; 
-            background: #1e293b; 
-            color: white; 
-            padding: 0.75rem; 
-            border-radius: 0.5rem; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
-            z-index: 10; 
-            white-space: normal; 
-            max-width: 400px; 
-            font-size: 1rem; 
-        }
-        .cart-item { 
-            transition: all 0.3s ease; 
-            background: #2f2f47; 
-            border-radius: 1rem; 
-            padding: 1.5rem; 
-            margin-bottom: 1rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
+        body { background: linear-gradient(135deg, #1e1e2e, #2a2a3c); color: #e5e7eb; font-family: 'Inter', sans-serif; }
+        .container { padding: 1rem; max-width: 1280px; margin: auto; }
+        .card { background: #25253a; border-radius: 1rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); padding: 1.5rem; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .item { background: #2f2f47; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
+        .item:hover { transform: translateY(-2px); background: linear-gradient(45deg, #3b82f6, #60a5fa); color: white; box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3); }
+        .item .text-container { max-width: 75%; overflow: hidden; white-space: normal; line-height: 1.4; }
+        .item .text-container:hover::after { content: attr(data-fulltext); position: absolute; top: -1.5rem; left: 0; background: #1e293b; color: white; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); z-index: 10; white-space: normal; max-width: 300px; font-size: 0.9rem; }
+        .cart-item { background: #2f2f47; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
         .cart-item:hover { background: #3b82f6; color: white; }
-        .category-tab { 
-            padding: 1rem 2rem; 
-            border-radius: 2rem; 
-            background: linear-gradient(45deg, #4b5563, #6b7280); 
-            color: #e5e7eb; 
-            transition: all 0.3s ease; 
-            font-weight: 600; 
-            margin-right: 0.75rem; 
-        }
-        .category-tab:hover { 
-            background: linear-gradient(45deg, #60a5fa, #93c5fd); 
-            color: white; 
-            transform: scale(1.1); 
-        }
-        .category-tab.active { 
-            background: linear-gradient(45deg, #2563eb, #3b82f6); 
-            color: white; 
-            transform: scale(1.1); 
-        }
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0, 0, 0, 0.8); 
-            z-index: 1000; 
-        }
-        .modal-content { 
-            background: #25253a; 
-            margin: 10% auto; 
-            padding: 2.5rem; 
-            border-radius: 1.5rem; 
-            width: 90%; 
-            max-width: 700px; 
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); 
-            transform: translateY(-50px); 
-            opacity: 0; 
-            transition: transform 0.4s ease, opacity 0.4s ease; 
-        }
-        .modal-content.show { 
-            transform: translateY(0); 
-            opacity: 1; 
-        }
-        .payment-modal { max-width: 600px; }
-        .custom-input { 
-            font-size: clamp(1.2rem, 3.5vw, 1.4rem); 
-            padding: 1.25rem; 
-            border-radius: 1rem; 
-            background: #2f2f47; 
-            color: white; 
-            border: 1px solid rgba(59, 130, 246, 0.3); 
-            transition: all 0.3s ease; 
-            outline: none; 
-        }
-        .custom-input:focus { 
-            border-color: #3b82f6; 
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); 
-            transform: scale(1.02); 
-        }
-        .custom-textarea { 
-            resize: none; 
-            font-size: clamp(1.1rem, 3vw, 1.3rem); 
-            line-height: 1.6; 
-        }
-        .custom-button { 
-            transition: all 0.3s ease; 
-            border-radius: 1rem; 
-            font-weight: 600; 
-            padding: 1rem 2rem; 
-            position: relative; 
-            overflow: hidden; 
-        }
-        .custom-button::before { 
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            left: -100%; 
-            width: 100%; 
-            height: 100%; 
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); 
-            transition: 0.5s; 
-        }
+        .category-tab { padding: 0.75rem 1.5rem; border-radius: 1.5rem; background: linear-gradient(45deg, #4b5563, #6b7280); color: #e5e7eb; font-weight: 600; margin-right: 0.5rem; transition: all 0.2s ease; }
+        .category-tab:hover, .category-tab.active { background: linear-gradient(45deg, #2563eb, #3b82f6); color: white; transform: scale(1.05); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; }
+        .modal-content { background: #25253a; margin: 15% auto; padding: 1.5rem; border-radius: 1rem; width: 90%; max-width: 600px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); transform: translateY(-30px); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
+        .modal-content.show { transform: translateY(0); opacity: 1; }
+        .payment-modal { max-width: 500px; }
+        .custom-input { font-size: 1rem; padding: 0.75rem; border-radius: 0.75rem; background: #2f2f47; color: white; border: 1px solid rgba(59, 130, 246, 0.3); transition: all 0.2s ease; outline: none; }
+        .custom-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .custom-textarea { resize: none; font-size: 0.9rem; line-height: 1.5; }
+        .custom-button { border-radius: 0.75rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: all 0.2s ease; position: relative; overflow: hidden; }
+        .custom-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: 0.4s; }
         .custom-button:hover::before { left: 100%; }
-        .custom-button:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
-        }
-        .toast { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 30px; 
-            padding: 1.25rem 2.5rem; 
-            border-radius: 1rem; 
-            color: white; 
-            z-index: 2000; 
-            transform: translateY(100px); 
-            transition: transform 0.4s ease, opacity 0.4s ease; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); 
-        }
-        .toast.show { 
-            transform: translateY(0); 
-            opacity: 1; 
-        }
+        .custom-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 0.75rem 1.5rem; border-radius: 0.75rem; color: white; z-index: 2000; transform: translateY(80px); transition: transform 0.3s ease, opacity 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+        .toast.show { transform: translateY(0); opacity: 1; }
         .toast-success { background: #10b981; }
         .toast-error { background: #ef4444; }
-        .text-adaptive { 
-            font-size: clamp(1.1rem, 3vw, 1.3rem); 
-            line-height: 1.5; 
-        }
-        .text-title { 
-            font-size: clamp(2rem, 5vw, 2.8rem); 
-        }
-        .text-price { 
-            font-size: clamp(1.1rem, 3vw, 1.3rem); 
-            font-weight: 700; 
-        }
+        .text-adaptive { font-size: clamp(0.9rem, 2.5vw, 1rem); line-height: 1.4; }
+        .text-title { font-size: clamp(1.5rem, 4vw, 2rem); }
+        .text-price { font-size: clamp(0.9rem, 2.5vw, 1rem); font-weight: 600; }
         @media (max-width: 640px) {
-            .container { padding: 1.5rem; }
-            .card { padding: 1.5rem; }
-            .item { padding: 1rem; }
-            .category-tab { padding: 0.75rem 1.5rem; font-size: 1rem; }
-            .modal-content { margin: 15% auto; padding: 2rem; }
-            .custom-button { padding: 0.75rem 1.5rem; }
-            .text-container { max-width: 70%; }
+            .container { padding: 0.75rem; }
+            .card { padding: 1rem; }
+            .item, .cart-item { padding: 0.75rem; }
+            .category-tab { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .modal-content { margin: 20% auto; padding: 1rem; }
+            .custom-button { padding: 0.5rem 1rem; }
+            .text-container { max-width: 65%; }
         }
     </style>
 </head>
 <body>
-    <div class="container mx-auto max-w-8xl">
-        <div class="flex justify-between items-center mb-10">
-            <h1 class="text-title font-extrabold text-white">Pokladní systém</h1>
+    <div class="container">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-title font-extrabold text-white">Tapin</h1>
             <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <!-- Menu -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="card col-span-2">
-                <h2 class="text-title font-semibold mb-6 text-white">Menu</h2>
-                <div class="mb-8 flex flex-col sm:flex-row gap-6">
-                    <input id="search" type="text" placeholder="Vyhledat položku..." class="custom-input p-4 w-full sm:w-1/2">
-                    <div id="categories" class="flex flex-wrap gap-4 mt-3"></div>
+                <h2 class="text-title font-semibold mb-4 text-white">Menu</h2>
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                    <input id="search" type="text" placeholder="Vyhledat..." class="custom-input w-full sm:w-1/3">
+                    <div id="categories" class="flex flex-wrap gap-3"></div>
                 </div>
-                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-3"></div>
+                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
             </div>
-            <!-- Košík -->
             <div class="card">
-                <h2 class="text-title font-semibold mb-6 text-white">Košík</h2>
-                <div id="cart" class="mb-8 max-h-[55vh] overflow-y-auto"></div>
-                <div class="space-y-8">
+                <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
+                <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
+                <div class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
-                        <button id="clear-cart" class="custom-button bg-red-600 text-white px-6 py-3"><i class="fas fa-trash mr-2"></i>Vyprázdnit</button>
+                        <button id="clear-cart" class="custom-button bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Vyprázdnit</button>
                     </div>
-                    <div class="space-y-6">
-                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input p-4 w-full">
-                        <textarea id="notes" placeholder="Poznámky k objednávce..." class="custom-input custom-textarea p-4 w-full h-32"></textarea>
+                    <div class="space-y-4">
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input w-full">
+                        <textarea id="notes" placeholder="Poznámky..." class="custom-input custom-textarea w-full h-24"></textarea>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button id="pay-cash" class="custom-button bg-green-600 text-white px-6 py-3 flex items-center justify-center"><i class="fas fa-money-bill mr-2"></i>Hotovost</button>
-                        <button id="pay-card" class="custom-button bg-blue-600 text-white px-6 py-3 flex items-center justify-center"><i class="fas fa-credit-card mr-2"></i>Karta</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="pay-cash" class="custom-button bg-green-600 text-white flex items-center justify-center"><i class="fas fa-money-bill mr-1"></i>Hotovost</button>
+                        <button id="pay-card" class="custom-button bg-blue-600 text-white flex items-center justify-center"><i class="fas fa-credit-card mr-1"></i>Karta</button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button id="export" class="custom-button bg-gray-600 text-white px-6 py-3"><i class="fas fa-download mr-2"></i>Export JSON</button>
-                        <button id="history" class="custom-button bg-yellow-600 text-white px-6 py-3"><i class="fas fa-history mr-2"></i>Historie</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="export" class="custom-button bg-gray-600 text-white"><i class="fas fa-download mr-1"></i>Export JSON</button>
+                        <button id="history" class="custom-button bg-yellow-600 text-white"><i class="fas fa-history mr-1"></i>Historie</button>
                     </div>
-                    <button id="print-receipt" class="custom-button bg-indigo-600 text-white px-6 py-3 w-full"><i class="fas fa-print mr-2"></i>Vytisknout účtenku</button>
+                    <button id="print-receipt" class="custom-button bg-indigo-600 text-white w-full"><i class="fas fa-print mr-1"></i>Vytisknout účtenku</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal pro historii -->
     <div id="history-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-title font-semibold mb-6 text-white">Historie transakcí</h2>
-            <div id="history-content" class="max-h-[55vh] overflow-y-auto"></div>
-            <button id="close-history" class="custom-button bg-red-600 text-white px-6 py-3 mt-6 w-full">Zavřít</button>
+            <h2 class="text-title font-semibold mb-4 text-white">Historie transakcí</h2>
+            <div id="history-content" class="max-h-[50vh] overflow-y-auto"></div>
+            <button id="close-history" class="custom-button bg-red-600 text-white w-full mt-4">Zavřít</button>
         </div>
     </div>
 
-    <!-- Modal pro platbu hotovostí -->
     <div id="cash-modal" class="modal">
         <div class="modal-content payment-modal">
-            <h2 class="text-title font-semibold mb-6 text-white">Platba hotovostí</h2>
-            <div class="mb-8">
-                <p class="text-adaptive">Celkem k úhradě: <span id="cash-total">0 Kč</span></p>
-                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="custom-input w-full mt-4">
-                <p class="mt-4 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
+            <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
+            <div class="mb-6">
+                <p class="text-adaptive">Celkem: <span id="cash-total">0 Kč</span></p>
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="custom-input w-full mt-3">
+                <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
             </div>
-            <div class="flex gap-4">
-                <button id="confirm-cash" class="custom-button bg-green-600 text-white px-6 py-3 flex-1">Potvrdit</button>
-                <button id="cancel-cash" class="custom-button bg-red-600 text-white px-6 py-3 flex-1">Zrušit</button>
+            <div class="flex gap-3">
+                <button id="confirm-cash" class="custom-button bg-green-600 text-white flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="custom-button bg-red-600 text-white flex-1">Zrušit</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast pro notifikace -->
     <div id="toast" class="toast" style="display: none;"></div>
 
     <script>
@@ -362,326 +202,245 @@
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
         let history = JSON.parse(localStorage.getItem('history') || '[]');
 
-        // Zobrazení aktuálního data
-        function updateDate() {
+        const updateDate = () => {
             document.getElementById('current-date').textContent = new Date().toLocaleString('cs-CZ', {
                 day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
-        }
+        };
 
-        // Zobrazení notifikací
-        function showToast(message, type = 'success') {
+        const showToast = (msg, type = 'success') => {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
+            toast.textContent = msg;
             toast.className = `toast ${type === 'success' ? 'toast-success' : 'toast-error'} show`;
             toast.style.display = 'block';
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => { toast.style.display = 'none'; }, 400);
+                setTimeout(() => toast.style.display = 'none', 300);
             }, 3000);
-        }
+        };
 
-        // Zobrazení kategorií
-        function displayCategories() {
-            const categoriesDiv = document.getElementById('categories');
-            const categories = ['Vše', ...new Set(products.map(p => p.category))];
-            categoriesDiv.innerHTML = categories.map(cat => 
+        const displayCategories = () => {
+            const cats = ['Vše', ...new Set(products.map(p => p.category))];
+            document.getElementById('categories').innerHTML = cats.map(cat => 
                 `<span class="category-tab ${cat === 'Vše' ? 'active' : ''}" data-category="${cat}">${cat}</span>`
             ).join('');
-            categoriesDiv.querySelectorAll('.category-tab').forEach(tab => 
+            document.querySelectorAll('.category-tab').forEach(tab => 
                 tab.addEventListener('click', () => filterMenu(tab.dataset.category))
             );
-        }
+        };
 
-        // Filtrování a zobrazení menu
-        function displayMenu(category = 'Vše', search = '') {
-            const menuDiv = document.getElementById('menu');
+        const displayMenu = (cat = 'Vše', search = '') => {
             const filtered = products.filter(p => 
-                (category === 'Vše' || p.category === category) &&
-                p.name.toLowerCase().includes(search.toLowerCase())
+                (cat === 'Vše' || p.category === cat) && p.name.toLowerCase().includes(search.toLowerCase())
             );
-            menuDiv.innerHTML = filtered.map(product => `
-                <div class="item" data-id="${product.id}">
-                    <div class="text-container text-adaptive font-medium text-white" data-fulltext="${product.name}">
-                        ${product.name}
-                    </div>
-                    <div class="flex items-center space-x-6">
-                        <span class="text-price text-green-400">${product.price} Kč</span>
-                        <span class="text-adaptive text-gray-400">${product.category}</span>
+            document.getElementById('menu').innerHTML = filtered.map(p => `
+                <div class="item" data-id="${p.id}">
+                    <div class="text-container text-adaptive font-medium text-white" data-fulltext="${p.name}">${p.name}</div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-price text-green-400">${p.price} Kč</span>
+                        <span class="text-adaptive text-gray-400">${p.category}</span>
                     </div>
                 </div>
             `).join('');
-            menuDiv.querySelectorAll('.item').forEach(item => 
+            document.querySelectorAll('.item').forEach(item => 
                 item.addEventListener('click', () => {
-                    const productId = parseInt(item.dataset.id);
-                    const product = products.find(p => p.id === productId);
+                    const product = products.find(p => p.id === +item.dataset.id);
                     if (product) {
                         addToCart(product);
                         showToast(`${product.name} přidán do košíku`);
                     }
                 })
             );
-        }
+        };
 
-        // Přidání do košíku
-        function addToCart(product) {
-            const existing = cart.find(item => item.id === product.id);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
+        const addToCart = product => {
+            const item = cart.find(i => i.id === product.id);
+            item ? item.quantity++ : cart.push({ ...product, quantity: 1 });
             saveCart();
             updateCart();
-        }
+        };
 
-        // Aktualizace košíku
-        function updateCart() {
-            const cartDiv = document.getElementById('cart');
-            const totalSpan = document.getElementById('total');
+        const updateCart = () => {
             const discount = parseFloat(document.getElementById('discount').value) || 0;
             if (discount < 0 || discount > 100) {
-                showToast('Sleva musí být mezi 0 a 100%', 'error');
+                showToast('Sleva musí být 0-100%', 'error');
                 document.getElementById('discount').value = '';
                 return;
             }
-            cartDiv.innerHTML = cart.map((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                return `
-                    <div class="cart-item">
-                        <div class="text-container text-adaptive font-medium text-white" data-fulltext="${item.name}">
-                            ${item.name} (${item.quantity}x)
-                        </div>
-                        <div class="flex items-center space-x-6">
-                            <button onclick="updateQuantity(${index}, -1)" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-minus"></i></button>
-                            <span class="text-price text-green-400">${itemTotal} Kč</span>
-                            <button onclick="updateQuantity(${index}, 1)" class="text-green-400 hover:text-green-600 transition"><i class="fas fa-plus"></i></button>
-                            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
-                        </div>
+            document.getElementById('cart').innerHTML = cart.map((item, i) => `
+                <div class="cart-item">
+                    <div class="text-container text-adaptive font-medium text-white" data-fulltext="${item.name}">${item.name} (${item.quantity}x)</div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="updateQuantity(${i}, -1)" class="text-red-400 hover:text-red-600"><i class="fas fa-minus"></i></button>
+                        <span class="text-price text-green-400">${item.price * item.quantity} Kč</span>
+                        <button onclick="updateQuantity(${i}, 1)" class="text-green-400 hover:text-green-600"><i class="fas fa-plus"></i></button>
+                        <button onclick="removeFromCart(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                     </div>
-                `;
-            }).join('');
-            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            total = discount ? total * (1 - discount / 100) : total;
-            totalSpan.textContent = `${Math.round(total)} Kč`;
-        }
+                </div>
+            `).join('');
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount / 100);
+            document.getElementById('total').textContent = `${Math.round(total)} Kč`;
+        };
 
-        // Úprava množství
-        function updateQuantity(index, change) {
-            cart[index].quantity += change;
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
+        const updateQuantity = (i, change) => {
+            cart[i].quantity += change;
+            if (cart[i].quantity <= 0) {
+                cart.splice(i, 1);
                 showToast('Položka odebrána z košíku');
             }
             saveCart();
             updateCart();
-        }
+        };
 
-        // Odebrání z košíku
-        function removeFromCart(index) {
-            const itemName = cart[index].name;
-            cart.splice(index, 1);
+        const removeFromCart = i => {
+            showToast(`${cart[i].name} odebrán z košíku`);
+            cart.splice(i, 1);
             saveCart();
             updateCart();
-            showToast(`${itemName} odebrán z košíku`);
-        }
+        };
 
-        // Uložení košíku
-        function saveCart() {
-            localStorage.setItem('cart', JSON.stringify(cart));
-        }
+        const saveCart = () => localStorage.setItem('cart', JSON.stringify(cart));
 
-        // Vyprázdnění košíku
         document.getElementById('clear-cart').addEventListener('click', () => {
-            if (cart.length === 0) {
-                showToast('Košík je již prázdný', 'error');
-                return;
-            }
+            if (!cart.length) return showToast('Košík je prázdný', 'error');
             cart = [];
             saveCart();
             updateCart();
             showToast('Košík vyprázdněn');
         });
 
-        // Filtrování podle kategorie
-        function filterMenu(category) {
-            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
-            displayMenu(category, document.getElementById('search').value);
-        }
+        const filterMenu = cat => {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-category="${cat}"]`).classList.add('active');
+            displayMenu(cat, document.getElementById('search').value);
+        };
 
-        // Vyhledávání
-        document.getElementById('search').addEventListener('input', e => {
-            const activeCategory = document.querySelector('.category-tab.active').dataset.category;
-            displayMenu(activeCategory, e.target.value);
-        });
+        document.getElementById('search').addEventListener('input', e => 
+            displayMenu(document.querySelector('.category-tab.active').dataset.category, e.target.value)
+        );
 
-        // Zpracování platby
-        function processPayment(method, receivedAmount = null) {
+        const processPayment = (method, received = null) => {
             const notes = document.getElementById('notes').value;
             const discount = parseFloat(document.getElementById('discount').value) || 0;
             const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount / 100);
-            if (!cart.length) {
-                showToast('Košík je prázdný!', 'error');
-                return;
-            }
-            
-            const transaction = {
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
+
+            history.push({
                 id: Date.now(),
                 cart: [...cart],
                 total: Math.round(total),
                 method,
                 notes,
                 date: new Date().toLocaleString('cs-CZ'),
-                change: receivedAmount ? Math.round((receivedAmount - total) * 100) / 100 : null
-            };
-            history.push(transaction);
+                change: received ? Math.round((received - total) * 100) / 100 : null
+            });
             localStorage.setItem('history', JSON.stringify(history));
-            
-            let message = `Platba ${method} provedena! Celkem: ${Math.round(total)} Kč`;
-            if (receivedAmount && receivedAmount > total) {
-                message += `\nVráceno: ${(receivedAmount - total).toFixed(2)} Kč`;
-            }
-            showToast(message);
-            
+            showToast(`Platba ${method}: ${Math.round(total)} Kč${received && received > total ? `\nVráceno: ${(received - total).toFixed(2)} Kč` : ''}`);
             cart = [];
             document.getElementById('notes').value = '';
             document.getElementById('discount').value = '';
             saveCart();
             updateCart();
-        }
+        };
 
-        // Platba hotovostí s výpočtem vrácených peněz
         document.getElementById('pay-cash').addEventListener('click', () => {
             const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * 
                          (1 - (parseFloat(document.getElementById('discount').value) || 0) / 100);
-            if (!cart.length) {
-                showToast('Košík je prázdný!', 'error');
-                return;
-            }
-            
-            const cashModal = document.getElementById('cash-modal');
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
+
+            const modal = document.getElementById('cash-modal');
             const cashTotal = document.getElementById('cash-total');
             const cashAmount = document.getElementById('cash-amount');
             const cashChange = document.getElementById('cash-change');
-            
+
             cashTotal.textContent = `${Math.round(total)} Kč`;
             cashAmount.value = '';
             cashChange.textContent = '0 Kč';
-            cashModal.style.display = 'block';
-            cashModal.querySelector('.modal-content').classList.add('show');
-            
+            modal.style.display = 'block';
+            modal.querySelector('.modal-content').classList.add('show');
+
             cashAmount.addEventListener('input', () => {
                 const received = parseFloat(cashAmount.value) || 0;
-                const change = received - total;
-                cashChange.textContent = change > 0 ? `${change.toFixed(2)} Kč` : '0 Kč';
+                cashChange.textContent = received > total ? `${(received - total).toFixed(2)} Kč` : '0 Kč';
             });
-            
+
             document.getElementById('confirm-cash').onclick = () => {
                 const received = parseFloat(cashAmount.value) || 0;
-                if (received < total) {
-                    showToast('Nedostatečná částka!', 'error');
-                    return;
-                }
+                if (received < total) return showToast('Nedostatečná částka!', 'error');
                 processPayment('Hotovost', received);
-                cashModal.style.display = 'none';
+                modal.style.display = 'none';
             };
-            
+
             document.getElementById('cancel-cash').onclick = () => {
-                cashModal.querySelector('.modal-content').classList.remove('show');
-                setTimeout(() => { cashModal.style.display = 'none'; }, 400);
+                modal.querySelector('.modal-content').classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
             };
         });
 
-        // Platba kartou
         document.getElementById('pay-card').addEventListener('click', () => processPayment('Karta'));
 
-        // Tisk účtenky
         document.getElementById('print-receipt').addEventListener('click', () => {
-            if (!cart.length) {
-                showToast('Košík je prázdný!', 'error');
-                return;
-            }
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
             const discount = parseFloat(document.getElementById('discount').value) || 0;
             const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount / 100);
             const notes = document.getElementById('notes').value;
-            
-            const receiptWindow = window.open('', '_blank');
-            receiptWindow.document.write(`
+
+            const win = window.open('', '_blank');
+            win.document.write(`
                 <html>
-                <head>
-                    <title>Účtenka</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; max-width: 300px; margin: 0 auto; }
-                        h1 { font-size: 18px; text-align: center; }
-                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                        th, td { padding: 5px; text-align: left; }
-                        .total { font-weight: bold; }
-                        .notes { font-style: italic; }
-                    </style>
-                </head>
+                <head><title>Účtenka</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 15px; max-width: 300px; margin: 0 auto; }
+                    h1 { font-size: 16px; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                    th, td { padding: 5px; text-align: left; }
+                    .total { font-weight: bold; }
+                    .notes { font-style: italic; }
+                </style></head>
                 <body>
-                    <h1>Účtenka</h1>
+                    <h1>Účtenka - Tapin</h1>
                     <p>Datum: ${new Date().toLocaleString('cs-CZ')}</p>
                     <table>
                         <tr><th>Položka</th><th>Množství</th><th>Cena</th></tr>
-                        ${cart.map(item => `
-                            <tr>
-                                <td>${item.name}</td>
-                                <td>${item.quantity}x</td>
-                                <td>${(item.price * item.quantity)} Kč</td>
-                            </tr>
-                        `).join('')}
+                        ${cart.map(item => `<tr><td>${item.name}</td><td>${item.quantity}x</td><td>${item.price * item.quantity} Kč</td></tr>`).join('')}
                         ${discount ? `<tr><td colspan="2">Sleva (${discount}%)</td><td>-${Math.round(total * discount / (100 - discount))} Kč</td></tr>` : ''}
                         <tr class="total"><td colspan="2">Celkem</td><td>${Math.round(total)} Kč</td></tr>
                     </table>
                     ${notes ? `<p class="notes">Poznámky: ${notes}</p>` : ''}
-                    <p style="text-align: center;">Děkujeme za nákup!</p>
-                </body>
-                </html>
+                    <p style="text-align: center;">Děkujeme za nákup na tapin.cz!</p>
+                </body></html>
             `);
-            receiptWindow.document.close();
-            receiptWindow.print();
+            win.document.close();
+            win.print();
         });
 
-        // Export JSON
         document.getElementById('export').addEventListener('click', () => {
-            if (!cart.length && !history.length) {
-                showToast('Žádná data k exportu!', 'error');
-                return;
-            }
-            const data = JSON.stringify({ cart, history }, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            if (!cart.length && !history.length) return showToast('Žádná data k exportu!', 'error');
+            const blob = new Blob([JSON.stringify({ cart, history }, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `pokladna_${Date.now()}.json`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `tapin_${Date.now()}.json`;
             a.click();
-            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(a.href);
             showToast('Data exportována');
         });
 
-        // Historie
         document.getElementById('history').addEventListener('click', () => {
             const modal = document.getElementById('history-modal');
             const content = document.getElementById('history-content');
-            if (!history.length) {
-                content.innerHTML = '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
-            } else {
-                content.innerHTML = history.map(t => `
-                    <div class="p-4 border-b bg-gray-700 rounded-lg transition-all duration-300 hover:bg-gray-600">
-                        <div class="flex justify-between">
-                            <span class="text-adaptive"><strong>ID:</strong> ${t.id}</span>
-                            <span class="text-adaptive"><strong>Datum:</strong> ${t.date}</span>
-                        </div>
-                        <div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div>
-                        <div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>
-                        ${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}
-                        <div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
-                        ${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}
+            content.innerHTML = history.length ? history.map(t => `
+                <div class="p-3 border-b bg-gray-700 rounded-lg hover:bg-gray-600 transition">
+                    <div class="flex justify-between text-adaptive">
+                        <span><strong>ID:</strong> ${t.id}</span>
+                        <span><strong>Datum:</strong> ${t.date}</span>
                     </div>
-                `).join('');
-            }
+                    <div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div>
+                    <div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>
+                    ${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}
+                    <div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
+                    ${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}
+                </div>
+            `).join('') : '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
             modal.style.display = 'block';
             modal.querySelector('.modal-content').classList.add('show');
         });
@@ -689,15 +448,14 @@
         document.getElementById('close-history').addEventListener('click', () => {
             const modal = document.getElementById('history-modal');
             modal.querySelector('.modal-content').classList.remove('show');
-            setTimeout(() => { modal.style.display = 'none'; }, 400);
+            setTimeout(() => modal.style.display = 'none', 300);
         });
 
-        // Inicializace
         updateDate();
         displayCategories();
         displayMenu();
         updateCart();
-        setInterval(updateDate, 60000); // Aktualizace času každou minutu
+        setInterval(updateDate, 60000);
     </script>
 </body>
 </html>
