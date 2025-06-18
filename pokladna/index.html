@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="cs"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Tapin - Moderní pokladní systém pro každého na tapin.cz"><title>Tapin</title><script src="https://cdn.tailwindcss.com/3.4.10"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"><style>body{background:linear-gradient(135deg,#1e1e2e,#2a2a3c);color:#e5e7eb;font-family:'Inter',sans-serif;margin:0}.container{padding:1rem;max-width:1280px;margin:auto}.card{background:#25253a;border-radius:1rem;box-shadow:0 4px 16px rgba(0,0,0,.3);padding:1.5rem;border:1px solid rgba(59,130,246,.2)}.item{background:#2f2f47;border-radius:.75rem;padding:1rem;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}.item:hover{transform:translateY(-2px);background:linear-gradient(45deg,#3b82f6,#60a5fa);color:#fff;box-shadow:0 4px 8px rgba(59,130,246,.3)}.item .text-container{max-width:75%;overflow:hidden;white-space:normal;line-height:1.4}.item .text-container:hover::after{content:attr(data-fulltext);position:absolute;top:-1.5rem;left:0;background:#1e293b;color:#fff;padding:.5rem;border-radius:.5rem;box-shadow:0 2px 4px rgba(0,0,0,.3);z-index:10;white-space:normal;max-width:300px;font-size:.9rem}.cart-item{background:#2f2f47;border-radius:.75rem;padding:1rem;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}.cart-item:hover{background:#3b82f6;color:#fff}.category-tab{padding:.75rem 1.5rem;border-radius:1.5rem;background:linear-gradient(45deg,#4b5563,#6b7280);color:#e5e7eb;font-weight:600;margin-right:.5rem;transition:all .2s ease}.category-tab:hover,.category-tab.active{background:linear-gradient(45deg,#2563eb,#3b82f6);color:#fff;transform:scale(1.05)}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000}.modal-content{background:#25253a;margin:15% auto;padding:1.5rem;border-radius:1rem;width:90%;max-width:600px;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(-30px);opacity:0;transition:transform .3s ease,opacity .3s ease}.modal-content.show{transform:translateY(0);opacity:1}.payment-modal{max-width:500px}.custom-input{font-size:1rem;padding:.75rem;border-radius:.75rem;background:#2f2f47;color:#fff;border:1px solid rgba(59,130,246,.3);transition:all .2s ease;outline:0}.custom-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}.custom-textarea{resize:none;font-size:.9rem;line-height:1.5}.custom-button{border-radius:.75rem;font-weight:600;padding:.75rem 1.5rem;transition:all .2s ease;position:relative;overflow:hidden}.custom-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:.4s}.custom-button:hover::before{left:100%}.custom-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.toast{position:fixed;bottom:20px;right:20px;padding:.75rem 1.5rem;border-radius:.75rem;color:#fff;z-index:2000;transform:translateY(80px);transition:transform .3s ease,opacity .3s ease;box-shadow:0 2px 8px rgba(0,0,0,.3)}.toast.show{transform:translateY(0);opacity:1}.toast-success{background:#10b981}.toast-error{background:#ef4444}.text-adaptive{font-size:clamp(.9rem,2.5vw,1rem);line-height:1.4}.text-title{font-size:clamp(1.5rem,4vw,2rem)}.text-price{font-size:clamp(.9rem,2.5vw,1rem);font-weight:600}.landing{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e1e2e,#2a2a3c);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:2000}.landing-content{text-align:center;padding:1rem}.landing-title{font-size:clamp(2rem,6vw,3.5rem);font-weight:800;color:#fff;margin-bottom:1rem}.landing-text{font-size:clamp(1rem,3vw,1.2rem);color:#d1d5db;max-width:600px;margin-bottom:2rem}.launch-button{padding:1rem 2rem;font-size:1.2rem;font-weight:600;border-radius:1rem;background:linear-gradient(45deg,#3b82f6,#60a5fa);color:#fff;border:0;cursor:pointer;transition:all .3s ease}.launch-button:hover{transform:scale(1.05);box-shadow:0 8px 16px rgba(59,130,246,.4)}.animation-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#1e1e2e;z-index:1500;display:none;flex-direction:column;justify-content:center;align-items:center}.spinner{width:60px;height:60px;border:6px solid #3b82f6;border-top:6px solid transparent;border-radius:50%;animation:spin 1.5s linear infinite;opacity:0}.animation-text{color:#d1d5db;font-size:1.2rem;margin-top:1rem;opacity:0}.pos-hidden{display:none}.pos-container{opacity:0;transform:translateY(20px)}.menu-card{transform:translateX(-50px);opacity:0}.cart-card{transform:translateX(50px);opacity:0}.header{transform:translateY(-20px);opacity:0}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@keyframes slideIn{0%{transform:translateX(-50px);opacity:0}100%{transform:translateX(0);opacity:1}}@keyframes slideInRight{0%{transform:translateX(50px);opacity:0}100%{transform:translateX(0);opacity:1}}@keyframes slideDown{0%{transform:translateY(-20px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes bgPulse{0%,100%{background:#1e1e2e}50%{background:#2a2a3c}}@media (max-width:640px){.container{padding:.75rem}.card{padding:1rem}.item,.cart-item{padding:.75rem}.category-tab{padding:.5rem 1rem;font-size:.9rem}.modal-content{margin:20% auto;padding:1rem}.custom-button{padding:.5rem 1rem}.text-container{max-width:65%}.landing-title{font-size:clamp(1.5rem,5vw,2.5rem)}.launch-button{padding:.75rem 1.5rem;font-size:1rem}}</style></head><body><div id="landing" class="landing"><div class="landing-content"><h1 class="landing-title">Vítejte v Tapin</h1><p class="landing-text">Moderní a zdarma pokladní systém pro každého. Vytvořte si vlastní pokladnu, přidejte produkty a sdílejte ji na tapin.cz!</p><button id="launch-pos" class="launch-button">Spustit Pokladnu</button></div></div><div id="animation-overlay" class="animation-overlay"><div class="spinner"></div><p class="animation-text">Načítání pokladny...</p></div><div id="pos-container" class="container pos-hidden"><div class="header"><div class="flex justify-between items-center mb-6"><h1 class="text-title font-extrabold text-white">Tapin</h1><div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="card col-span-2 menu-card"><div class="flex justify-between items-center mb-4"><h2 class="text-title font-semibold text-white">Menu</h2><button id="manage-products" class="custom-button bg-blue-600 text-white"><i class="fas fa-cog mr-1"></i>Spravovat produkty</button></div><div class="mb-6 flex flex-col sm:flex-row gap-4"><input id="search" type="text" placeholder="Vyhledat..." class="custom-input w-full sm:w-1/3"><div id="categories" class="flex flex-wrap gap-3"></div></div><div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div></div><div class="card cart-card"><h2 class="text-title font-semibold mb-4 text-white">Košík</h2><div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div><div class="space-y-6"><div class="flex justify-between items-center"><h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3><button id="clear-cart" class="custom-button bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Vyprázdnit</button></div><div class="space-y-4"><input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input w-full"><input id="tip" type="number" min="0" step="1" placeholder="Dýško (Kč)" class="custom-input w-full"><textarea id="notes" placeholder="Poznámky..." class="custom-input custom-textarea w-full h-24"></textarea></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><button id="pay-cash" class="custom-button bg-green-600 text-white flex items-center justify-center"><i class="fas fa-money-bill mr-1"></i>Hotovost</button><button id="pay-card" class="custom-button bg-blue-600 text-white flex items-center justify-center"><i class="fas fa-credit-card mr-1"></i>Karta</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><button id="share-config" class="custom-button bg-purple-600 text-white"><i class="fas fa-share-alt mr-1"></i>Sdílet pokladnu</button><button id="reset-pos" class="custom-button bg-red-600 text-white"><i class="fas fa-sync-alt mr-1"></i>Resetovat pokladnu</button></div><button id="print-receipt" class="custom-button bg-indigo-600 text-white w-full"><i class="fas fa-print mr-1"></i>Vytisknout účtenku</button></div></div></div><div id="cash-modal" class="modal"><div class="modal-content payment-modal">< Express Checkout
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tapin - Moderní pokladní systém pro každého na tapin.cz">
+    <title>Tapin</title>
+    <script src="https://cdn.tailwindcss.com/3.4.10"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body{background:linear-gradient(135deg,#1e1e2e,#2a2a3c);color:#e5e7eb;font-family:'Inter',sans-serif;margin:0}.container{padding:1rem;max-width:1280px;margin:auto}.card{background:#25253a;border-radius:1rem;box-shadow:0 4px 16px rgba(0,0,0,.3);padding:1.5rem;border:1px solid rgba(59,130,246,.2)}.item{background:#2f2f47;border-radius:.75rem;padding:1rem;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}.item:hover{transform:translateY(-2px);background:linear-gradient(45deg,#3b82f6,#60a5fa);color:#fff;box-shadow:0 4px 8px rgba(59,130,246,.3)}.item .text-container{max-width:75%;overflow:hidden;white-space:normal;line-height:1.4}.item .text-container:hover::after{content:attr(data-fulltext);position:absolute;top:-1.5rem;left:0;background:#1e293b;color:#fff;padding:.5rem;border-radius:.5rem;box-shadow:0 2px 4px rgba(0,0,0,.3);z-index:10;white-space:normal;max-width:300px;font-size:.9rem}.cart-item{background:#2f2f47;border-radius:.75rem;padding:1rem;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}.cart-item:hover{background:#3b82f6;color:#fff}.category-tab{padding:.75rem 1.5rem;border-radius:1.5rem;background:linear-gradient(45deg,#4b5563,#6b7280);color:#e5e7eb;font-weight:600;margin-right:.5rem;transition:all .2s ease}.category-tab:hover,.category-tab.active{background:linear-gradient(45deg,#2563eb,#3b82f6);color:#fff;transform:scale(1.05)}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000}.modal-content{background:#25253a;margin:15% auto;padding:1.5rem;border-radius:1rem;width:90%;max-width:600px;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(-30px);opacity:0;transition:transform .3s ease,opacity .3s ease}.modal-content.show{transform:translateY(0);opacity:1}.payment-modal{max-width:500px}.custom-input{font-size:1rem;padding:.75rem;border-radius:.75rem;background:#2f2f47;color:#fff;border:1px solid rgba(59,130,246,.3);transition:all .2s ease;outline:0}.custom-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}.custom-textarea{resize:none;font-size:.9rem;line-height:1.5}.custom-button{border-radius:.75rem;font-weight:600;padding:.75rem 1.5rem;transition:all .2s ease;position:relative;overflow:hidden}.custom-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:.4s}.custom-button:hover::before{left:100%}.custom-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.toast{position:fixed;bottom:20px;right:20px;padding:.75rem 1.5rem;border-radius:.75rem;color:#fff;z-index:2000;transform:translateY(80px);transition:transform .3s ease,opacity .3s ease;box-shadow:0 2px 8px rgba(0,0,0,.3)}.toast.show{transform:translateY(0);opacity:1}.toast-success{background:#10b981}.toast-error{background:#ef4444}.text-adaptive{font-size:clamp(.9rem,2.5vw,1rem);line-height:1.4}.text-title{font-size:clamp(1.5rem,4vw,2rem)}.text-price{font-size:clamp(.9rem,2.5vw,1rem);font-weight:600}.landing{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e1e2e,#2a2a3c);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:2000}.landing-content{text-align:center;padding:1rem}.landing-title{font-size:clamp(2rem,6vw,3.5rem);font-weight:800;color:#fff;margin-bottom:1rem}.landing-text{font-size:clamp(1rem,3vw,1.2rem);color:#d1d5db;max-width:600px;margin-bottom:2rem}.launch-button{padding:1rem 2rem;font-size:1.2rem;font-weight:600;border-radius:1rem;background:linear-gradient(45deg,#3b82f6,#60a5fa);color:#fff;border:0;cursor:pointer;transition:all .3s ease}.launch-button:hover{transform:scale(1.05);box-shadow:0 8px 16px rgba(59,130,246,.4)}.animation-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#1e1e2e;z-index:1500;display:none;flex-direction:column;justify-content:center;align-items:center}.spinner{width:60px;height:60px;border:6px solid #3b82f6;border-top:6px solid transparent;border-radius:50%;animation:spin 1.5s linear infinite;opacity:0}.animation-text{color:#d1d5db;font-size:1.2rem;margin-top:1rem;opacity:0}.pos-hidden{display:none}.pos-container{opacity:0;transform:translateY(20px)}.menu-card{transform:translateX(-50px);opacity:0}.cart-card{transform:translateX(50px);opacity:0}.header{transform:translateY(-20px);opacity:0}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@keyframes slideIn{0%{transform:translateX(-50px);opacity:0}100%{transform:translateX(0);opacity:1}}@keyframes slideInRight{0%{transform:translateX(50px);opacity:0}100%{transform:translateX(0);opacity:1}}@keyframes slideDown{0%{transform:translateY(-20px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes bgPulse{0%,100%{background:#1e1e2e}50%{background:#2a2a3c}}@media (max-width:640px){.container{padding:.75rem}.card{padding:1rem}.item,.cart-item{padding:.75rem}.category-tab{padding:.5rem 1rem;font-size:.9rem}.modal-content{margin:20% auto;padding:1rem}.custom-button{padding:.5rem 1rem}.text-container{max-width:65%}.landing-title{font-size:clamp(1.5rem,5vw,2.5rem)}.launch-button{padding:.75rem 1.5rem;font-size:1rem}}
+    </style>
+</head>
+<body>
+    <div id="landing" class="landing">
+        <div class="landing-content">
+            <h1 class="landing-title">Vítejte v Tapin</h1>
+            <p class="landing-text">Moderní a zdarma pokladní systém pro každého. Vytvořte si vlastní pokladnu, přidejte produkty a sdílejte ji na tapin.cz!</p>
+            <button id="launch-pos" class="launch-button">Spustit Pokladnu</button>
+        </div>
+    </div>
+    <div id="animation-overlay" class="animation-overlay">
+        <div class="spinner"></div>
+        <p class="animation-text">Načítání pokladny...</p>
+    </div>
+    <div id="pos-container" class="container pos-hidden">
+        <div class="header">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-title font-extrabold text-white">Tapin</h1>
+                <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="card col-span-2 menu-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-title font-semibold text-white">Menu</h2>
+                    <button id="manage-products" class="custom-button bg-blue-600 text-white"><i class="fas fa-cog mr-1"></i>Spravovat produkty</button>
+                </div>
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                    <input id="search" type="text" placeholder="Vyhledat..." class="custom-input w-full sm:w-1/3">
+                    <div id="categories" class="flex flex-wrap gap-3"></div>
+                </div>
+                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+            </div>
+            <div class="card cart-card">
+                <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
+                <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
+                        <button id="clear-cart" class="custom-button bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Vyprázdnit</button>
+                    </div>
+                    <div class="space-y-4">
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input w-full">
+                        <input id="tip" type="number" min="0" step="1" placeholder="Dýško (Kč)" class="custom-input w-full">
+                        <textarea id="notes" placeholder="Poznámky..." class="custom-input custom-textarea w-full h-24"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="pay-cash" class="custom-button bg-green-600 text-white flex items-center justify-center"><i class="fas fa-money-bill mr-1"></i>Hotovost</button>
+                        <button id="pay-card" class="custom-button bg-blue-600 text-white flex items-center justify-center"><i class="fas fa-credit-card mr-1"></i>Karta</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="share-config" class="custom-button bg-purple-600 text-white"><i class="fas fa-share-alt mr-1"></i>Sdílet pokladnu</button>
+                        <button id="reset-pos" class="custom-button bg-red-600 text-white"><i class="fas fa-sync-alt mr-1"></i>Resetovat pokladnu</button>
+                    </div>
+                    <button id="print-receipt" class="custom-button bg-indigo-600 text-white w-full"><i class="fas fa-print mr-1"></i>Vytisknout účtenku</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="cash-modal" class="modal">
+        <div class="modal-content payment-modal">
+            <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
+            <div class="mb-6">
+                <p class="text-adaptive">Celkem: <span id="cash-total">0 Kč</span></p>
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="custom-input w-full mt-3">
+                <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
+            </div>
+            <div class="flex gap-3">
+                <button id="confirm-cash" class="custom-button bg-green-600 text-white flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="custom-button bg-red-600 text-white flex-1">Zrušit</button>
+            </div>
+        </div>
+    </div>
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Správa produktů</h2>
+            <div class="space-y-4 mb-6">
+                <input id="product-name" type="text" placeholder="Název produktu" class="custom-input w-full">
+                <input id="product-price" type="number" min="0" step="0.01" placeholder="Cena (Kč)" class="custom-input w-full">
+                <select id="product-category" class="custom-input w-full">
+                    <option value="">Vyberte kategorii</option>
+                </select>
+                <input id="new-category" type="text" placeholder="Nová kategorie (pokud není vybrána)" class="custom-input w-full">
+                <input id="product-id" type="hidden">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button id="save-product" class="custom-button bg-green-600 text-white">Uložit</button>
+                <button id="close-product" class="custom-button bg-red-600 text-white">Zavřít</button>
+            </div>
+            <div class="mt-6">
+                <h3 class="text-title font-semibold mb-4 text-white">Seznam produktů</h3>
+                <div id="product-list" class="max-h-[30vh] overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+    <div id="share-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Sdílení pokladny</h2>
+            <div class="space-y-4 mb-6">
+                <textarea id="share-code" placeholder="Vložte kód pokladny pro import" class="custom-input custom-textarea w-full h-24"></textarea>
+                <button id="import-config" class="custom-button bg-blue-600 text-white w-full">Importovat pokladnu</button>
+                <textarea id="export-code" readonly class="custom-input custom-textarea w-full h-24" placeholder="Váš kód pokladny pro sdílení"></textarea>
+                <button id="copy-code" class="custom-button bg-green-600 text-white w-full">Kopírovat kód</button>
+            </div>
+            <button id="close-share" class="custom-button bg-red-600 text-white w-full">Zavřít</button>
+        </div>
+    </div>
+    <div id="toast" class="toast" style="display:none"></div>
+    <script src="pos.js"></script>
+</body>
+</html>
