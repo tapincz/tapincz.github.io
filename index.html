@@ -63,6 +63,39 @@
             transform: scale(1.05);
             box-shadow: 0 8px 16px rgba(59, 130, 246, .4);
         }
+        .custom-input {
+            font-size: 1rem;
+            padding: .75rem;
+            border-radius: .75rem;
+            background: #2f2f47;
+            color: #fff;
+            border: 1px solid rgba(59, 130, 246, .3);
+            transition: all .2s ease;
+            outline: 0;
+        }
+        .custom-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: .75rem 1.5rem;
+            border-radius: .75rem;
+            color: #fff;
+            z-index: 2000;
+            transform: translateY(80px);
+            transition: transform .3s ease, opacity .3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-error {
+            background: #ef4444;
+        }
         @media (max-width: 640px) {
             .container {
                 padding: .75rem;
@@ -80,14 +113,42 @@
 <body>
     <div id="landing" class="landing">
         <div class="landing-content">
-            <h1 class="landing-title">Tapin</h1>
-            <p class="landing-text">Moderní a zdarma pokladní systém pro každého. Vytvořte si vlastní pokladnu, přidejte produkty a sdílejte. Na tapin.cz!</p>
+            <h1 class="landing-title">Vítejte v Tapin</h1>
+            <p class="landing-text">Moderní a zdarma pokladní systém pro každého. Vytvořte si vlastní pokladnu, přidejte produkty a sdílejte ji na tapin.cz!</p>
             <button id="launch-pos" class="launch-button">Spustit Pokladnu</button>
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-white mb-2">Připojit se ke kuchyni</h2>
+                <div class="flex gap-3">
+                    <input id="kitchen-code" type="text" placeholder="Zadejte kód pokladny" class="custom-input w-48">
+                    <button id="launch-kitchen" class="launch-button"><i class="fas fa-utensils mr-1"></i>Připojit</button>
+                </div>
+            </div>
         </div>
     </div>
+    <div id="toast" class="toast" style="display:none"></div>
     <script>
+        const showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast toast-error show';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.style.display = 'none', 300);
+            }, 3000);
+        };
+
         document.getElementById('launch-pos').addEventListener('click', () => {
             window.location.href = '/pokladna?from=home';
+        });
+
+        document.getElementById('launch-kitchen').addEventListener('click', () => {
+            const code = document.getElementById('kitchen-code').value.trim().toUpperCase();
+            if (!code || !/^[A-Z0-9]{6}$/.test(code)) {
+                showToast('Zadejte platný 6místný kód pokladny');
+                return;
+            }
+            window.location.href = `/pokladna/kuchyn.html?code=${code}`;
         });
     </script>
 </body>
