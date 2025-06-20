@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tapin - Moderní pokladní systém pro každého na tapin.cz">
+    <title>Tapin - Pokladna</title>
+    <script src="https://cdn.tailwindcss.com/3.4.10"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e2e, #2a2a3c);
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+        .container {
+            padding: 1rem;
+            max-width: 1280px;
+            margin: auto;
+        }
+        .card {
+            background: #25253a;
+            border-radius: 1rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+            padding: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, .2);
+        }
+        .item {
+            background: #2f2f47;
+            border-radius: .75rem;
+            padding: 1rem;
+            margin-bottom: .75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all .2s ease;
+        }
+        .item:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, .3);
+        }
+        .item .text-container {
+            max-width: 75%;
+            overflow: hidden;
+            white-space: normal;
+            line-height: 1.4;
+        }
+        .item .text-container:hover::after {
+            content: attr(data-fulltext);
+            position: absolute;
+            top: -1.5rem;
+            left: 0;
+            background: #1e293b;
+            color: #fff;
+            padding: .5rem;
+            border-radius: .5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+            z-index: 10;
+            white-space: normal;
+            max-width: 300px;
+            font-size: .9rem;
+        }
+        .cart-item {
+            background: #2f2f47;
+            border-radius: .75rem;
+            padding: 1rem;
+            margin-bottom: .75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all .2s ease;
+        }
+        .cart-item:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .category-tab {
+            padding: .75rem 1.5rem;
+            border-radius: 1.5rem;
+            background: linear-gradient(45deg, #4b5563, #6b7280);
+            color: #e5e7eb;
+            font-weight: 600;
+            margin-right: .5rem;
+            transition: all .2s ease;
+        }
+        .category-tab:hover, .category-tab.active {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .8);
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #25253a;
+            margin: 15% auto;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+            transform: translateY(-30px);
+            opacity: 0;
+            transition: transform .3s ease, opacity .3s ease;
+        }
+        .modal-content.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .payment-modal {
+            max-width: 500px;
+        }
+        .custom-input {
+            font-size: 1rem;
+            padding: .75rem;
+            border-radius: .75rem;
+            background: #2f2f47;
+            color: #fff;
+            border: 1px solid rgba(59, 130, 246, .3);
+            transition: all .2s ease;
+            outline: 0;
+        }
+        .custom-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+        .custom-textarea {
+            resize: none;
+            font-size: .9rem;
+            line-height: 1.5;
+        }
+        .custom-button {
+            border-radius: .75rem;
+            font-weight: 600;
+            padding: .75rem 1.5rem;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent);
+            transition: .4s;
+        }
+        .custom-button:hover::before {
+            left: 100%;
+        }
+        .custom-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: .75rem 1.5rem;
+            border-radius: .75rem;
+            color: #fff;
+            z-index: 2000;
+            transform: translateY(80px);
+            transition: transform .3s ease, opacity .3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success {
+            background: #10b981;
+        }
+        .toast-error {
+            background: #ef4444;
+        }
+        .text-adaptive {
+            font-size: clamp(.9rem, 2.5vw, 1rem);
+            line-height: 1.4;
+        }
+        .text-title {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+        .text-price {
+            font-size: clamp(.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+        }
+        .animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1e1e2e;
+            z-index: 1500;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #3b82f6;
+            border-top: 6px solid transparent;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            opacity: 0;
+        }
+        .animation-text {
+            color: #d1d5db;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0;
+        }
+        .pos-hidden {
+            display: none;
+        }
+        .pos-container {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .menu-card {
+            transform: translateX(-50px);
+            opacity: 0;
+        }
+        .cart-card {
+            transform: translateX(50px);
+            opacity: 0;
+        }
+        .header {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes slideIn {
+            0% { transform: translateX(-50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInRight {
+            0% { transform: translateX(50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideDown {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes bgPulse {
+            0%, 100% { background: #1e1e2e; }
+            50% { background: #2a2a3c; }
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: .75rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .item, .cart-item {
+                padding: .75rem;
+            }
+            .category-tab {
+                padding: .5rem 1rem;
+                font-size: .9rem;
+            }
+            .modal-content {
+                margin: 20% auto;
+                padding: 1rem;
+            }
+            .custom-button {
+                padding: .5rem 1rem;
+            }
+            .text-container {
+                max-width: 65%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="animation-overlay" class="animation-overlay">
+        <div class="spinner"></div>
+        <p class="animation-text">Načítání pokladny...</p>
+    </div>
+    <div id="pos-container" class="container pos-hidden">
+        <div class="header">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-title font-extrabold text-white">Tapin</h1>
+                <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="card col-span-2 menu-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-title font-semibold text-white">Menu</h2>
+                    <button id="manage-products" class="custom-button bg-blue-600 text-white"><i class="fas fa-cog mr-1"></i>Spravovat produkty</button>
+                </div>
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                    <input id="search" type="text" placeholder="Vyhledat..." class="custom-input w-full sm:w-1/3">
+                    <div id="categories" class="flex flex-wrap gap-3"></div>
+                </div>
+                <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+            </div>
+            <div class="card cart-card">
+                <h2 class="text-title font-semibold mb-4 text-white">Košík</h2>
+                <div id="cart" class="mb-6 max-h-[50vh] overflow-y-auto"></div>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-title font-semibold text-white">Celkem: <span id="total">0 Kč</span></h3>
+                        <button id="clear-cart" class="custom-button bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Vyprázdnit</button>
+                    </div>
+                    <div class="space-y-4">
+                        <input id="discount" type="number" min="0" max="100" placeholder="Sleva (%)" class="custom-input w-full">
+                        <input id="tip" type="number" min="0" step="1" placeholder="Dýško (Kč)" class="custom-input w-full">
+                        <textarea id="notes" placeholder="Poznámky..." class="custom-input custom-textarea w-full h-24"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="pay-cash" class="custom-button bg-green-600 text-white flex items-center justify-center"><i class="fas fa-money-bill mr-1"></i>Hotovost</button>
+                        <button id="pay-card" class="custom-button bg-blue-600 text-white flex items-center justify-center"><i class="fas fa-credit-card mr-1"></i>Karta</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="export" class="custom-button bg-gray-600 text-white"><i class="fas fa-download mr-1"></i>Export JSON</button>
+                        <button id="history" class="custom-button bg-yellow-600 text-white"><i class="fas fa-history mr-1"></i>Historie</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="share-config" class="custom-button bg-purple-600 text-white"><i class="fas fa-share-alt mr-1"></i>Sdílet pokladnu</button>
+                        <button id="reset-pos" class="custom-button bg-red-600 text-white"><i class="fas fa-sync-alt mr-1"></i>Resetovat pokladnu</button>
+                    </div>
+                    <button id="print-receipt" class="custom-button bg-indigo-600 text-white w-full"><i class="fas fa-print mr-1"></i>Vytisknout účtenku</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Historie transakcí</h2>
+            <div id="history-content" class="max-h-[50vh] overflow-y-auto"></div>
+            <button id="close-history" class="custom-button bg-red-600 text-white w-full mt-4">Zavřít</button>
+        </div>
+    </div>
+    <div id="cash-modal" class="modal">
+        <div class="modal-content payment-modal">
+            <h2 class="text-title font-semibold mb-4 text-white">Platba hotovostí</h2>
+            <div class="mb-6">
+                <p class="text-adaptive">Celkem: <span id="cash-total">0 Kč</span></p>
+                <input id="cash-amount" type="number" min="0" step="0.01" placeholder="Zadaná částka (Kč)" class="custom-input w-full mt-3">
+                <p class="mt-3 text-adaptive">Vrátit: <span id="cash-change">0 Kč</span></p>
+            </div>
+            <div class="flex gap-3">
+                <button id="confirm-cash" class="custom-button bg-green-600 text-white flex-1">Potvrdit</button>
+                <button id="cancel-cash" class="custom-button bg-red-600 text-white flex-1">Zrušit</button>
+            </div>
+        </div>
+    </div>
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Správa produktů</h2>
+            <div class="space-y-4 mb-6">
+                <input id="product-name" type="text" placeholder="Název produktu" class="custom-input w-full">
+                <input id="product-price" type="number" min="0" step="0.01" placeholder="Cena (Kč)" class="custom-input w-full">
+                <select id="product-category" class="custom-input w-full">
+                    <option value="">Vyberte kategorii</option>
+                </select>
+                <input id="new-category" type="text" placeholder="Nová kategorie (pokud není vybrána)" class="custom-input w-full">
+                <input id="product-id" type="hidden">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button id="save-product" class="custom-button bg-green-600 text-white">Uložit</button>
+                <button id="close-product" class="custom-button bg-red-600 text-white">Zavřít</button>
+            </div>
+            <div class="mt-6">
+                <h3 class="text-title font-semibold mb-4 text-white">Seznam produktů</h3>
+                <div id="product-list" class="max-h-[30vh] overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+    <div id="share-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-title font-semibold mb-4 text-white">Sdílení pokladny</h2>
+            <div class="space-y-4 mb-6">
+                <textarea id="share-code" placeholder="Vložte kód pokladny pro import" class="custom-input custom-textarea w-full h-24"></textarea>
+                <button id="import-config" class="custom-button bg-blue-600 text-white w-full">Importovat pokladnu</button>
+                <textarea id="export-code" readonly class="custom-input custom-textarea w-full h-24" placeholder="Váš kód pokladny pro sdílení"></textarea>
+                <button id="copy-code" class="custom-button bg-green-600 text-white w-full">Kopírovat kód</button>
+            </div>
+            <button id="close-share" class="custom-button bg-red-600 text-white w-full">Zavřít</button>
+        </div>
+    </div>
+    <div id="toast" class="toast" style="display:none"></div>
+    <script>
+        // Access control: Redirect to homepage if not accessed from home
+        if (!window.location.search.includes('from=home')) {
+            window.location.href = '/';
+        }
+
+        let products = JSON.parse(localStorage.getItem('products') || '[]'),
+            cart = JSON.parse(localStorage.getItem('cart') || '[]'),
+            history = JSON.parse(localStorage.getItem('history') || '[]');
+
+        const updateDate = () => {
+            document.getElementById('current-date').textContent = new Date().toLocaleString('cs-CZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        const showToast = (msg, type = 'success') => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type === 'success' ? 'toast-success' : 'toast-error'} show`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.style.display = 'none', 300);
+            }, 3000);
+        };
+
+        const launchPOS = () => {
+            const overlay = document.getElementById('animation-overlay'),
+                  posContainer = document.getElementById('pos-container'),
+                  spinner = overlay.querySelector('.spinner'),
+                  animText = overlay.querySelector('.animation-text'),
+                  menuCard = document.querySelector('.menu-card'),
+                  cartCard = document.querySelector('.cart-card'),
+                  header = document.querySelector('.header');
+
+            overlay.style.display = 'flex';
+            overlay.style.animation = 'bgPulse 7s ease-in-out';
+            setTimeout(() => {
+                spinner.style.animation = 'fadeIn 0.5s forwards, spin 1.5s linear infinite';
+                animText.style.animation = 'fadeIn 0.5s forwards';
+            }, 500);
+            setTimeout(() => {
+                spinner.style.animation = 'fadeIn 0.5s reverse';
+                animText.style.animation = 'fadeIn 0.5s reverse';
+            }, 1500);
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                posContainer.classList.remove('pos-hidden');
+                posContainer.style.animation = 'fadeIn 1s forwards';
+                header.style.animation = 'slideDown 1s forwards 0.5s';
+                menuCard.style.animation = 'slideIn 1s forwards 1s';
+                cartCard.style.animation = 'slideInRight 1s forwards 1.5s';
+            }, 2000);
+            setTimeout(() => {
+                posContainer.style.opacity = '1';
+                posContainer.style.transform = 'translateY(0)';
+                header.style.opacity = '1';
+                header.style.transform = 'translateY(0)';
+                menuCard.style.opacity = '1';
+                menuCard.style.transform = 'translateX(0)';
+                cartCard.style.opacity = '1';
+                cartCard.style.transform = 'translateX(0)';
+            }, 6000);
+        };
+
+        const displayCategories = () => {
+            const cats = ['Vše', ...new Set(products.map(p => p.category))],
+                  categoriesEl = document.getElementById('categories');
+            categoriesEl.innerHTML = cats.map(cat => `<span class="category-tab ${cat === 'Vše' ? 'active' : ''}" data-category="${cat}">${cat}</span>`).join('');
+            document.querySelectorAll('.category-tab').forEach(tab => tab.addEventListener('click', () => filterMenu(tab.dataset.category)));
+            document.getElementById('product-category').innerHTML = '<option value="">Vyberte kategorii</option>' + cats.filter(cat => cat !== 'Vše').map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        };
+
+        const displayMenu = (cat = 'Vše', search = '') => {
+            const filtered = products.filter(p => (cat === 'Vše' || p.category === cat) && p.name.toLowerCase().includes(search.toLowerCase()));
+            document.getElementById('menu').innerHTML = filtered.map(p => `<div class="item" data-id="${p.id}"><div class="text-container text-adaptive font-medium text-white" data-fulltext="${p.name}">${p.name}</div><div class="flex items-center space-x-4"><span class="text-price text-green-400">${p.price} Kč</span><span class="text-adaptive text-gray-400">${p.category}</span></div></div>`).join('');
+            document.querySelectorAll('.item').forEach(item => item.addEventListener('click', () => {
+                const product = products.find(p => p.id === +item.dataset.id);
+                if (product) {
+                    addToCart(product);
+                    showToast(`${product.name} přidán do košíku`);
+                }
+            }));
+        };
+
+        const displayProducts = () => {
+            document.getElementById('product-list').innerHTML = products.length ? products.map(p => `<div class="p-3 border-b bg-gray-700 rounded-lg hover:bg-gray-600 transition"><div class="flex justify-between text-adaptive"><span><strong>${p.name}</strong> (${p.category})</span><span>${p.price} Kč</span></div><div class="flex gap-2 mt-2"><button onclick="editProduct(${p.id})" class="custom-button bg-blue-600 text-white text-sm">Upravit</button><button onclick="deleteProduct(${p.id})" class="custom-button bg-red-600 text-white text-sm">Smazat</button></div></div>`).join('') : '<p class="text-gray-400 text-adaptive">Žádné produkty.</p>';
+        };
+
+        const addToCart = product => {
+            const item = cart.find(i => i.id === product.id);
+            item ? item.quantity++ : cart.push({ ...product, quantity: 1 });
+            saveCart();
+            updateCart();
+        };
+
+        const updateCart = () => {
+            const discount = +document.getElementById('discount').value || 0,
+                  tip = +document.getElementById('tip').value || 0;
+            if (discount < 0 || discount > 100) {
+                showToast('Sleva musí být 0-100%', 'error');
+                document.getElementById('discount').value = '';
+                return;
+            }
+            if (tip < 0) {
+                showToast('Dýško nemůže být záporné', 'error');
+                document.getElementById('tip').value = '';
+                return;
+            }
+            document.getElementById('cart').innerHTML = cart.map((item, i) => `<div class="cart-item"><div class="text-container text-adaptive font-medium text-white" data-fulltext="${item.name}">${item.name} (${item.quantity}x)</div><div class="flex items-center space-x-4"><button onclick="updateQuantity(${i}, -1)" class="text-red-400 hover:text-red-600"><i class="fas fa-minus"></i></button><span class="text-price text-green-400">${item.price * item.quantity} Kč</span><button onclick="updateQuantity(${i}, 1)" class="text-green-400 hover:text-green-600"><i class="fas fa-plus"></i></button><button onclick="removeFromCart(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  total = subtotal * (1 - discount / 100) + tip;
+            document.getElementById('total').textContent = `${Math.round(total)} Kč`;
+        };
+
+        const updateQuantity = (i, change) => {
+            cart[i].quantity += change;
+            if (cart[i].quantity <= 0) {
+                cart.splice(i, 1);
+                showToast('Položka odebrána z košíku');
+            }
+            saveCart();
+            updateCart();
+        };
+
+        const removeFromCart = i => {
+            showToast(`${cart[i].name} odebrán z košíku`);
+            cart.splice(i, 1);
+            saveCart();
+            updateCart();
+        };
+
+        const saveCart = () => localStorage.setItem('cart', JSON.stringify(cart));
+
+        const saveProducts = () => {
+            localStorage.setItem('products', JSON.stringify(products));
+            displayCategories();
+            displayMenu();
+            displayProducts();
+        };
+
+        document.getElementById('clear-cart').addEventListener('click', () => {
+            if (!cart.length) return showToast('Košík je prázdný', 'error');
+            cart = [];
+            saveCart();
+            updateCart();
+            showToast('Košík vyprázdněn');
+        });
+
+        document.getElementById('discount').addEventListener('input', updateCart);
+        document.getElementById('tip').addEventListener('input', updateCart);
+
+        const filterMenu = cat => {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-category="${cat}"]`).classList.add('active');
+            displayMenu(cat, document.getElementById('search').value);
+        };
+
+        document.getElementById('search').addEventListener('input', e => displayMenu(document.querySelector('.category-tab.active').dataset.category, e.target.value));
+
+        const processPayment = (method, received = null) => {
+            const notes = document.getElementById('notes').value,
+                  discount = +document.getElementById('discount').value || 0,
+                  tip = +document.getElementById('tip').value || 0,
+                  subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  total = subtotal * (1 - discount / 100) + tip;
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
+            history.push({
+                id: Date.now(),
+                cart: [...cart],
+                total: Math.round(total),
+                method,
+                notes,
+                tip: Math.round(tip),
+                discount,
+                date: new Date().toLocaleString('cs-CZ'),
+                change: received ? Math.round((received - total) * 100) / 100 : null
+            });
+            localStorage.setItem('history', JSON.stringify(history));
+            showToast(`Platba ${method}: ${Math.round(total)} Kč${received && received > total ? `\nVráceno: ${(received - total).toFixed(2)} Kč` : ''}`);
+            cart = [];
+            document.getElementById('notes').value = '';
+            document.getElementById('discount').value = '';
+            document.getElementById('tip').value = '';
+            saveCart();
+            updateCart();
+        };
+
+        document.getElementById('pay-cash').addEventListener('click', () => {
+            const discount = +document.getElementById('discount').value || 0,
+                  tip = +document.getElementById('tip').value || 0,
+                  subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  total = subtotal * (1 - discount / 100) + tip;
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
+            const modal = document.getElementById('cash-modal'),
+                  cashTotal = document.getElementById('cash-total'),
+                  cashAmount = document.getElementById('cash-amount'),
+                  cashChange = document.getElementById('cash-change');
+            cashTotal.textContent = `${Math.round(total)} Kč`;
+            cashAmount.value = '';
+            cashChange.textContent = '0 Kč';
+            modal.style.display = 'block';
+            modal.querySelector('.modal-content').classList.add('show');
+            cashAmount.addEventListener('input', () => {
+                const received = +cashAmount.value || 0;
+                cashChange.textContent = received > total ? `${(received - total).toFixed(2)} Kč` : '0 Kč';
+            }, { once: true });
+            document.getElementById('confirm-cash').onclick = () => {
+                const received = +cashAmount.value || 0;
+                if (received < total) return showToast('Nedostatečná částka!', 'error');
+                processPayment('Hotovost', received);
+                modal.style.display = 'none';
+            };
+            document.getElementById('cancel-cash').onclick = () => {
+                modal.querySelector('.modal-content').classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
+            };
+        });
+
+        document.getElementById('pay-card').addEventListener('click', () => processPayment('Karta'));
+
+        document.getElementById('print-receipt').addEventListener('click', () => {
+            if (!cart.length) return showToast('Košík je prázdný!', 'error');
+            const discount = +document.getElementById('discount').value || 0,
+                  tip = +document.getElementById('tip').value || 0,
+                  subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  total = subtotal * (1 - discount / 100) + tip,
+                  notes = document.getElementById('notes').value,
+                  win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Účtenka</title><style>body{font-family:Arial,sans-serif;padding:15px;max-width:300px;margin:0 auto}h1{font-size:16px;text-align:center}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{padding:5px;text-align:left}.total{font-weight:700}.notes{font-style:italic}</style></head><body><h1>Účtenka - Tapin</h1><p>Datum: ${new Date().toLocaleString('cs-CZ')}</p><table><tr><th>Položka</th><th>Množství</th><th>Cena</th></tr>${cart.map(item => `<tr><td>${item.name}</td><td>${item.quantity}x</td><td>${item.price * item.quantity} Kč</td></tr>`).join('')}${discount ? `<tr><td colspan="2">Sleva (${discount}%)</td><td>-${Math.round(subtotal * discount / 100)} Kč</td></tr>` : ''}${tip ? `<tr><td colspan="2">Dýško</td><td>${Math.round(tip)} Kč</td></tr>` : ''}<tr class="total"><td colspan="2">Celkem</td><td>${Math.round(total)} Kč</td></tr></table>${notes ? `<p class="notes">Poznámky: ${notes}</p>` : ''}<p style="text-align:center">Děkujeme za nákup na tapin.cz!</p></body></html>`);
+            win.document.close();
+            win.print();
+        });
+
+        document.getElementById('export').addEventListener('click', () => {
+            if (!cart.length && !history.length) return showToast('Žádná data k exportu!', 'error');
+            const blob = new Blob([JSON.stringify({ cart, history }, null, 2)], { type: 'application/json' }),
+                  a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `tapin_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('Data exportována');
+        });
+
+        document.getElementById('history').addEventListener('click', () => {
+            const modal = document.getElementById('history-modal'),
+                  content = document.getElementById('history-content');
+            content.innerHTML = history.length ? history.map(t => `<div class="p-3 border-b bg-gray-700 rounded-lg hover:bg-gray-600 transition"><div class="flex justify-between text-adaptive"><span><strong>ID:</strong> ${t.id}</span><span><strong>Datum:</strong> ${t.date}</span></div><div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div><div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}${t.tip ? `<div class="text-adaptive"><strong>Dýško:</strong> ${t.tip} Kč</div>` : ''}<div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}</div>`).join('') : '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
+            modal.style.display = 'block';
+            modal.querySelector('.modal-content').classList.add('show');
+        });
+
+        document.getElementById('close-history').addEventListener('click', () => {
+            const modal = document.getElementById('history-modal');
+            modal.querySelector('.modal-content').classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        });
+
+        const editProduct = id => {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                document.getElementById('product-id').value = id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-category').value = product.category;
+                document.getElementById('new-category').value = '';
+                document.getElementById('product-modal').style.display = 'block';
+                document.getElementById('product-modal').querySelector('.modal-content').classList.add('show');
+            }
+        };
+
+        const deleteProduct = id => {
+            products = products.filter(p => p.id !== id);
+            saveProducts();
+            showToast('Produkt smazán');
+        };
+
+        document.getElementById('manage-products').addEventListener('click', () => {
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-price').value = '';
+            document.getElementById('product-category').value = '';
+            document.getElementById('new-category').value = '';
+            document.getElementById('product-modal').style.display = 'block';
+            document.getElementById('product-modal').querySelector('.modal-content').classList.add('show');
+            displayProducts();
+        });
+
+        document.getElementById('save-product').addEventListener('click', () => {
+            const id = +document.getElementById('product-id').value,
+                  name = document.getElementById('product-name').value.trim(),
+                  price = +document.getElementById('product-price').value,
+                  category = document.getElementById('product-category').value || document.getElementById('new-category').value.trim();
+            if (!name || !category || price <= 0) return showToast('Vyplňte všechny údaje správně', 'error');
+            if (id) {
+                const product = products.find(p => p.id === id);
+                if (product) {
+                    product.name = name;
+                    product.price = price;
+                    product.category = category;
+                }
+            } else {
+                products.push({ id: products.length ? Math.max(...products.map(p => p.id)) + 1 : 1, name, price, category });
+            }
+            saveProducts();
+            document.getElementById('product-modal').style.display = 'none';
+            showToast('Produkt uložen');
+        });
+
+        document.getElementById('close-product').addEventListener('click', () => {
+            const modal = document.getElementById('product-modal');
+            modal.querySelector('.modal-content').classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        });
+
+        document.getElementById('share-config').addEventListener('click', () => {
+            const modal = document.getElementById('share-modal'),
+                  exportCode = document.getElementById('export-code');
+            exportCode.value = JSON.stringify(products, null, 2);
+            document.getElementById('share-code').value = '';
+            modal.style.display = 'block';
+            modal.querySelector('.modal-content').classList.add('show');
+        });
+
+        document.getElementById('import-config').addEventListener('click', () => {
+            try {
+                const imported = JSON.parse(document.getElementById('share-code').value);
+                if (Array.isArray(imported) && imported.every(p => p.id && p.name && p.price && p.category)) {
+                    products = imported;
+                    saveProducts();
+                    showToast('Pokladna importována');
+                    document.getElementById('share-modal').style.display = 'none';
+                }
+            } catch (e) {
+                showToast('Neplatný kód pokladny', 'error');
+            }
+        });
+
+        document.getElementById('copy-code').addEventListener('click', () => {
+            const exportCode = document.getElementById('export-code');
+            exportCode.select();
+            document.execCommand('copy');
+            showToast('Kód zkopírován');
+        });
+
+        document.getElementById('close-share').addEventListener('click', () => {
+            const modal = document.getElementById('share-modal');
+            modal.querySelector('.modal-content').classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        });
+
+        document.getElementById('reset-pos').addEventListener('click', () => {
+            if (confirm('Opravdu chcete resetovat pokladnu? Všechny produkty a historie budou smazány.')) {
+                products = [];
+                cart = [];
+                history = [];
+                localStorage.clear();
+                saveProducts();
+                saveCart();
+                updateCart();
+                document.getElementById('history-content').innerHTML = '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
+                showToast('Pokladna resetována');
+            }
+        });
+
+        updateDate();
+        displayCategories();
+        displayMenu();
+        updateCart();
+        launchPOS();
+        setInterval(updateDate, 60000);
+    </script>
+</body>
+</html>
