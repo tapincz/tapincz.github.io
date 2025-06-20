@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tapin - Kuchyňský displej pro zobrazení objednávek">
+    <title>Tapin - Kuchyňský displej</title>
+    <script src="https://cdn.tailwindcss.com/3.4.10"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e2e, #2a2a3c);
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+        .container {
+            padding: 1rem;
+            max-width: 1280px;
+            margin: auto;
+        }
+        .card {
+            background: #25253a;
+            border-radius: 1rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+            padding: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, .2);
+        }
+        .order-item {
+            background: #2f2f47;
+            border-radius: .75rem;
+            padding: 1rem;
+            margin-bottom: .75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all .2s ease;
+        }
+        .order-item.new {
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, .3);
+        }
+        .order-item:hover {
+            transform: translateY(-2px);
+        }
+        .text-adaptive {
+            font-size: clamp(.9rem, 2.5vw, 1rem);
+            line-height: 1.4;
+        }
+        .text-title {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+        .text-price {
+            font-size: clamp(.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+        }
+        .custom-button {
+            border-radius: .75rem;
+            font-weight: 600;
+            padding: .75rem 1.5rem;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent);
+            transition: .4s;
+        }
+        .custom-button:hover::before {
+            left: 100%;
+        }
+        .custom-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: .75rem 1.5rem;
+            border-radius: .75rem;
+            color: #fff;
+            z-index: 2000;
+            transform: translateY(80px);
+            transition: transform .3s ease, opacity .3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success {
+            background: #10b981;
+        }
+        .toast-error {
+            background: #ef4444;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: .75rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .order-item {
+                padding: .75rem;
+            }
+            .custom-button {
+                padding: .5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-title font-extrabold text-white">Tapin - Kuchyňský displej <span class="text-sm text-gray-400 ml-2">Kód: <span id="pos-code"></span></span></h1>
+                <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="text-title font-semibold mb-4 text-white">Nové objednávky</h2>
+            <div id="orders" class="max-h-[80vh] overflow-y-auto"></div>
+        </div>
+    </div>
+    <div id="toast" class="toast" style="display:none"></div>
+    <script>
+        // Access control: Redirect to homepage if no valid code
+        const urlParams = new URLSearchParams(window.location.search);
+        const posCode = urlParams.get('code')?.toUpperCase();
+        if (!posCode || !/^[A-Z0-9]{6}$/.test(posCode)) {
+            window.location.href = '/';
+        }
+        document.getElementById('pos-code').textContent = posCode;
+
+        let lastOrderCount = 0;
+
+        const updateDate = () => {
+            document.getElementById('current-date').textContent = new Date().toLocaleString('cs-CZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        const showToast = (msg, type = 'success') => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type === 'success' ? 'toast-success' : 'toast-error'} show`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.style.display = 'none', 300);
+            }, 3000);
+        };
+
+        const displayOrders = () => {
+            const history = JSON.parse(localStorage.getItem(`history_${posCode}`) || '[]');
+            const newOrders = history.filter(order => order.status === 'new');
+            
+            if (newOrders.length > lastOrderCount) {
+                showToast(`Nová objednávka přijata (ID: ${newOrders[newOrders.length - 1].id})`);
+                lastOrderCount = newOrders.length;
+            } else if (newOrders.length < lastOrderCount) {
+                lastOrderCount = newOrders.length;
+            }
+
+            document.getElementById('orders').innerHTML = newOrders.length ? 
+                newOrders.map(order => `
+                    <div class="order-item new">
+                        <div class="text-adaptive">
+                            <div><strong>ID:</strong> ${order.id}</div>
+                            <div><strong>Datum:</strong> ${order.date}</div>
+                            <div><strong>Platba:</strong> ${order.method}</div>
+                            <div><strong>Celkem:</strong> ${order.total} Kč</div>
+                            ${order.change ? `<div><strong>Vráceno:</strong> ${order.change} Kč</div>` : ''}
+                            ${order.tip ? `<div><strong>Dýško:</strong> ${order.tip} Kč</div>` : ''}
+                            <div><strong>Položky:</strong> ${order.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
+                            ${order.notes ? `<div><strong>Poznámky:</strong> ${order.notes}</div>` : ''}
+                        </div>
+                        <button onclick="completeOrder(${order.id})" class="custom-button bg-green-600 text-white">
+                            <i class="fas fa-check mr-1"></i>Dokončit
+                        </button>
+                    </div>
+                `).join('') : 
+                '<p class="text-gray-400 text-adaptive">Žádné nové objednávky.</p>';
+        };
+
+        const completeOrder = id => {
+            let history = JSON.parse(localStorage.getItem(`history_${posCode}`) || '[]');
+            const order = history.find(o => o.id === id);
+            if (order) {
+                order.status = 'completed';
+                localStorage.setItem(`history_${posCode}`, JSON.stringify(history));
+                showToast(`Objednávka ${id} dokončena`);
+                displayOrders();
+            }
+        };
+
+        updateDate();
+        displayOrders();
+        setInterval(() => {
+            updateDate();
+            displayOrders();
+        }, 5000);
+    </script>
+</body>
+</html>
