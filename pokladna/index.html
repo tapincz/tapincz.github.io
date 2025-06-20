@@ -303,7 +303,7 @@
     <div id="pos-container" class="container pos-hidden">
         <div class="header">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-title font-extrabold text-white">Tapin</h1>
+                <h1 class="text-title font-extrabold text-white">Tapin <span class="text-sm text-gray-400 ml-2">Kód: <span id="pos-code"></span></span></h1>
                 <div class="text-adaptive text-gray-400">Datum: <span id="current-date"></span></div>
             </div>
         </div>
@@ -411,9 +411,25 @@
             window.location.href = '/';
         }
 
-        let products = JSON.parse(localStorage.getItem('products') || '[]'),
-            cart = JSON.parse(localStorage.getItem('cart') || '[]'),
-            history = JSON.parse(localStorage.getItem('history') || '[]');
+        // Generate or retrieve POS code
+        const generatePosCode = () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        };
+        let posCode = localStorage.getItem('posCode');
+        if (!posCode) {
+            posCode = generatePosCode();
+            localStorage.setItem('posCode', posCode);
+        }
+        document.getElementById('pos-code').textContent = posCode;
+
+        let products = JSON.parse(localStorage.getItem(`products_${posCode}`) || '[]'),
+            cart = JSON.parse(localStorage.getItem(`cart_${posCode}`) || '[]'),
+            history = JSON.parse(localStorage.getItem(`history_${posCode}`) || '[]');
 
         const updateDate = () => {
             document.getElementById('current-date').textContent = new Date().toLocaleString('cs-CZ', {
@@ -542,10 +558,10 @@
             updateCart();
         };
 
-        const saveCart = () => localStorage.setItem('cart', JSON.stringify(cart));
+        const saveCart = () => localStorage.setItem(`cart_${posCode}`, JSON.stringify(cart));
 
         const saveProducts = () => {
-            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem(`products_${posCode}`, JSON.stringify(products));
             displayCategories();
             displayMenu();
             displayProducts();
@@ -586,9 +602,10 @@
                 tip: Math.round(tip),
                 discount,
                 date: new Date().toLocaleString('cs-CZ'),
-                change: received ? Math.round((received - total) * 100) / 100 : null
+                change: received ? Math.round((received - total) * 100) / 100 : null,
+                status: 'new'
             });
-            localStorage.setItem('history', JSON.stringify(history));
+            localStorage.setItem(`history_${posCode}`, JSON.stringify(history));
             showToast(`Platba ${method}: ${Math.round(total)} Kč${received && received > total ? `\nVráceno: ${(received - total).toFixed(2)} Kč` : ''}`);
             cart = [];
             document.getElementById('notes').value = '';
@@ -639,7 +656,7 @@
                   total = subtotal * (1 - discount / 100) + tip,
                   notes = document.getElementById('notes').value,
                   win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Účtenka</title><style>body{font-family:Arial,sans-serif;padding:15px;max-width:300px;margin:0 auto}h1{font-size:16px;text-align:center}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{padding:5px;text-align:left}.total{font-weight:700}.notes{font-style:italic}</style></head><body><h1>Účtenka - Tapin</h1><p>Datum: ${new Date().toLocaleString('cs-CZ')}</p><table><tr><th>Položka</th><th>Množství</th><th>Cena</th></tr>${cart.map(item => `<tr><td>${item.name}</td><td>${item.quantity}x</td><td>${item.price * item.quantity} Kč</td></tr>`).join('')}${discount ? `<tr><td colspan="2">Sleva (${discount}%)</td><td>-${Math.round(subtotal * discount / 100)} Kč</td></tr>` : ''}${tip ? `<tr><td colspan="2">Dýško</td><td>${Math.round(tip)} Kč</td></tr>` : ''}<tr class="total"><td colspan="2">Celkem</td><td>${Math.round(total)} Kč</td></tr></table>${notes ? `<p class="notes">Poznámky: ${notes}</p>` : ''}<p style="text-align:center">Děkujeme za nákup na tapin.cz!</p></body></html>`);
+            win.document.write(`<html><head><title>Účtenka</title><style>body{font-family:Arial,sans-serif;padding:15px;max-width:300px;margin:0 auto}h1{font-size:16px;text-align:center}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{padding:5px;text-align:left}.total{font-weight:700}.notes{font-style:italic}</style></head><body><h1>Účtenka - Tapin (Kód: ${posCode})</h1><p>Datum: ${new Date().toLocaleString('cs-CZ')}</p><table><tr><th>Položka</th><th>Množství</th><th>Cena</th></tr>${cart.map(item => `<tr><td>${item.name}</td><td>${item.quantity}x</td><td>${item.price * item.quantity} Kč</td></tr>`).join('')}${discount ? `<tr><td colspan="2">Sleva (${discount}%)</td><td>-${Math.round(subtotal * discount / 100)} Kč</td></tr>` : ''}${tip ? `<tr><td colspan="2">Dýško</td><td>${Math.round(tip)} Kč</td></tr>` : ''}<tr class="total"><td colspan="2">Celkem</td><td>${Math.round(total)} Kč</td></tr></table>${notes ? `<p class="notes">Poznámky: ${notes}</p>` : ''}<p style="text-align:center">Děkujeme za nákup na tapin.cz!</p></body></html>`);
             win.document.close();
             win.print();
         });
@@ -649,7 +666,7 @@
             const blob = new Blob([JSON.stringify({ cart, history }, null, 2)], { type: 'application/json' }),
                   a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `tapin_${Date.now()}.json`;
+            a.download = `tapin_${posCode}_${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(a.href);
             showToast('Data exportována');
@@ -658,7 +675,7 @@
         document.getElementById('history').addEventListener('click', () => {
             const modal = document.getElementById('history-modal'),
                   content = document.getElementById('history-content');
-            content.innerHTML = history.length ? history.map(t => `<div class="p-3 border-b bg-gray-700 rounded-lg hover:bg-gray-600 transition"><div class="flex justify-between text-adaptive"><span><strong>ID:</strong> ${t.id}</span><span><strong>Datum:</strong> ${t.date}</span></div><div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div><div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}${t.tip ? `<div class="text-adaptive"><strong>Dýško:</strong> ${t.tip} Kč</div>` : ''}<div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}</div>`).join('') : '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
+            content.innerHTML = history.length ? history.map(t => `<div class="p-3 border-b bg-gray-700 rounded-lg hover:bg-gray-600 transition"><div class="flex justify-between text-adaptive"><span><strong>ID:</strong> ${t.id}</span><span><strong>Datum:</strong> ${t.date}</span></div><div class="text-adaptive"><strong>Platba:</strong> ${t.method}</div><div class="text-adaptive"><strong>Stav:</strong> ${t.status === 'new' ? 'Nová' : 'Dokončená'}</div><div class="text-adaptive"><strong>Celkem:</strong> ${t.total} Kč</div>${t.change ? `<div class="text-adaptive"><strong>Vráceno:</strong> ${t.change} Kč</div>` : ''}${t.tip ? `<div class="text-adaptive"><strong>Dýško:</strong> ${t.tip} Kč</div>` : ''}<div class="text-adaptive"><strong>Položky:</strong> ${t.cart.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>${t.notes ? `<div class="text-adaptive"><strong>Poznámky:</strong> ${t.notes}</div>` : ''}</div>`).join('') : '<p class="text-gray-400 text-adaptive">Žádné transakce v historii.</p>';
             modal.style.display = 'block';
             modal.querySelector('.modal-content').classList.add('show');
         });
@@ -763,11 +780,16 @@
         });
 
         document.getElementById('reset-pos').addEventListener('click', () => {
-            if (confirm('Opravdu chcete resetovat pokladnu? Všechny produkty a historie budou smazány.')) {
+            if (confirm('Opravdu chcete resetovat pokladnu? Všechny produkty a historie budou smazány a vytvoří se nový kód pokladny.')) {
                 products = [];
                 cart = [];
                 history = [];
-                localStorage.clear();
+                posCode = generatePosCode();
+                localStorage.setItem('posCode', posCode);
+                document.getElementById('pos-code').textContent = posCode;
+                localStorage.removeItem(`products_${posCode}`);
+                localStorage.removeItem(`cart_${posCode}`);
+                localStorage.removeItem(`history_${posCode}`);
                 saveProducts();
                 saveCart();
                 updateCart();
