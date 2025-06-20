@@ -1,0 +1,68 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přestřelka v Los Santos - Weazel News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-red-600 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <h1 class="text-3xl font-bold">Weazel News</h1>
+            <a href="index.html" class="text-yellow-300 hover:underline">Zpět na hlavní stránku</a>
+        </div>
+    </header>
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-4">BREAKING NEWS: Masivní přestřelka v centru Los Santos!</h1>
+        <p class="text-sm text-gray-600 mb-4">Autor: Jana Nováková | Vydáno: 20. června 2025, 10:30</p>
+        <img src="https://via.placeholder.com/800x400?text=Prestelka_v_Los_Santos" alt="Přestřelka v Los Santos" class="w-full h-96 object-cover rounded mb-6">
+        <p class="text-gray-700 mb-4">Dnes ráno kolem 9:00 vypukla na Vinewood Boulevard chaotická přestřelka mezi členy gangů Ballas a Vagos. Svědci popisují scénu jako "válečnou zónu" s desítkami výstřelů a hořícími auty. LSPD uzavřela oblast a zadržela několik podezřelých. Předběžné zprávy hovoří o pěti zraněných civilistech, z nichž dva jsou ve vážném stavu.</p>
+        <p class="text-gray-700 mb-4">Policejní mluvčí uvedl: "Situace je pod kontrolou, ale vyzýváme občany, aby se oblasti vyhnuli." Spekuluje se, že konflikt souvisí s bojem o kontrolu nad místním trhem s drogami. Weazel News sleduje vývoj situace a přinese další informace.</p>
+    </div>
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>© 2025 Weazel News. Všechna práva vyhrazena.</p>
+        </div>
+    </footer>
+</body>
+</html>
