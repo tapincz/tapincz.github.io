@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CON:WW3 Časová Kalkulačka</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #1a2525, #2e3b3e);
+      color: #e5e7eb;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      max-width: 400px;
+      margin: 20px auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e5e7eb;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      outline: none;
+      transition: all 0.3s;
+    }
+    input:focus {
+      border-color: #10b981;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    button {
+      background: #10b981;
+      color: white;
+      border-radius: 10px;
+      padding: 10px 20px;
+      border: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      color: #34d399;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+    }
+    .military-font {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="military-font">CON:WW3 Časová Kalkulačka</h1>
+    
+    <!-- Aktuální herní čas -->
+    <div class="p-4">
+      <h2 class="military-font">Aktuální herní čas</h2>
+      <div class="mb-2">
+        <label for="current-game-time" class="block text-sm">Den a čas (např. 5d 06:15):</label>
+        <input id="current-game-time" type="text" value="5d 06:15" class="w-full p-2" oninput="updateCurrentTime()">
+      </div>
+      <p id="current-time-display" class="text-sm military-font">Aktuální čas: 5d 06:15</p>
+    </div>
+
+    <!-- Kalkulačka herní čas -> IRL čas -->
+    <div class="p-4">
+      <h2 class="military-font">Herní čas na IRL čas</h2>
+      <div class="mb-2">
+        <label for="game-time" class="block text-sm">Herní čas (např. 5h 30m nebo 1d 12h):</label>
+        <input id="game-time" type="text" placeholder="např. 5h 30m" class="w-full p-2">
+      </div>
+      <button onclick="calculateIRLTime()">Přepočítat</button>
+      <p id="irl-result" class="mt-2 text-sm military-font"></p>
+      <div id="alert-section" class="hidden mt-2">
+        <button onclick="setAlert()">Nastavit upozornění</button>
+        <p id="alert-status" class="text-sm military-font mt-1"></p>
+      </div>
+    </div>
+
+    <!-- Kalkulačka dojezdu -->
+    <div class="p-4">
+      <h2 class="military-font">Čas dojezdu</h2>
+      <div class="mb-2">
+        <label for="game-arrival" class="block text-sm">Herní čas dojezdu (např. 18:15):</label>
+        <input id="game-arrival" type="text" placeholder="např. 18:15" class="w-full p-2">
+      </div>
+      <button onclick="calculateArrival()">Přepočítat</button>
+      <p id="arrival-result" class="mt-2 text-sm military-font"></p>
+      <div id="arrival-alert-section" class="hidden mt-2">
+        <button onclick="setArrivalAlert()">Nastavit upozornění</button>
+        <p id="arrival-alert-status" class="text-sm military-font mt-1"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentGameTime = { day: 5, hours: 6, minutes: 15 }; // Výchozí čas: 5d 06:15
+
+    // Aktualizace aktuálního herního času
+    function updateCurrentTime() {
+      const input = document.getElementById('current-game-time').value;
+      const regex = /^(\d+)d\s*(\d{1,2}):(\d{2})$/;
+      const match = input.match(regex);
+      if (match) {
+        currentGameTime = {
+          day: parseInt(match[1]),
+          hours: parseInt(match[2]),
+          minutes: parseInt(match[3])
+        };
+        document.getElementById('current-time-display').textContent = `Aktuální čas: ${input}`;
+      } else {
+        document.getElementById('current-time-display').textContent = 'Chyba: Zadejte čas ve formátu Xd HH:MM';
+      }
+    }
+
+    // Převod textu na minuty (např. 1d 5h 30m -> minuty)
+    function parseTimeInput(input) {
+      let totalMinutes = 0;
+      const daysMatch = input.match(/(\d+)d/);
+      const hoursMatch = input.match(/(\d+)h/);
+      const minutesMatch = input.match(/(\d+)m/);
+      if (daysMatch) totalMinutes += parseInt(daysMatch[1]) * 24 * 60;
+      if (hoursMatch) totalMinutes += parseInt(hoursMatch[1]) * 60;
+      if (minutesMatch) totalMinutes += parseInt(minutesMatch[1]);
+      return totalMinutes;
+    }
+
+    // Převod minut na čitelný formát
+    function formatTime(minutes) {
+      const days = Math.floor(minutes / (24 * 60));
+      const hours = Math.floor((minutes % (24 * 60)) / 60);
+      const mins = minutes % 60;
+      let result = [];
+      if (days > 0) result.push(`${days}d`);
+      if (hours > 0) result.push(`${hours}h`);
+      if (mins > 0) result.push(`${mins}m`);
+      return result.length > 0 ? result.join(' ') : '0m';
+    }
+
+    // Převod herního času na IRL čas
+    function calculateIRLTime() {
+      const gameTime = document.getElementById('game-time').value;
+      const minutes = parseTimeInput(gameTime);
+      const irlMinutes = minutes / 4; // 4x zrychlení
+      const result = formatTime(Math.round(irlMinutes));
+      document.getElementById('irl-result').textContent = `IRL čas: ${result}`;
+      document.getElementById('alert-section').classList.remove('hidden');
+      window.irlTargetTime = new Date(Date.now() + irlMinutes * 60 * 1000);
+    }
+
+    // Převod času dojezdu
+    function calculateArrival() {
+      const arrivalTime = document.getElementById('game-arrival').value;
+      const timeRegex = /^(\d{1,2}):(\d{2})$/;
+      const arrivalMatch = arrivalTime.match(timeRegex);
+
+      if (!arrivalMatch) {
+        document.getElementById('arrival-result').textContent = 'Chyba: Zadejte čas ve formátu HH:MM';
+        return;
+      }
+
+      const arrivalHours = parseInt(arrivalMatch[1]);
+      const arrivalMinutes = parseInt(arrivalMatch[2]);
+      let totalGameMinutes = ((currentGameTime.day * 24 * 60 + arrivalHours * 60 + arrivalMinutes) - (currentGameTime.day * 24 * 60 + currentGameTime.hours * 60 + currentGameTime.minutes));
+      if (totalGameMinutes < 0) totalGameMinutes += 24 * 60; // Přes půlnoc
+
+      const irlMinutes = totalGameMinutes / 4;
+      const irlTime = new Date(Date.now() + irlMinutes * 60 * 1000);
+      const hours = String(irlTime.getHours()).padStart(2, '0');
+      const minutes = String(irlTime.getMinutes()).padStart(2, '0');
+      document.getElementById('arrival-result').textContent = `IRL čas dojezdu: ${hours}:${minutes}`;
+      document.getElementById('arrival-alert-section').classList.remove('hidden');
+      window.arrivalTargetTime = irlTime;
+    }
+
+    // Nastavení upozornění pro herní čas
+    function setAlert() {
+      if (!("Notification" in window)) {
+        document.getElementById('alert-status').textContent = 'Upozornění nejsou podporována ve vašem prohlížeči.';
+        return;
+      }
+
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          const timeDiff = window.irlTargetTime - Date.now();
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              new Notification('CON:WW3 Upozornění', {
+                body: 'Čas pro váš herní příkaz nastal!'
+              });
+            }, timeDiff);
+            document.getElementById('alert-status').textContent = `Upozornění nastaveno na ${window.irlTargetTime.toLocaleTimeString('cs-CZ')}`;
+          } else {
+            document.getElementById('alert-status').textContent = 'Čas už vypršel!';
+          }
+        } else {
+          document.getElementById('alert-status').textContent = 'Povolení pro upozornění zamítnuto.';
+        }
+      });
+    }
+
+    // Nastavení upozornění pro čas dojezdu
+    function setArrivalAlert() {
+      if (!("Notification" in window)) {
+        document.getElementById('arrival-alert-status').textContent = 'Upozornění nejsou podporována ve vašem prohlížeči.';
+        return;
+      }
+
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          const timeDiff = window.arrivalTargetTime - Date.now();
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              new Notification('CON:WW3 Upozornění', {
+                body: 'Vaše armáda dorazila!'
+              });
+            }, timeDiff);
+            document.getElementById('arrival-alert-status').textContent = `Upozornění nastaveno na ${window.arrivalTargetTime.toLocaleTimeString('cs-CZ')}`;
+          } else {
+            document.getElementById('arrival-alert-status').textContent = 'Čas dojezdu už vypršel!';
+          }
+        } else {
+          document.getElementById('arrival-alert-status').textContent = 'Povolení pro upozornění zamítnuto.';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
