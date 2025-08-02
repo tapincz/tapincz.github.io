@@ -1,308 +1,102 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CON:WW3 Časová Kalkulačka</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WW3 Časový Převod</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: linear-gradient(to bottom, #0f172a, #1e293b);
-      color: #e5e7eb;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(ellipse at center, #0f2027, #203a43, #2c5364);
+      color: #0ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       overflow: hidden;
     }
+
     .container {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      padding: 24px;
-      max-width: 420px;
-      margin: 40px auto;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 1.5s ease-in-out;
     }
-    input {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #e5e7eb;
-      border-radius: 12px;
-      padding: 12px;
-      width: 100%;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-    input:focus {
-      border-color: #22d3ee;
-      background: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
-    }
-    button {
-      background: linear-gradient(to right, #22d3ee, #06b6d4);
-      color: white;
-      border-radius: 12px;
-      padding: 12px 24px;
-      border: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    button:hover {
-      background: linear-gradient(to right, #06b6d4, #0891b2);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(34, 211, 238, 0.4);
-    }
-    h1 {
+
+    .input-line {
       font-size: 2rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid #0ff;
+      color: #0ff;
       text-align: center;
-      color: #22d3ee;
-      text-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
-      margin-bottom: 20px;
+      width: 300px;
+      outline: none;
+      caret-color: #0ff;
+      animation: slideUp 1s ease-out;
     }
-    h2 {
-      font-size: 1.3rem;
-      color: #e5e7eb;
-      margin-bottom: 12px;
-      font-weight: 500;
+
+    .result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out forwards;
+      animation-delay: 1s;
     }
-    .military-font {
-      font-family: 'Courier New', monospace;
-      letter-spacing: 0.5px;
-      color: #a3e635;
-      text-shadow: 0 0 5px rgba(163, 230, 53, 0.5);
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    .section {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .digital-display {
-      background: #1a2525;
-      border: 1px solid #a3e635;
-      border-radius: 8px;
-      padding: 8px;
-      text-align: center;
-      font-size: 1.2rem;
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="military-font">CON:WW3 Časová Kalkulačka</h1>
-    
-    <!-- Synchronizace času -->
-    <div class="section">
-      <h2 class="military-font">Synchronizace herního času</h2>
-      <div class="mb-3">
-        <label for="initial-game-time" class="block text-sm">Počáteční herní čas (např. 5d 06:37:00):</label>
-        <input id="initial-game-time" type="text" value="5d 06:37:00" class="w-full p-2">
-      </div>
-      <button onclick="syncTime()">Synchronizovat</button>
-      <p id="current-game-time" class="mt-2 text-sm military-font digital-display">Aktuální herní čas: 5d 06:37:00</p>
-    </div>
-
-    <!-- Kalkulačka herní čas -> IRL čas -->
-    <div class="section">
-      <h2 class="military-font">Herní čas na IRL čas</h2>
-      <div class="mb-3">
-        <label for="game-time" class="block text-sm">Herní čas (např. 1d 14h):</label>
-        <input id="game-time" type="text" placeholder="např. 1d 14h" class="w-full p-2">
-      </div>
-      <button onclick="calculateIRLTime()">Přepočítat</button>
-      <p id="irl-result" class="mt-2 text-sm military-font"></p>
-      <div id="alert-section" class="hidden mt-2">
-        <button onclick="setAlert()">Nastavit upozornění</button>
-        <p id="alert-status" class="text-sm military-font mt-1"></p>
-      </div>
-    </div>
-
-    <!-- Kalkulačka dojezdu -->
-    <div class="section">
-      <h2 class="military-font">Čas dojezdu</h2>
-      <div class="mb-3">
-        <label for="game-arrival" class="block text-sm">Herní čas dojezdu (např. 6d 21:03):</label>
-        <input id="game-arrival" type="text" placeholder="např. 6d 21:03" class="w-full p-2">
-      </div>
-      <button onclick="calculateArrival()">Přepočítat</button>
-      <p id="arrival-result" class="mt-2 text-sm military-font"></p>
-      <div id="arrival-alert-section" class="hidden mt-2">
-        <button onclick="setArrivalAlert()">Nastavit upozornění</button>
-        <p id="arrival-alert-status" class="text-sm military-font mt-1"></p>
-      </div>
-    </div>
+    <input id="input" class="input-line" type="text" placeholder="Zadej např. 1d 15h" autofocus>
+    <div class="result" id="output"></div>
   </div>
 
   <script>
-    let gameTimeBase = null;
-    let irlTimeBase = null;
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
 
-    // Aktualizace herního času
-    function updateGameTime() {
-      if (!gameTimeBase || !irlTimeBase) return;
-      const now = new Date();
-      const elapsedIRLSeconds = (now - irlTimeBase) / 1000;
-      const elapsedGameSeconds = elapsedIRLSeconds * 4; // 4x rychleji
-      const newGameTime = new Date(gameTimeBase.getTime() + elapsedGameSeconds * 1000);
-      
-      const days = Math.floor(newGameTime.getTime() / (1000 * 60 * 60 * 24));
-      const hours = String(newGameTime.getHours()).padStart(2, '0');
-      const minutes = String(newGameTime.getMinutes()).padStart(2, '0');
-      const seconds = String(newGameTime.getSeconds()).padStart(2, '0');
-      document.getElementById('current-game-time').textContent = `Aktuální herní čas: ${days}d ${hours}:${minutes}:${seconds}`;
+    function parseDuration(inputStr) {
+      const dayMatch = inputStr.match(/(\d+)\s*d/);
+      const hourMatch = inputStr.match(/(\d+)\s*h/);
+      const days = dayMatch ? parseInt(dayMatch[1]) : 0;
+      const hours = hourMatch ? parseInt(hourMatch[1]) : 0;
+      return (days * 24 + hours);
     }
 
-    // Synchronizace času
-    function syncTime() {
-      const gameTimeInput = document.getElementById('initial-game-time').value;
-      const gameTimeRegex = /^(\d+)d\s*(\d{1,2}):(\d{2}):(\d{2})$/;
-      const gameMatch = gameTimeInput.match(gameTimeRegex);
-      if (!gameMatch) {
-        document.getElementById('current-game-time').textContent = 'Chyba: Herní čas ve formátu Xd HH:MM:SS';
-        return;
+    function formatDuration(totalMinutes) {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = Math.round(totalMinutes % 60);
+      return `${hours}h ${minutes}min`;
+    }
+
+    input.addEventListener('input', () => {
+      const text = input.value;
+      const gameHours = parseDuration(text);
+      if (gameHours > 0) {
+        const realMinutes = gameHours * 60 / 4;
+        output.style.opacity = 1;
+        output.innerHTML = `Reálný čas: <strong>${formatDuration(realMinutes)}</strong>`;
+      } else {
+        output.style.opacity = 0;
       }
-
-      const days = parseInt(gameMatch[1]);
-      const hours = parseInt(gameMatch[2]);
-      const minutes = parseInt(gameMatch[3]);
-      const seconds = parseInt(gameMatch[4]);
-      gameTimeBase = new Date(0);
-      gameTimeBase.setUTCDate(days);
-      gameTimeBase.setUTCHours(hours, minutes, seconds);
-      irlTimeBase = new Date(); // Automaticky aktuální IRL čas
-
-      updateGameTime();
-      setInterval(updateGameTime, 1000);
-    }
-
-    // Převod textu na sekundy
-    function parseTimeInput(input) {
-      let totalSeconds = 0;
-      const daysMatch = input.match(/(\d+)d/);
-      const hoursMatch = input.match(/(\d+)h/);
-      const minutesMatch = input.match(/(\d+)m/);
-      if (daysMatch) totalSeconds += parseInt(daysMatch[1]) * 24 * 60 * 60;
-      if (hoursMatch) totalSeconds += parseInt(hoursMatch[1]) * 60 * 60;
-      if (minutesMatch) totalSeconds += parseInt(minutesMatch[1]) * 60;
-      return totalSeconds;
-    }
-
-    // Převod sekund na čitelný formát
-    function formatTime(seconds) {
-      const days = Math.floor(seconds / (24 * 60 * 60));
-      const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-      const mins = Math.floor((seconds % (60 * 60)) / 60);
-      const secs = seconds % 60;
-      let result = [];
-      if (days > 0) result.push(`${days}d`);
-      if (hours > 0) result.push(`${hours}h`);
-      if (mins > 0) result.push(`${mins}m`);
-      if (secs > 0) result.push(`${secs}s`);
-      return result.length > 0 ? result.join(' ') : '0s';
-    }
-
-    // Převod herního času na IRL čas
-    function calculateIRLTime() {
-      const gameTime = document.getElementById('game-time').value;
-      const seconds = parseTimeInput(gameTime);
-      const irlSeconds = seconds / 4; // 4x zrychlení
-      const result = formatTime(Math.round(irlSeconds));
-      document.getElementById('irl-result').textContent = `IRL čas: ${result}`;
-      document.getElementById('alert-section').classList.remove('hidden');
-      window.irlTargetTime = new Date(Date.now() + irlSeconds * 1000);
-    }
-
-    // Převod času dojezdu
-    function calculateArrival() {
-      if (!gameTimeBase || !irlTimeBase) {
-        document.getElementById('arrival-result').textContent = 'Chyba: Nejprve synchronizujte čas!';
-        return;
-      }
-
-      const arrivalTime = document.getElementById('game-arrival').value;
-      const timeRegex = /^(\d+)d\s*(\d{1,2}):(\d{2})$/;
-      const arrivalMatch = arrivalTime.match(timeRegex);
-
-      if (!arrivalMatch) {
-        document.getElementById('arrival-result').textContent = 'Chyba: Zadejte čas ve formátu Xd HH:MM';
-        return;
-      }
-
-      const arrivalDays = parseInt(arrivalMatch[1]);
-      const arrivalHours = parseInt(arrivalMatch[2]);
-      const arrivalMinutes = parseInt(arrivalMatch[3]);
-      const arrivalTimeObj = new Date(0);
-      arrivalTimeObj.setUTCDate(arrivalDays);
-      arrivalTimeObj.setUTCHours(arrivalHours, arrivalMinutes, 0);
-
-      const now = new Date();
-      const elapsedIRLSeconds = (now - irlTimeBase) / 1000;
-      const currentGameTime = new Date(gameTimeBase.getTime() + elapsedIRLSeconds * 4 * 1000);
-      const totalGameSeconds = (arrivalTimeObj - currentGameTime) / 1000;
-      const irlSeconds = totalGameSeconds / 4;
-
-      const irlTime = new Date(Date.now() + irlSeconds * 1000);
-      const hours = String(irlTime.getHours()).padStart(2, '0');
-      const minutes = String(irlTime.getMinutes()).padStart(2, '0');
-      const date = irlTime.toLocaleDateString('cs-CZ');
-      document.getElementById('arrival-result').textContent = `IRL čas dojezdu: ${date} ${hours}:${minutes}, za ${formatTime(Math.round(irlSeconds))}`;
-      document.getElementById('arrival-alert-section').classList.remove('hidden');
-      window.arrivalTargetTime = irlTime;
-    }
-
-    // Nastavení upozornění pro herní čas
-    function setAlert() {
-      if (!("Notification" in window)) {
-        document.getElementById('alert-status').textContent = 'Upozornění nejsou podporována ve vašem prohlížeči.';
-        return;
-      }
-
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          const timeDiff = window.irlTargetTime - Date.now();
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              new Notification('CON:WW3 Upozornění', {
-                body: 'Čas pro váš herní příkaz nastal!'
-              });
-            }, timeDiff);
-            document.getElementById('alert-status').textContent = `Upozornění nastaveno na ${window.irlTargetTime.toLocaleString('cs-CZ')}`;
-          } else {
-            document.getElementById('alert-status').textContent = 'Čas už vypršel!';
-          }
-        } else {
-          document.getElementById('alert-status').textContent = 'Povolení pro upozornění zamítnuto.';
-        }
-      });
-    }
-
-    // Nastavení upozornění pro čas dojezdu
-    function setArrivalAlert() {
-      if (!("Notification" in window)) {
-        document.getElementById('arrival-alert-status').textContent = 'Upozornění nejsou podporována ve vašem prohlížeči.';
-        return;
-      }
-
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          const timeDiff = window.arrivalTargetTime - Date.now();
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              new Notification('CON:WW3 Upozornění', {
-                body: 'Vaše armáda dorazila!'
-              });
-            }, timeDiff);
-            document.getElementById('arrival-alert-status').textContent = `Upozornění nastaveno na ${window.arrivalTargetTime.toLocaleString('cs-CZ')}`;
-          } else {
-            document.getElementById('arrival-alert-status').textContent = 'Čas dojezdu už vypršel!';
-          }
-        } else {
-          document.getElementById('arrival-alert-status').textContent = 'Povolení pro upozornění zamítnuto.';
-        }
-      });
-    }
-
-    // Inicializace
-    syncTime();
+    });
   </script>
 </body>
 </html>
