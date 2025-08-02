@@ -47,8 +47,7 @@
       margin-top: 2rem;
       font-size: 1.5rem;
       opacity: 0;
-      animation: fadeIn 1s ease-in-out forwards;
-      animation-delay: 1s;
+      transition: opacity 0.5s ease-in-out;
     }
 
     @keyframes fadeIn {
@@ -64,7 +63,7 @@
 </head>
 <body>
   <div class="container">
-    <input id="input" class="input-line" type="text" placeholder="Zadej např. 1d 15h" autofocus>
+    <input id="input" class="input-line" type="text" placeholder="Zadej např. 1d 15h nebo 6h 50min" autofocus>
     <div class="result" id="output"></div>
   </div>
 
@@ -75,9 +74,13 @@
     function parseDuration(inputStr) {
       const dayMatch = inputStr.match(/(\d+)\s*d/);
       const hourMatch = inputStr.match(/(\d+)\s*h/);
+      const minMatch = inputStr.match(/(\d+)\s*min/);
+
       const days = dayMatch ? parseInt(dayMatch[1]) : 0;
       const hours = hourMatch ? parseInt(hourMatch[1]) : 0;
-      return (days * 24 + hours);
+      const minutes = minMatch ? parseInt(minMatch[1]) : 0;
+
+      return (days * 24 * 60) + (hours * 60) + minutes;
     }
 
     function formatDuration(totalMinutes) {
@@ -88,13 +91,14 @@
 
     input.addEventListener('input', () => {
       const text = input.value;
-      const gameHours = parseDuration(text);
-      if (gameHours > 0) {
-        const realMinutes = gameHours * 60 / 4;
+      const gameMinutes = parseDuration(text);
+      if (gameMinutes > 0) {
+        const realMinutes = gameMinutes / 4;
         output.style.opacity = 1;
         output.innerHTML = `Reálný čas: <strong>${formatDuration(realMinutes)}</strong>`;
       } else {
         output.style.opacity = 0;
+        output.innerHTML = "";
       }
     });
   </script>
