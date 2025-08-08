@@ -12,27 +12,29 @@
 </header>
 
 <main>
-  <section id="product-management">
-    <h2>Produkty</h2>
+  <section id="product-management" class="card-section">
+    <h2>Správa produktů</h2>
     <form id="product-form">
       <input type="text" id="product-name" placeholder="Název produktu" required />
       <input type="number" id="product-price" placeholder="Cena (Kč)" min="0" step="0.01" required />
+      <input type="url" id="product-photo" placeholder="URL obrázku produktu (volitelné)" />
       <button type="submit">Přidat / Upravit produkt</button>
+      <button type="button" id="cancel-edit" style="display:none;">Zrušit úpravu</button>
     </form>
-    <ul id="product-list"></ul>
+    <div id="product-list" class="product-grid"></div>
   </section>
 
-  <section id="sale-section">
+  <section id="sale-section" class="card-section">
     <h2>Prodej</h2>
-    <div id="sale-products"></div>
+    <div id="sale-products" class="sale-products-list"></div>
     <div id="sale-summary">
       <strong>Celkem: <span id="sale-total">0</span> Kč</strong>
       <button id="complete-sale-btn" disabled>Dokončit prodej</button>
     </div>
   </section>
 
-  <section id="sales-history">
-    <h2>Prodeje</h2>
+  <section id="sales-history" class="card-section">
+    <h2>Historie prodejů</h2>
     <ul id="sales-list"></ul>
   </section>
 </main>
