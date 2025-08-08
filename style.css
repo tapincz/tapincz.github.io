@@ -1,0 +1,148 @@
+/* style.css */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f7fa;
+  color: #333;
+}
+
+header {
+  background: #0057b8;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 2rem;
+}
+
+section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  padding: 1rem;
+}
+
+form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+form input[type="text"],
+form input[type="number"] {
+  flex: 1 1 120px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  background: #0057b8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+form button:hover {
+  background: #004799;
+}
+
+#product-list,
+#sales-list {
+  list-style: none;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: 1px solid #eee;
+}
+
+#product-list li,
+#sales-list li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-item-name {
+  cursor: pointer;
+}
+
+.product-item-price {
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+.sale-product {
+  display: inline-block;
+  margin: 0.25rem;
+  padding: 0.3rem 0.5rem;
+  background: #d0e3ff;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  color: #0057b8;
+  transition: background 0.2s ease;
+}
+
+.sale-product:hover {
+  background: #a4c2ff;
+}
+
+#sale-summary {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#complete-sale-btn {
+  background: #007b00;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#complete-sale-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+#complete-sale-btn:hover:not(:disabled) {
+  background: #005a00;
+}
+
+@media (min-width: 768px) {
+  main {
+    flex-direction: row;
+  }
+  section {
+    flex: 1;
+  }
+}
