@@ -1,419 +1,279 @@
-<!DOCTYPE html>
-<html lang="cs" class="scroll-smooth">
+<!doctype html>
+<html lang="cs">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Underground Shop — Autoservis Písek • Oldřichov</title>
-  <meta name="description" content="Underground Shop je moderní autoservis v Písku (Oldřichov). Diagnostika, pneuservis, brzdy, klimatizace, příprava na STK. Férové ceny a rychlé termíny." />
-  <meta name="theme-color" content="#0ea5e9" />
-  <!-- Open Graph / Social -->
-  <meta property="og:title" content="Underground Shop — Autoservis Písek" />
-  <meta property="og:description" content="Profesionální autoservis: diagnostika, pneuservis, brzdy, klimatizace, STK. Písek • Oldřichov." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80" />
-  <meta property="og:url" content="https://www.vasedomena.cz/" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230ea5e9'/%3E%3Cpath d='M14 40h36l-4-10H18l-4 10z' fill='white'/%3E%3C/svg%3E" />
-
-  <!-- Tailwind v3 (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              200: '#bfdbfe',
-              300: '#93c5fd',
-              400: '#60a5fa',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-            }
-          },
-          boxShadow: {
-            soft: '0 10px 30px rgba(2, 132, 199, .15)'
-          },
-          backdropBlur: { xs: '2px' },
-          keyframes: {
-            fadeUp: { '0%': {opacity:0, transform:'translateY(12px)'}, '100%': {opacity:1, transform:'translateY(0)'} }
-          },
-          animation: { fadeUp: 'fadeUp .7s ease forwards' }
-        }
-      }
-    }
-  </script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D tisk – cenová kalkulačka</title>
   <style>
-    /* jemné sklo efekty + focus ring */
-    .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: rgba(255,255,255,.08); }
-    .dark .glass { background: rgba(255,255,255,.06); }
-    .focus-ring:focus-visible { outline: 3px solid rgb(59 130 246); outline-offset: 2px; border-radius: .75rem; }
+    :root{--bg:#f7f7fb;--card:#ffffff;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--primary:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    .wrap{max-width:1100px;margin:auto;padding:24px}
+    h1{font-size:28px;margin:0 0 16px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:860px){.grid-2{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+    .card-h{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:600}
+    .card-c{padding:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+    input[type=range]{padding:0}
+    .switch{display:flex;align-items:center;gap:8px;margin:8px 0}
+    .pill{border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;display:inline-flex;gap:8px;align-items:center}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+    .stat small{display:block;color:var(--muted)}
+    .stat b{font-size:22px}
+    .btns{display:flex;gap:10px;margin-top:10px}
+    button{appearance:none;border-radius:12px;padding:10px 14px;border:1px solid var(--line);background:#fff;cursor:pointer}
+    button.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .muted{color:var(--muted)}
+    .note{font-size:13px;color:var(--muted)}
+    ul{margin:0;padding-left:18px}
+    .value{font-weight:700}
   </style>
 </head>
-<body class="bg-gradient-to-b from-white via-sky-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-gray-800 dark:text-gray-100 antialiased">
+<body>
+  <div class="wrap">
+    <h1>3D tisk – cenová kalkulačka</h1>
 
-  <!-- Top bar -->
-  <header class="sticky top-0 z-40">
-    <div class="mx-auto max-w-7xl">
-      <div class="m-3 rounded-2xl glass shadow-soft border border-white/20 dark:border-white/10">
-        <div class="px-4 sm:px-6 py-3 flex items-center justify-between">
-          <a href="#" class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-soft">U</span>
-            <span class="font-semibold text-lg tracking-tight">Underground <span class="text-brand-600">Shop</span></span>
-          </a>
-
-          <!-- Desktop nav -->
-          <nav class="hidden md:flex items-center gap-6">
-            <a href="#sluzby" class="hover:text-brand-600">Služby</a>
-            <a href="#cenik" class="hover:text-brand-600">Ceník</a>
-            <a href="#reference" class="hover:text-brand-600">Reference</a>
-            <a href="#faq" class="hover:text-brand-600">FAQ</a>
-            <a href="#kontakt" class="hover:text-brand-600">Kontakt</a>
-            <a href="#adresa" class="hover:text-brand-600">Adresa</a>
-            <a href="tel:+420777123456" class="ml-1 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-white shadow-soft hover:bg-brand-700 transition">
-              <!-- phone icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v2a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.09 4.18 2 2 0 0 1 4.06 2h2a2 2 0 0 1 2 1.72c.12.9.3 1.77.54 2.61a2 2 0 0 1-.45 2.11L7.1 9.1a16 16 0 0 0 6 6l.66-1.06a2 2 0 0 1 2.11-.45c.84.24 1.71.42 2.61.54A2 2 0 0 1 22 16.92z"/></svg>
-              Zavolat
-            </a>
-          </nav>
-
-          <!-- Right actions -->
-          <div class="flex items-center gap-2 md:gap-4">
-            <button id="themeToggle" class="focus-ring rounded-xl p-2 hover:bg-black/5 dark:hover:bg-white/5 transition" aria-label="Přepnout motiv">
-              <!-- sun/moon toggled via JS -->
-              <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:inline" viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.42 1.41 1.79 1.8 1.43-1.42zm10.48 0l1.8-1.79 1.41 1.41-1.79 1.8-1.42-1.42zM12 4V1h-0v3h0zm0 19v-3h0v3h0zM4 12H1v0h3v0zm19 0h-3v0h3v0zM6.76 19.16l-1.43 1.42-1.79-1.8 1.42-1.41 1.8 1.79zM19.16 17.24l1.42 1.41-1.79 1.8-1.41-1.42 1.78-1.79zM12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
-              <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
-            </button>
-            <button id="menuBtn" class="md:hidden focus-ring rounded-xl p-2 hover:bg-black/5 dark:hover:bg-white/5 transition" aria-label="Otevřít menu">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
+    <div class="card">
+      <div class="card-h">Vstupy</div>
+      <div class="card-c grid grid-2">
+        <div class="grid" style="gap:12px">
+          <div>
+            <label for="pricePerKg">Cena filamentu (Kč/kg)</label>
+            <input id="pricePerKg" type="number" step="0.01" value="274.5" />
           </div>
-        </div>
 
-        <!-- Mobile nav -->
-        <nav id="mobileNav" class="hidden md:hidden px-4 pb-4">
-          <div class="grid gap-2 text-sm">
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#sluzby">Služby</a>
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#cenik">Ceník</a>
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#reference">Reference</a>
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#faq">FAQ</a>
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#kontakt">Kontakt</a>
-            <a class="block rounded-xl px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5" href="#adresa">Adresa</a>
-            <a class="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-white shadow-soft hover:bg-brand-700 transition" href="tel:+420777123456">Zavolat</a>
-          </div>
-        </nav>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="relative">
-    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-600/20 via-transparent to-transparent dark:from-brand-600/25"></div>
-    <div class="mx-auto max-w-7xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
-      <div class="grid lg:grid-cols-2 gap-10 items-center">
-        <div class="animate-fadeUp opacity-0">
-          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            Autoservis <span class="text-brand-600">Underground Shop</span>
-          </h1>
-          <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
-            Písek • Oldřichov — kompletní servis vozidel: diagnostika, mechanické opravy, pneuservis, klimatizace, příprava na STK. Rychlé termíny a férové ceny.
-          </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <a href="#cenik" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700 transition">
-              Zobrazit ceník
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-            <a href="#kontakt" class="inline-flex items-center gap-2 rounded-xl border border-brand-600/40 px-5 py-3 hover:bg-brand-50 dark:hover:bg-white/5 transition">
-              Objednat termín
-            </a>
-          </div>
-          <ul class="mt-6 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <li class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Expresní servis</li>
-            <li class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>Záruka na práci</li>
-            <li class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span>Originální díly</li>
-          </ul>
-        </div>
-
-        <div class="relative animate-fadeUp opacity-0 [animation-delay:150ms]">
-          <div class="rounded-3xl overflow-hidden shadow-soft ring-1 ring-black/5 dark:ring-white/10">
-            <img src="https://images.unsplash.com/photo-1515923162061-3d9d16d6b7c5?auto=format&fit=crop&w=1600&q=80" alt="Autoservis – dílna" class="w-full h-[380px] object-cover">
-          </div>
-          <div class="absolute -bottom-6 -left-6 hidden sm:block">
-            <div class="glass rounded-2xl p-4 shadow-soft border border-white/20 dark:border-white/10">
-              <p class="text-sm text-gray-200">Průměrné hodnocení</p>
-              <p class="text-xl font-semibold text-white">4.9/5 ★</p>
+          <div class="row">
+            <div>
+              <label for="timeH">Doba tisku – hodiny</label>
+              <input id="timeH" type="number" step="1" value="0" />
+            </div>
+            <div>
+              <label for="timeM">Doba tisku – minuty</label>
+              <input id="timeM" type="number" step="1" value="0" />
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Služby (cards) -->
-  <section id="sluzby" class="py-14">
-    <div class="mx-auto max-w-7xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight text-center mb-10">Naše služby</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Card -->
-        <article class="group rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-xl transition will-change-transform">
-          <div class="h-12 w-12 rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300 flex items-center justify-center mb-4">
-            <!-- wrench icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M14.7 6.3A5 5 0 019 12l-7 7 3 3 7-7a5 5 0 105.7-8.7z"/></svg>
+          <div class="switch">
+            <input type="checkbox" id="useMeters" />
+            <label for="useMeters" style="margin:0">Zadat délku (m) místo hmotnosti (g)</label>
           </div>
-          <h3 class="font-semibold text-lg mb-1">Mechanické opravy</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Brzdy, spojky, tlumiče, výfuky, rozvody. Kvalitně a se zárukou.</p>
-        </article>
 
-        <article class="group rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-xl transition">
-          <div class="h-12 w-12 rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300 flex items-center justify-center mb-4">
-            <!-- tire icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke-width="1.8"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div id="gramsWrap">
+            <label for="grams">Spotřeba materiálu (g)</label>
+            <input id="grams" type="number" step="0.01" value="0" />
           </div>
-          <h3 class="font-semibold text-lg mb-1">Pneuservis</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Přezutí, vyvažování, opravy defektů, sezónní uskladnění.</p>
-        </article>
 
-        <article class="group rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-xl transition">
-          <div class="h-12 w-12 rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300 flex items-center justify-center mb-4">
-            <!-- diagnostic icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2" stroke-width="1.8"/><path d="M7 11l3 3 3-6 4 7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div id="metersWrap" style="display:none">
+            <div style="margin-bottom:8px">
+              <label for="meters">Délka filamentu (m)</label>
+              <input id="meters" type="number" step="0.01" value="0" />
+            </div>
+            <div class="row">
+              <div>
+                <label for="diameter">Průměr filamentu</label>
+                <select id="diameter">
+                  <option value="1.75" selected>1.75 mm</option>
+                  <option value="2.85">2.85 mm</option>
+                </select>
+              </div>
+              <div>
+                <label for="density">Hustota materiálu</label>
+                <select id="density">
+                  <option value="1.24" selected>PLA (1,24 g/cm³)</option>
+                  <option value="1.05">PETG (1,05 g/cm³)</option>
+                  <option value="1.20">ABS/ASA (1,20 g/cm³)</option>
+                  <option value="1.00">Vlastní (1,00 g/cm³)</option>
+                </select>
+              </div>
+            </div>
+            <div class="note">Vypočtená hmotnost: <span id="gramsFromMeters" class="value">0</span> g</div>
           </div>
-          <h3 class="font-semibold text-lg mb-1">Diagnostika</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Moderní diagnostika všech značek, čtení a mazání chyb.</p>
-        </article>
+        </div>
 
-        <article class="group rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-xl transition">
-          <div class="h-12 w-12 rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-300 flex items-center justify-center mb-4">
-            <!-- snowflake icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M4 7l16 10M4 17L20 7" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="grid" style="gap:12px">
+          <div class="row">
+            <div>
+              <label for="powerW">Výkon tiskárny (W)</label>
+              <input id="powerW" type="number" step="1" value="100" />
+            </div>
+            <div>
+              <label for="kwhPrice">Cena elektřiny (Kč/kWh)</label>
+              <input id="kwhPrice" type="number" step="0.01" value="5" />
+            </div>
           </div>
-          <h3 class="font-semibold text-lg mb-1">Klimatizace</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Plnění, dezinfekce, tlakové zkoušky a opravy okruhu.</p>
-        </article>
-      </div>
-    </div>
-  </section>
 
-  <!-- Ceník (moderní tab/panel) -->
-  <section id="cenik" class="py-14 bg-gradient-to-b from-white to-sky-50 dark:from-gray-950 dark:to-gray-900">
-    <div class="mx-auto max-w-7xl px-6">
-      <div class="flex items-end justify-between gap-6 mb-8">
-        <h2 class="text-3xl font-bold tracking-tight">Ceník služeb</h2>
-        <span class="text-sm text-gray-500 dark:text-gray-400">Ceny jsou orientační, bez materiálu.</span>
-      </div>
-      <div class="grid lg:grid-cols-3 gap-6">
-        <!-- položky -->
-        <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <h3 class="font-semibold text-brand-700 dark:text-brand-300 mb-3">Základní servis</h3>
-          <ul class="space-y-3 text-sm">
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Výměna oleje</span><span class="font-semibold">od 800 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Diagnostika</span><span class="font-semibold">od 500 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Výměna brzd (pár)</span><span class="font-semibold">od 1 500 Kč</span></li>
-          </ul>
-        </div>
-        <div class="rounded-2xl bg-white dark:bg-gray-900 border-2 border-brand-500/30 p-6 shadow-soft relative">
-          <div class="absolute -top-3 right-4 text-[11px] uppercase tracking-wider bg-brand-600 text-white px-2 py-1 rounded-md shadow">Nejčastěji</div>
-          <h3 class="font-semibold text-brand-700 dark:text-brand-300 mb-3">Pneuservis</h3>
-          <ul class="space-y-3 text-sm">
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Přezutí (4 ks)</span><span class="font-semibold">od 600 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Vyvážení (4 ks)</span><span class="font-semibold">od 300 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Oprava defektu</span><span class="font-semibold">od 250 Kč</span></li>
-          </ul>
-        </div>
-        <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <h3 class="font-semibold text-brand-700 dark:text-brand-300 mb-3">Klimatizace & STK</h3>
-          <ul class="space-y-3 text-sm">
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Plnění klimatizace</span><span class="font-semibold">od 1 200 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Dezinfekce A/C</span><span class="font-semibold">od 450 Kč</span></li>
-            <li class="flex justify-between border-b border-gray-100 dark:border-white/10 pb-2"><span>Příprava na STK</span><span class="font-semibold">od 2 000 Kč</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Reference -->
-  <section id="reference" class="py-14">
-    <div class="mx-auto max-w-7xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight text-center mb-10">Co říkají zákazníci</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <figure class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <blockquote class="text-gray-700 dark:text-gray-300 italic">„Rychlá domluva a skvělá práce. Auto hotové ještě ten den.“</blockquote>
-          <figcaption class="mt-4 font-semibold text-brand-700 dark:text-brand-300">Jan K.</figcaption>
-        </figure>
-        <figure class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <blockquote class="text-gray-700 dark:text-gray-300 italic">„Přezutí i vyvážení bez čekání, příjemné ceny a ochotní mechanici.“</blockquote>
-          <figcaption class="mt-4 font-semibold text-brand-700 dark:text-brand-300">Petra L.</figcaption>
-        </figure>
-        <figure class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <blockquote class="text-gray-700 dark:text-gray-300 italic">„Profesionální diagnostika, vyřešili problém, se kterým si jinde nevěděli rady.“</blockquote>
-          <figcaption class="mt-4 font-semibold text-brand-700 dark:text-brand-300">Martin R.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq" class="py-14 bg-sky-50/60 dark:bg-gray-900/40">
-    <div class="mx-auto max-w-4xl px-6">
-      <h2 class="text-3xl font-bold tracking-tight text-center mb-8">Časté dotazy</h2>
-      <div class="space-y-3">
-        <details class="group rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-5">
-          <summary class="cursor-pointer list-none font-semibold flex items-center justify-between">
-            Jak rychle se mohu objednat?
-            <span class="transition group-open:rotate-180 text-gray-500">⌄</span>
-          </summary>
-          <p class="mt-3 text-gray-600 dark:text-gray-300">Obvykle do 24–48 hodin. V urgentních případech nabízíme expresní servis.</p>
-        </details>
-        <details class="group rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-5">
-          <summary class="cursor-pointer list-none font-semibold flex items-center justify-between">
-            Používáte originální díly?
-            <span class="transition group-open:rotate-180 text-gray-500">⌄</span>
-          </summary>
-          <p class="mt-3 text-gray-600 dark:text-gray-300">Ano, nebo kvalitní OEM dle dohody a rozpočtu zákazníka.</p>
-        </details>
-        <details class="group rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-5">
-          <summary class="cursor-pointer list-none font-semibold flex items-center justify-between">
-            Poskytujete záruku?
-            <span class="transition group-open:rotate-180 text-gray-500">⌄</span>
-          </summary>
-          <p class="mt-3 text-gray-600 dark:text-gray-300">Na práci standardně 12 měsíců, na díly dle výrobce.</p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- Kontakt -->
-  <section id="kontakt" class="py-14">
-    <div class="mx-auto max-w-7xl px-6">
-      <div class="grid lg:grid-cols-2 gap-8">
-        <div class="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/10 p-6 shadow-soft">
-          <h2 class="text-3xl font-bold tracking-tight mb-3">Kontakt</h2>
-          <p class="text-gray-600 dark:text-gray-300">Telefon: <a href="tel:+420777123456" class="text-brand-700 dark:text-brand-300 font-semibold">+420 777 123 456</a></p>
-          <p class="text-gray-600 dark:text-gray-300">E-mail: <a href="mailto:info@undergroundshop.cz" class="text-brand-700 dark:text-brand-300 font-semibold">info@undergroundshop.cz</a></p>
-          <p class="text-gray-600 dark:text-gray-300">Provozní doba: <span class="font-medium">Po–Pá 8:00–17:00, So 9:00–13:00</span></p>
-
-          <form class="mt-6 grid gap-3" onsubmit="event.preventDefault(); window.location.href='mailto:info@undergroundshop.cz?subject=Poptávka%20servisu&body=' + encodeURIComponent(document.getElementById('msg').value);">
-            <label class="text-sm" for="msg">Krátká zpráva</label>
-            <textarea id="msg" rows="4" class="rounded-xl border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-gray-800/60 px-4 py-3 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Napište, s čím potřebujete pomoct…"></textarea>
-            <button class="justify-self-start inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700 transition">
-              Odeslat e-mailem
-            </button>
-          </form>
-        </div>
-
-        <!-- Adresa + mapa -->
-        <div id="adresa" class="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/10 shadow-soft">
-          <div class="p-6 bg-white dark:bg-gray-900">
-            <h3 class="font-semibold text-lg">Adresa</h3>
-            <p class="text-gray-600 dark:text-gray-300">Underground Shop — Autoservis</p>
-            <p class="text-gray-600 dark:text-gray-300">Oldřichov, 397 01 Písek</p>
+          <div class="row">
+            <div>
+              <label for="machineRate">Strojní čas (Kč/h)</label>
+              <input id="machineRate" type="number" step="0.5" value="20" />
+            </div>
+            <div>
+              <label for="setupFee">Paušál obsluhy (Kč)</label>
+              <input id="setupFee" type="number" step="1" value="15" />
+            </div>
           </div>
-          <iframe class="w-full h-72"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2248.889028138035!2d14.147!3d49.308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDnCsDE4JzI4LjgiTiAxNMKwMDgnNDkuNSJF!5e0!3m2!1scs!2scz!4v1632920000000!5m2!1scs!2scz"
-            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+          <div>
+            <label for="margin">Marže: <span id="marginVal" class="value">50</span>%</label>
+            <input id="margin" type="range" min="0" max="200" step="1" value="50" />
+          </div>
+
+          <div class="btns">
+            <button id="reset">Reset</button>
+            <button id="fillDemo" class="primary" title="Vyplnit ukázková data">Demo</button>
+          </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- CTA pás -->
-  <section class="py-10">
-    <div class="mx-auto max-w-7xl px-6">
-      <div class="rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-soft">
-        <div>
-          <h3 class="text-2xl font-semibold">Potřebujete rychlý termín?</h3>
-          <p class="text-white/90">Zavolejte a domluvte se ještě dnes. Poradíme, naceníme, opravíme.</p>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-h">Výsledky</div>
+        <div class="card-c grid" style="gap:12px">
+          <div class="pill">
+            Čas: <span id="hours" class="value">0</span> h • Hmotnost: <span id="totalGrams" class="value">0</span> g • El.: <span id="electricityKwh" class="value">0</span> kWh
+          </div>
+          <div class="stats">
+            <div class="stat"><small>Materiál</small><b id="materialCost">0 Kč</b></div>
+            <div class="stat"><small>Elektřina</small><b id="electricityCost">0 Kč</b></div>
+            <div class="stat"><small>Přímý náklad</small><b id="directCost">0 Kč</b></div>
+            <div class="stat"><small>Podnikový náklad</small><b id="businessCost">0 Kč</b></div>
+          </div>
         </div>
-        <a href="tel:+420777123456" class="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 hover:bg-white/20 transition">
-          +420 777 123 456
-        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-h">Prodejní cena</div>
+        <div class="card-c grid" style="gap:12px">
+          <div class="stat"><small>Doporučená cena (s marží)</small><b id="priceWithMargin" style="font-size:28px">0 Kč</b></div>
+          <div class="stats">
+            <div class="stat"><small>+30 %</small><b id="p30">0 Kč</b></div>
+            <div class="stat"><small>+50 %</small><b id="p50">0 Kč</b></div>
+            <div class="stat"><small>+100 %</small><b id="p100">0 Kč</b></div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Patička -->
-  <footer class="py-10">
-    <div class="mx-auto max-w-7xl px-6 text-sm text-gray-500 dark:text-gray-400">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <p>© 2025 Underground Shop — Autoservis. Všechna práva vyhrazena.</p>
-        <p>IČ: 12345678 • Nezávazné cenové nabídky • GDPR respektujeme</p>
+    <div class="card" style="margin-top:16px">
+      <div class="card-h">Jak se počítá</div>
+      <div class="card-c">
+        <ul class="note">
+          <li>Materiál = (Cena/kg ÷ 1000) × hmotnost(g)</li>
+          <li>Hmotnost z délky = π·(d/2)^2 × 100 × hustota (g/cm³) × délka(m) (s převody na cm)</li>
+          <li>Elektřina = (Výkon W ÷ 1000) × čas(h) × cena (Kč/kWh)</li>
+          <li>Přímý náklad = Materiál + Elektřina</li>
+          <li>Podnikový náklad = Přímý náklad + (Strojní čas × hodiny) + Paušál</li>
+          <li>Prodejní cena = Podnikový náklad × (1 + marže)</li>
+        </ul>
       </div>
     </div>
-  </footer>
+  </div>
 
-  <!-- JSON-LD: LocalBusiness -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"AutoRepair",
-    "name":"Underground Shop — Autoservis",
-    "address":{
-      "@type":"PostalAddress",
-      "addressLocality":"Písek",
-      "addressRegion":"Jihočeský kraj",
-      "streetAddress":"Oldřichov",
-      "postalCode":"397 01",
-      "addressCountry":"CZ"
-    },
-    "telephone":"+420777123456",
-    "email":"info@undergroundshop.cz",
-    "url":"https://www.vasedomena.cz/",
-    "openingHours":"Mo-Fr 08:00-17:00 Sa 09:00-13:00",
-    "image":"https://images.unsplash.com/photo-1515923162061-3d9d16d6b7c5?auto=format&fit=crop&w=1600&q=80",
-    "priceRange":"$$"
-  }
-  </script>
-
-  <!-- Skripty: menu, dark mode, animace on-scroll -->
   <script>
-    // Dark mode toggle (persist do localStorage)
-    const root = document.documentElement;
-    const themeBtn = document.getElementById('themeToggle');
-    const mobileNav = document.getElementById('mobileNav');
-    const menuBtn = document.getElementById('menuBtn');
+    const $ = (id) => document.getElementById(id);
+    const nfmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
+    const kfmt = (n) => `${nfmt.format(isFinite(n) ? n : 0)} Kč`;
 
-    const applyTheme = (mode) => {
-      if (mode === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
-      localStorage.setItem('theme', mode);
-    };
-    // init theme
-    (function(){
-      const saved = localStorage.getItem('theme');
-      if (saved) applyTheme(saved);
-      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
-    })();
+    function metersToGrams(meters, diameterMm, densityGcm3){
+      const r_cm = (diameterMm/2)/10; // mm -> cm
+      const area_cm2 = Math.PI * r_cm * r_cm;
+      const length_cm = meters * 100;
+      const volume_cm3 = area_cm2 * length_cm;
+      return volume_cm3 * densityGcm3; // g
+    }
 
-    themeBtn?.addEventListener('click', () => {
-      const isDark = root.classList.contains('dark');
-      applyTheme(isDark ? 'light' : 'dark');
+    function val(id){
+      const el = $(id);
+      const v = parseFloat(el.value);
+      return isFinite(v) ? v : 0;
+    }
+
+    function compute(){
+      const pricePerKg = val('pricePerKg');
+      const timeH = val('timeH');
+      const timeM = val('timeM');
+      const useMeters = $('useMeters').checked;
+      const grams = val('grams');
+      const meters = val('meters');
+      const diameter = val('diameter');
+      const density = val('density');
+      const powerW = val('powerW');
+      const kwhPrice = val('kwhPrice');
+      const machineRate = val('machineRate');
+      const setupFee = val('setupFee');
+      const marginPct = val('margin');
+
+      const hours = timeH + timeM/60;
+      const gramsFromMeters = useMeters ? metersToGrams(meters, diameter, density) : 0;
+      const totalGrams = useMeters ? gramsFromMeters : grams;
+
+      const materialCost = (pricePerKg/1000) * totalGrams;
+      const electricityKwh = (powerW/1000) * hours;
+      const electricityCost = electricityKwh * kwhPrice;
+      const directCost = materialCost + electricityCost;
+      const businessCost = directCost + machineRate * hours + setupFee;
+      const priceWithMargin = businessCost * (1 + marginPct/100);
+
+      $('hours').textContent = nfmt.format(hours);
+      $('gramsFromMeters').textContent = nfmt.format(gramsFromMeters);
+      $('totalGrams').textContent = nfmt.format(totalGrams);
+      $('electricityKwh').textContent = nfmt.format(electricityKwh);
+
+      $('materialCost').textContent = kfmt(materialCost);
+      $('electricityCost').textContent = kfmt(electricityCost);
+      $('directCost').textContent = kfmt(directCost);
+      $('businessCost').textContent = kfmt(businessCost);
+      $('priceWithMargin').textContent = kfmt(priceWithMargin);
+      $('p30').textContent = kfmt(businessCost * 1.30);
+      $('p50').textContent = kfmt(businessCost * 1.50);
+      $('p100').textContent = kfmt(businessCost * 2.00);
+
+      $('marginVal').textContent = nfmt.format(marginPct);
+    }
+
+    function toggleMode(){
+      const on = $('useMeters').checked;
+      $('gramsWrap').style.display = on ? 'none' : 'block';
+      $('metersWrap').style.display = on ? 'block' : 'none';
+      compute();
+    }
+
+    // wire events
+    ['pricePerKg','timeH','timeM','grams','meters','diameter','density','powerW','kwhPrice','machineRate','setupFee','margin']
+      .forEach(id => $(id).addEventListener('input', compute));
+    $('useMeters').addEventListener('change', toggleMode);
+
+    $('reset').addEventListener('click', () => {
+      ['pricePerKg','timeH','timeM','grams','meters','powerW','kwhPrice','machineRate','setupFee','margin']
+        .forEach((id,i) => {
+          const el = $(id);
+          const defaults = {pricePerKg:274.5,timeH:0,timeM:0,grams:0,meters:0,powerW:100,kwhPrice:5,machineRate:20,setupFee:15,margin:50};
+          el.value = defaults[id];
+        });
+      $('diameter').value = '1.75';
+      $('density').value = '1.24';
+      $('useMeters').checked = false;
+      toggleMode();
     });
 
-    // mobile nav
-    menuBtn?.addEventListener('click', () => {
-      mobileNav.classList.toggle('hidden');
+    $('fillDemo').addEventListener('click', () => {
+      $('pricePerKg').value = 274.5;
+      $('timeH').value = 2; $('timeM').value = 15;
+      $('grams').value = 17.26;
+      $('useMeters').checked = false;
+      $('powerW').value = 100; $('kwhPrice').value = 5;
+      $('machineRate').value = 20; $('setupFee').value = 15; $('margin').value = 50;
+      toggleMode();
     });
 
-    // on-scroll animace (fadeUp) pomocí IntersectionObserver
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('animate-fadeUp');
-          e.target.style.opacity = 1;
-          io.unobserve(e.target);
-        }
-      })
-    }, { threshold: 0.12 });
-
-    document.querySelectorAll('.animate-fadeUp').forEach(el => {
-      el.style.opacity = 0;
-      io.observe(el);
-    });
+    // initial render
+    compute();
   </script>
 </body>
 </html>
